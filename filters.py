@@ -2,14 +2,10 @@ import numpy as np
 
 
 def lowpass(data, n = 101):
-    """Average array over n data points.
-    N must be odd.
+    """Averages over n data points.
     """
-
-    if(n % 2 != 1):
-        raise Exception("n must be odd!")
-    n -= 1
-    return(np.array([np.mean(data[i : i + n + 1]) for i in range(data.size - n)]))
+    
+    return(np.array([np.mean(data[i : i + n]) for i in range(data.size - n + 1)]))
 
 
 def highpass(data, n = 101):
@@ -20,4 +16,4 @@ def highpass(data, n = 101):
     
     if(n % 2 != 1):
         raise Exception("n must be odd!")
-    return(np.array(data[int(n/2) : -int(n/2)] - lowpass(data, n)))
+    return(np.array(data[int((n - 1) / 2) : -int((n - 1) / 2)] - lowpass(data, n)))
