@@ -1,0 +1,102 @@
+# custom matplotlib stylesheet
+# based on seaborn aesthetic
+# darkgrid + deep palette + notebook context
+# colour palette: tableau-colorblind10
+
+axes.axisbelow: True
+axes.edgecolor: 07A8FF #MAIN COLOR
+axes.facecolor: white
+axes.grid: True
+axes.labelcolor: .15
+axes.labelsize: 13
+axes.labelpad: 8.0
+#axes.linewidth: 1
+#axes.prop_cycle: cycler('color', ['4C72B0', '55A868', 'C44E52', '8172B2', 'CCB974', '64B5CD'])
+axes.prop_cycle: cycler('color', ['006BA4', 'FF800E', 'ABABAB', '595959', '5F9ED1', 'C85200', '898989', 'A2C8EC', 'FFBC79', 'CFCFCF'])
+axes.titlesize: 15
+axes.titlepad: 12.0
+axes.titlelocation: left
+
+axes.spines.left: True
+axes.spines.right: False
+axes.spines.top: False
+axes.spines.bottom: True
+
+figure.facecolor: white
+figure.figsize: 8.0, 5.5
+figure.titlesize: 16
+
+font.family: sans-serif
+font.sans-serif: Arial, Liberation Sans, DejaVu Sans, Bitstream Vera Sans, sans-serif
+
+grid.color: A9DFFC #MAIN COLOR LIGHT
+grid.linestyle: -
+grid.linewidth: 1
+
+image.cmap: Greys
+
+legend.fontsize: 10
+legend.numpoints: 1
+legend.scatterpoints: 1
+legend.frameon: True
+legend.framealpha: 0.9
+legend.facecolor: w
+legend.edgecolor: 07A8FF #MAIN COLOR
+legend.fancybox: True
+
+lines.linewidth: 1.75
+lines.marker: o
+#lines.marker: cycler('marker', ['x', 'o', 'O', '+'])
+#lines.markeredgewidth: 0
+#lines.markersize: 7
+#lines.solid_capstyle: round
+
+#patch.facecolor: 4C72B0
+patch.facecolor: A9DFFC #MAIN COLOR LIGHT
+patch.linewidth: .3
+
+text.color: .15
+
+#xtick.color: .15
+#xtick.direction: out
+#xtick.labelsize: 10
+#xtick.major.pad: 7
+#xtick.major.size: 0
+#xtick.major.width: 1
+#xtick.minor.size: 0
+#xtick.minor.width: .5
+
+#ytick.color: .15
+#ytick.direction: out
+#ytick.labelsize: 10
+#ytick.major.pad: 7
+#ytick.major.size: 0
+#ytick.major.width: 1
+#ytick.minor.size: 0
+#ytick.minor.width: .5
+
+xtick.color: 07A8FF #MAIN COLOR
+xtick.labelcolor: k
+xtick.direction: out
+xtick.labelsize: 10
+xtick.major.pad: 7
+xtick.major.size: 6
+xtick.major.width: 1
+xtick.minor.size: 2
+xtick.minor.width: 1
+xtick.minor.visible: True
+
+ytick.color: 07A8FF #MAIN COLOR
+ytick.labelcolor: k
+ytick.direction: out
+ytick.labelsize: 10
+ytick.major.pad: 7
+ytick.major.size: 6
+ytick.major.width: 1
+ytick.minor.size: 2
+ytick.minor.width: 1
+ytick.minor.visible: True
+
+date.autoformatter.year:        %Y
+date.autoformatter.month:       %m.%Y
+date.autoformatter.day:         %d.%m.%Y
