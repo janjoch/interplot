@@ -1,4 +1,4 @@
-def _parse_datetime(self, time_str, drop_ms=True):
+def parse_datetime(self, time_str, drop_ms=True):
     """
     Parse timestamps.
 
