@@ -1,26 +1,26 @@
-import datetime
-import re
+def _parse_datetime(self, time_str, drop_ms=True):
+    """
+    Parse timestamps.
 
-
-def parse_datetime(timestr):
-    match = re.search(
-        r'^([0-9]{4})'
-        r'-([0-9]{2})'
-        r'-([0-9]{2})'
-        r'T([0-9]{2})'
-        r':([0-9]{2})'
-        r':([0-9]{2})'
-        r'\.([0-9]{3})$',
-        timestr,
+    Input Format: 2022-07-12T13:42:15.622628
+    Output Format datetime.datetime
+    """
+    match = re.match(
+        r'^\s*([0-9]+)'
+        r'-([0-9]+)'
+        r'-([0-9]+)'
+        r'T([0-9]+)'
+        r':([0-9]+)'
+        r':([0-9]+)'
+        r'\.([0-9]+)\s*$',
+        time_str,
     )
+    ints = np.zeros(7,dtype=np.int64)
     if(match):
-        timelist = [
-            int(match_strs)
-            for match_strs
-            in match.group(*range(1, 8))
-        ]
-        timelist[6] = timelist[6] * 1000
-        parsed = datetime.datetime(*timelist)
-        return(parsed)
+        for i in range(7):
+            ints[i] = int(match[i+1])
     else:
-        raise Exception("cannot parse " + str(timestr))
+        raise Exception("nothing found in "+time_str)
+    if(drop_ms):
+        ints[6] = 0
+    return dt.datetime(*ints)
