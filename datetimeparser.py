@@ -17,6 +17,9 @@ datetime.datetime(2023, 2, 1, 18, 40, 59, 123456)
 
 >>> dtp.dmy("1.2.23 18:40:59.123", microsecond_shift=3)
 datetime.datetime(2023, 2, 1, 18, 40, 59, 123000)
+
+>>>dtp.ymd("Recording started on 2023-12-31 11:30:59.123456 in Zurich")
+datetime.datetime(2023, 12, 31, 11, 30, 59, 123456)
 ```
 """
 
