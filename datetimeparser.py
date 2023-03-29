@@ -28,6 +28,14 @@ import re
 
 import numpy as np
 
+class DateTimeParsingError(Exception):
+
+    def __init__(self, value): 
+        self.value = value
+
+    def __str__(self): 
+        return "Error: %s" % self.value
+
 def generic(
     time_str,
     pattern,
@@ -80,7 +88,12 @@ def generic(
     if(match):
         ints = np.array(match.groups(default=0), dtype=int)
     else:
-        return False
+        raise DateTimeParsingError(
+            (
+                "No timestamp found.\n\ntime_str:\n{}"
+                "\n\npattern:\n{}"
+            ).format(time_str, pattern)
+        )
     if(order is None):
         for s in swap:
             ints[s[0]], ints[s[1]] = ints[s[1]], ints[s[0]]
