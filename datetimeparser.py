@@ -116,7 +116,7 @@ def ymd(
     time_str,
     start=r".*?",
     end=r".*",
-    space=r"[\s_]",
+    space=r"[\sTt_]",
     date_delimiter=r"[-.]",
     time_delimiter=r"[:.-]",
     microsecond_shift=None,
