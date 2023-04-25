@@ -1,7 +1,7 @@
 # toolbox
 Janosch's small Python code snippets making life a bit easier.
 
-## Import
+## Install
 ```pip install git+https://github.com/janjoch/toolbox#egg=toolbox```
 
 ## Licence
