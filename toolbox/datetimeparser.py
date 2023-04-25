@@ -7,7 +7,7 @@ Source: https://github.com/janjoch/toolbox
 Examples:
     
 ```
->>>import toolbox.datetimeparser as dtp
+>>> import toolbox.datetimeparser as dtp
 
 >>> dtp.dmy("31.12.2023")
 datetime.datetime(2023, 12, 31, 0, 0)
@@ -18,7 +18,7 @@ datetime.datetime(2023, 2, 1, 18, 40, 59, 123456)
 >>> dtp.dmy("1.2.23 18:40:59.123", microsecond_shift=3)
 datetime.datetime(2023, 2, 1, 18, 40, 59, 123000)
 
->>>dtp.ymd("Recording started on 2023-12-31 11:30:59.123456 in Zurich")
+>>> dtp.ymd("Recording started on 2023-12-31 11:30:59.123456 in Zurich")
 datetime.datetime(2023, 12, 31, 11, 30, 59, 123456)
 ```
 """
@@ -28,6 +28,10 @@ import re
 
 import numpy as np
 
+
+AUTO_YEAR_COMPLETE = 2000
+
+
 class DateTimeParsingError(Exception):
 
     def __init__(self, value): 
@@ -35,6 +39,7 @@ class DateTimeParsingError(Exception):
 
     def __str__(self): 
         return "Error: %s" % self.value
+
 
 def generic(
     time_str,
@@ -44,7 +49,7 @@ def generic(
     start=(),
     end=(),
     microsecond_shift=None,
-    auto_year_complete=2000,
+    auto_year_complete=None,
     tzinfo=None,
 ):
     """
@@ -77,6 +82,8 @@ def generic(
         Example: To convert ms to us, use microseconds_shift=3.
     auto_year_complete: int, optional
         If the parsed year is below 100, add a number of years.
+        Default 2000.
+        Provide 0 to deactivate.
     tzinfo: datetime.tzinfo, optional
         Pass time zone information to datetime.datetime
 
@@ -84,6 +91,7 @@ def generic(
     -------
     datetime.datetime if the pattern was able to match
     """
+    auto_year_complete = auto_year_complete if auto_year_complete is not None else AUTO_YEAR_COMPLETE
     match = re.match(pattern, time_str)
     if(match):
         ints = np.array(match.groups(default=0), dtype=int)
@@ -120,7 +128,7 @@ def ymd(
     date_delimiter=r"[-.]",
     time_delimiter=r"[:.-]",
     microsecond_shift=None,
-    auto_year_complete=2000,
+    auto_year_complete=None,
 ):
     r"""
     Parse timestamps to datetime.datetime.
@@ -184,7 +192,7 @@ def dmy(
     date_delimiter=r"[-.]",
     time_delimiter=r"[:.-]",
     microsecond_shift=None,
-    auto_year_complete=2000,
+    auto_year_complete=None,
 ):
     r"""
     Parse timestamps to datetime.datetime.
@@ -250,7 +258,7 @@ def mdy(
     date_delimiter=r"[-./]",
     time_delimiter=r"[:./-]",
     microsecond_shift=None,
-    auto_year_complete=2000,
+    auto_year_complete=None,
 ):
     r"""
     Parse timestamps to datetime.datetime.

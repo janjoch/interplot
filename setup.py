@@ -6,7 +6,6 @@ with open("requirements.txt", "r", encoding="utf-8") as f:
 setup(
     name='toolbox',
     version='0.2.0',
-    #package_dir="src",
     description="Janosch's small Python code snippets making life a bit easier",
     url='https://github.com/janjoch/toolbox',
     author='Janosch Jörg',
