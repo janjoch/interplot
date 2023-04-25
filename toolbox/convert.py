@@ -1,7 +1,9 @@
+import math
+
 class Convert:
 
     def __init__(self):
-         """Convert A to B."""
+        """Convert A to B."""
         pass
 
     @staticmethod

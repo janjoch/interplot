@@ -1,4 +1,8 @@
-from . import Convert
+import math
+
+import numpy as np
+
+from .convert import Convert
 
 class Accel:
     """Simulate acceleration behaviour of a stepper motor."""

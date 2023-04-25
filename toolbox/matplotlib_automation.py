@@ -1,9 +1,11 @@
+import os
+
 import matplotlib.pyplot as plt
 
 
 class GenericClass():
 
-  def _generate_plot_prepare(self, plotFormat={}):
+    def _generate_plot_prepare(self, plotFormat={}):
         """
         sets display options for plots
         """

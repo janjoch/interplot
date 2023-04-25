@@ -1,8 +1,27 @@
+"""
+Work with 1D arrays.
+"""
+
+
+import math
+
 import numpy as np
 
 
 def lowpass(data, n = 101):
-    """Averages over n data points.
+    """
+    Average symetrically over n data points.
+
+    Parameters
+    ----------
+    data: array-like
+        List or array to filter.
+    n: int, optional
+        Number of data points to average over.
+
+    Returns
+    -------
+    np.ndarray
     """
     
     return(np.array([np.mean(data[i : i + n]) for i in range(data.size - n + 1)]))
