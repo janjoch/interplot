@@ -2,12 +2,12 @@
 """
 Parse str timestamps to datetime.datetime.
 
-Source: https://github.com/Janjoch/toolbox
+Source: https://github.com/janjoch/toolbox
 
 Examples:
     
 ```
->>>import datetimeparser as dtp
+>>>import toolbox.datetimeparser as dtp
 
 >>> dtp.dmy("31.12.2023")
 datetime.datetime(2023, 12, 31, 0, 0)
@@ -50,7 +50,7 @@ def generic(
     """
     Parse str timestamps to datetime.datetime.
 
-    Source: https://github.com/Janjoch/toolbox
+    Source: https://github.com/janjoch/toolbox
     
     Parameters
     ----------
@@ -137,7 +137,7 @@ def ymd(
 
     Output Format datetime.datetime
 
-    Source: https://github.com/Janjoch/toolbox
+    Source: https://github.com/janjoch/toolbox
 
     Parameters
     ----------
@@ -202,7 +202,7 @@ def dmy(
 
     Output Format datetime.datetime
 
-    Source: https://github.com/Janjoch/toolbox
+    Source: https://github.com/janjoch/toolbox
 
     Parameters
     ----------
@@ -268,7 +268,7 @@ def mdy(
 
     Output Format datetime.datetime
 
-    Source: https://github.com/Janjoch/toolbox
+    Source: https://github.com/janjoch/toolbox
 
     Parameters
     ----------
