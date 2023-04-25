@@ -17,3 +17,26 @@ def highpass(data, n = 101):
     if(n % 2 != 1):
         raise Exception("n must be odd!")
     return(np.array(data[int((n - 1) / 2) : -int((n - 1) / 2)] - lowpass(data, n)))
+
+
+def interp(array, pos):
+    """
+    Linearly interpolate between neighboring indexes.
+    
+    Parameters
+    ----------
+    array: 1D list-like
+    pos: float
+
+    Returns
+    -------
+    float
+        interpolated value
+    """
+    if(math.floor(pos)==math.ceil(pos)):
+        return array[int(pos)]
+
+    i = math.floor(pos)
+    w = pos - i
+    d = array[i+1] - array[i]
+    return array[i] + w * d
