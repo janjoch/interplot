@@ -20,20 +20,17 @@ def change_hex_brightness(color, factor, to_white=False, hash_out=True):
     Returns
     -------
     str:
-        New color, with leading hash
+        New color, with leading hash (default)
     """
     if(len(color) != 6):
         if(len(color) == 7 and color[0] == "#"):
             color = color[1:]
         else:
-            raise Exception("Expected 6 digit hex color.")
+            raise ValueError("Expected 6 digit hex color.")
         if(factor<0):
-            raise Exception("Factor must be a positive value!")
+            raise ValueError("Factor must be a positive value!")
 
-    if(hash_out):
-        out = "#"
-    else:
-        out = ""
+    out = "#" if hash_out else ""
 
     for i in range(3):
         if(to_white):

@@ -1,3 +1,8 @@
+"""
+Use snippets from the following code if you want to control matplotlib.pyplot
+"""
+
+
 import os
 
 import matplotlib.pyplot as plt
