@@ -11,6 +11,7 @@ __all__ = [
     "datetimeparser",
     "gauss",
     "iter",
+    "plot",
 ]
 
 from . import *
