@@ -2,10 +2,24 @@
 Boilerplate code to advance Python line plots.
 
 It combines the best of the matplotlib and the plotly worlds.
+
+Example:
+```
+>>> @tb.plot.lineplot_advanced
+>>> def plot(*xy, add_trace=None, **kw_xy):
+>>>     add_trace(*xy, **kw_xy)
+
+>>> plot([1,2,4,8])
+[plotly figure]
+
+>>> plot([0,4,6,7], [1,2,4,8], interactive=False, title="matploblib static figure")
+[matplotlib figure]
+```
 """
 
 
 import re
+#import functools
 
 import numpy as np
 
@@ -16,6 +30,45 @@ import plotly.express as px
 
 
 REWRITE_DOCSTRING = True
+
+DOC_INTERACTIVE = """
+    interactive: bool, optional
+        Display an interactive plotly line plot
+        instead of the default matplotlib figure.
+        Default: False"""
+DOC_LINEPLOT = """
+    title: str, optional
+        Plot title.
+        Default: None
+    xlabel, ylabel: str, optional
+        Axis labels.
+        Default: None
+    fig_size: tuple of 2x float, optional
+        Default: None
+        PTY: dimensions in px.
+        MPL: dimensions in inch.
+    xlim, ylim: tuple of 2 numbers, optional
+        Axis range limits.
+    legend_loc: str, optional
+        MPL Only.
+        Default:
+            In case of 1 line: None
+            In case of >1 line: "best" (auto-detect)
+    legend_title: str, optional
+        Default: None"""
+
+
+class NotebookInteraction:
+    """Calls the child's show()._repr_html_() for automatic display in Jupyter Notebooks"""
+
+    def _repr_html_(self):
+        # look for show() method
+        try:
+            return self.show()._repr_html_()
+
+        # fall back to plot() method
+        except AttributeError:
+            return self.plot()._repr_html_()
 
 
 class LinePlot:
@@ -62,7 +115,7 @@ class LinePlot:
             y = x
             x = np.arange(len(y))
         self.count += 1
-        
+
         # PLOTLY
         if(self.interactive):
             self.fig.add_trace(
@@ -76,7 +129,7 @@ class LinePlot:
         # MATPLOTLIB
         else:
             self.ax.plot(x, y, label=label)
-    
+
     def post_process(
         self,
         title=None,
@@ -120,6 +173,28 @@ class LinePlot:
 
 
 def _rewrite_docstring(doc, doc_insert):
+    """
+    Appends arguments to a docstring.
+
+    Returns original docstring if REWRITE_DOCSTRING is set to False.
+
+    Attempts:
+    1. Search for [decorator.*?].
+    2. Search for numpy-style "Parameters" block.
+    3. Append to the end.
+
+    Parameters
+    ----------
+    doc: str
+        Original docstring.
+    doc_insert: str,
+        Docstring to insert.
+
+    Returns
+    -------
+    str:
+        Rewritten docstring
+    """
     # check rewrite flag
     if(not REWRITE_DOCSTRING):
         return doc
@@ -136,10 +211,10 @@ def _rewrite_docstring(doc, doc_insert):
     insert_indent = match.group("indent") if match else ""
 
     # search "[decorator parameters]"
-    match = re.search(r"\[decorator parameters]", doc)
+    match = re.search(r"\n[ \t]*\[decorator.*?]", doc)
     if(match):
         return re.sub(
-            r"\n[ \t]*\[decorator parameters]",
+            r"\n[ \t]*\[decorator.*?]",
             re.sub(r"\n{}".format(insert_indent), r"\n{}".format(indent), doc_insert),
             doc,
         )
@@ -165,26 +240,11 @@ def _rewrite_docstring(doc, doc_insert):
     return doc + re.sub(r"\n{}".format(insert_indent), r"\n{}".format(indent), doc_insert)
 
 
-def advanced_lineplot(core):
+def lineplot_advanced(core):
     """
     Boilerplate code to advance Python line plots.
     """
-    doc_insert = """
-        interactive: bool, optional
-            Display an interactive plotly line plot
-            instead of the default matplotlib figure.
-            Default: False
-        title: str, optional
-            Plot title.
-        xlabel, ylabel: str, optional
-            Axis labels.
-        xlim, ylim: tuple of 2 numbers, optional
-            Axis range limits.
-        legend_title: str, optional
-            Legend title.
-        ...: ...
-            ..."""
-
+    #@functools.wraps(core)
     def wrapper(
         *args,
         interactive=True,
@@ -221,13 +281,32 @@ def advanced_lineplot(core):
             ylabel,
             xlim,
             ylim,
-
         )
         
         # return
         return plot
 
     # rewrite docstring
-    wrapper.__doc__ = _rewrite_docstring(core.__doc__, doc_insert)
+    wrapper.__doc__ = _rewrite_docstring(core.__doc__, DOC_INTERACTIVE + DOC_LINEPLOT)
+
+    return wrapper
+
+def lineplot_static(core, *args_dec, **kwargs_dec):
+    """Enforce a static matplotlib plot upon lineplot_advanced"""
+    #@functools.wraps(core)
+    def wrapper(*args, **kwargs):
+        return lineplot_advanced(core, *args_dec, **kwargs_dec)(*args, interactive=False, **kwargs)
+    
+    wrapper.__doc__ = _rewrite_docstring(core.__doc__, DOC_LINEPLOT)
+
+    return wrapper
+
+def lineplot_dynamic(core, *args_dec, **kwargs_dec):
+    """Enforce a dynamic plotly plot upon lineplot_advanced"""
+    #@functools.wraps(core)
+    def wrapper(*args, **kwargs):
+        return lineplot_advanced(core, *args_dec, **kwargs_dec)(*args, interactive=True, **kwargs)
+
+    wrapper.__doc__ = _rewrite_docstring(core.__doc__, DOC_LINEPLOT)
 
     return wrapper
