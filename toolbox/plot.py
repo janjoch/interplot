@@ -189,7 +189,21 @@ class Plot:
 
 class LinePlot(Plot):
 
-    def add_trace(self, x, y=None, label=None):
+    def add_trace(self, x, y=None, label=None, color=None):
+        """
+        Add a new histogram to the plot.
+
+        Parameters
+        ----------
+        x: array-like
+        y: array-like, optional
+            If only x is defined, it will be assumed as x,
+            and x will be the index, starting from 0.
+        label: str, optional
+            Trace label for legend.
+        color: str, optional
+            Trace color.
+        """
         # input verification
         if(y is None):
             y = x
@@ -203,17 +217,35 @@ class LinePlot(Plot):
                     x=x,
                     y=y,
                     name=label,
+                    marker_color=color,
                 ),
             )
 
         # MATPLOTLIB
         else:
-            self.ax.plot(x, y, label=label)
+            self.ax.plot(x, y, label=label, color=color)
 
 
 class HistPlot(Plot):
 
-    def add_trace(self, x, bins=None, label=None):
+    def add_trace(self, x, bins=None, label=None, color=None):
+        """
+        Add a new histogram to the plot.
+
+        Parameters
+        ----------
+        x: array-like
+            Histogram data.
+        bins: int, optional
+            Number of bins.
+            If undefined, plotly/matplotlib will detect automatically.
+            Default: None
+        label: str, optional
+            Trace label for legend.
+        color: str, optional
+            Trace color.
+        """
+        self.count += 1
         # PLOTLY
         if(self.interactive):
             self.fig.add_trace(
@@ -221,15 +253,16 @@ class HistPlot(Plot):
                     x=x,
                     name=label,
                     nbinsx=bins,
-                    #xbins=dict(size=bins),
+                    marker_color=color,
                 ),
             )
 
         # MATPLOTLIB
         else:
-            self.ax.hist(x, label=label, bins=bins)
+            self.ax.hist(x, label=label, bins=bins, color=color)
     
     def post_process(self, *args, **kwargs):
+        # overlay histograms by default
         if(self.interactive):
             self.fig.update_layout(barmode='overlay')
         super().post_process(*args, **kwargs)
