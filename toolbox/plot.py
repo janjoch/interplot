@@ -19,7 +19,7 @@ Example:
 
 
 import re
-#import functools
+import functools
 
 import numpy as np
 
@@ -45,16 +45,40 @@ DOC_LINEPLOT = """
         Default: None
     fig_size: tuple of 2x float, optional
         Default: None
-        PTY: dimensions in px.
-        MPL: dimensions in inch.
+        PLOTLY: dimensions in px.
+        MATPLOTLIB: dimensions in inch.
     xlim, ylim: tuple of 2 numbers, optional
         Axis range limits.
     legend_loc: str, optional
-        MPL Only.
+        MATPLOTLIB ONLY.
         Default:
             In case of 1 line: None
             In case of >1 line: "best" (auto-detect)
     legend_title: str, optional
+        Default: None
+    pty_update_layout: dict, optional
+         PLOTLY ONLY.
+        Pass keyword arguments to plotly's fig.update_layout(**pty_update_layout)
+        Thus, take full control over 
+        Default: None
+    pty_custom_func: function, optional
+        PLOTLY ONLY.
+        Pass a function reference to further style the plotly graphs.
+        Function must accept fig and return fig.
+        Example:
+        >>> def pty_custom_func(fig):
+        >>>     fig.do_stuff()
+        >>>     return fig
+        Default: None
+    mpl_custom_func: function, optional
+        MATPLOTLIB ONLY.
+        Pass a function reference to further style the matplotlib graphs.
+        Function must accept fig, ax and return fig, ax.
+        Example:
+        >>> def mpl_custom_func(fig, ax):
+        >>>     fig.do_stuff()
+        >>>     ax.do_more()
+        >>>     return fig, ax
         Default: None"""
 
 
@@ -71,7 +95,7 @@ class NotebookInteraction:
             return self.plot()._repr_html_()
 
 
-class LinePlot:
+class Plot:
 
     def __init__(
         self,
@@ -108,27 +132,6 @@ class LinePlot:
         # init matplotlib
         else:
             self.fig, self.ax = plt.subplots(figsize=fig_size)
-    
-    def add_trace(self, x, y=None, label=None):
-        # input verification
-        if(y is None):
-            y = x
-            x = np.arange(len(y))
-        self.count += 1
-
-        # PLOTLY
-        if(self.interactive):
-            self.fig.add_trace(
-                go.Scatter(
-                    x=x,
-                    y=y,
-                    name=label,
-                ),
-            )
-
-        # MATPLOTLIB
-        else:
-            self.ax.plot(x, y, label=label)
 
     def post_process(
         self,
@@ -137,8 +140,19 @@ class LinePlot:
         ylabel=None,
         xlim=None,
         ylim=None,
+        pty_update_layout=None,
+        pty_custom_func=None,
+        mpl_custom_func=None,
     ):
-        if(not self.interactive):
+        # PLOTLY
+        if(self.interactive):
+            if(pty_update_layout is not None):
+                self.fig.update_layout(**pty_update_layout)
+            if(pty_custom_func is not None):
+                self.fig = pty_custom_func(self.fig)
+
+        # MATPLOTLIB
+        else:
             self.ax.set_title(title)
             self.ax.set_xlabel(xlabel)
             self.ax.set_ylabel(ylabel)
@@ -147,6 +161,8 @@ class LinePlot:
             if(self.legend_loc or self.count > 1):
                 self.legend_loc = self.legend_loc or "best"
                 self.ax.legend(loc=self.legend_loc, title=self.legend_title)
+            if(mpl_custom_func is not None):
+                self.fig, self.ax = mpl_custom_func(self.fig, self.ax)
 
     def save(self, path, **kwargs):
 
@@ -170,6 +186,53 @@ class LinePlot:
         if(self.interactive):
             return self.fig._repr_html_()
         return self.fig.show()
+
+class LinePlot(Plot):
+
+    def add_trace(self, x, y=None, label=None):
+        # input verification
+        if(y is None):
+            y = x
+            x = np.arange(len(y))
+        self.count += 1
+
+        # PLOTLY
+        if(self.interactive):
+            self.fig.add_trace(
+                go.Scatter(
+                    x=x,
+                    y=y,
+                    name=label,
+                ),
+            )
+
+        # MATPLOTLIB
+        else:
+            self.ax.plot(x, y, label=label)
+
+
+class HistPlot(Plot):
+
+    def add_trace(self, x, bins=None, label=None):
+        # PLOTLY
+        if(self.interactive):
+            self.fig.add_trace(
+                go.Histogram(
+                    x=x,
+                    name=label,
+                    nbinsx=bins,
+                    #xbins=dict(size=bins),
+                ),
+            )
+
+        # MATPLOTLIB
+        else:
+            self.ax.hist(x, label=label, bins=bins)
+    
+    def post_process(self, *args, **kwargs):
+        if(self.interactive):
+            self.fig.update_layout(barmode='overlay')
+        super().post_process(*args, **kwargs)
 
 
 def _rewrite_docstring(doc, doc_insert):
@@ -240,9 +303,9 @@ def _rewrite_docstring(doc, doc_insert):
     return doc + re.sub(r"\n{}".format(insert_indent), r"\n{}".format(indent), doc_insert)
 
 
-def lineplot_advanced(core):
+def generic_plot_advanced(core, PlotClass):
     """
-    Boilerplate code to advance Python line plots.
+    Boilerplate code to advance Python plots.
     """
     #@functools.wraps(core)
     def wrapper(
@@ -256,10 +319,13 @@ def lineplot_advanced(core):
         fig_size=None,
         legend_loc=None,
         legend_title=None,
+        pty_update_layout=None,
+        pty_custom_func=None,
+        mpl_custom_func=None,
         **kwargs
     ):
         # preparation
-        plot = LinePlot(
+        plot = PlotClass(
             interactive,
             title,
             xlabel,
@@ -270,7 +336,7 @@ def lineplot_advanced(core):
             legend_loc,
             legend_title,
         )
-        
+
         # execute core method
         core(*args, add_trace=plot.add_trace, **kwargs)
 
@@ -281,13 +347,38 @@ def lineplot_advanced(core):
             ylabel,
             xlim,
             ylim,
+            pty_update_layout,
+            pty_custom_func,
+            mpl_custom_func,
         )
-        
+
         # return
         return plot
 
     # rewrite docstring
     wrapper.__doc__ = _rewrite_docstring(core.__doc__, DOC_INTERACTIVE + DOC_LINEPLOT)
+
+    return wrapper
+
+def lineplot_advanced(core, *args_dec, **kwargs_dec):
+    """
+    Boilerplate code to advance Python line plots.
+    """
+    @functools.wraps(generic_plot_advanced)
+    def wrapper(*args, **kwargs):
+        return generic_plot_advanced(core, PlotClass=LinePlot, *args_dec, **kwargs_dec)(*args, **kwargs)
+
+    return wrapper
+
+def histplot_advanced(core, *args_dec, **kwargs_dec):
+    """
+    Boilerplate code to advance Python line plots.
+    """
+    @functools.wraps(core)
+    def wrapper(*args, **kwargs):
+        return generic_plot_advanced(core, PlotClass=HistPlot, *args_dec, **kwargs_dec)(*args, **kwargs)
+    
+    wrapper.__doc__ = _rewrite_docstring(core.__doc__, DOC_LINEPLOT)
 
     return wrapper
 
