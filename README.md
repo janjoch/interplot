@@ -28,6 +28,8 @@ array([0, 0, 0])
 ```
 
 ### datetimeparser
+Parse str timestamps to datetime.datetime.
+
 ```python
 >>> import toolbox.datetimeparser as dtp
 
@@ -43,12 +45,13 @@ datetime.datetime(2023, 2, 1, 18, 40, 59, 123000)
 >>> dtp.ymd("Recording started on 2023-12-31 11:30:59.123456 in Zurich")
 datetime.datetime(2023, 12, 31, 11, 30, 59, 123456)
 ```
-"""
 
 ### iter
+Tools to iterate python objects.
+
 ```python
 >>> from toolbox.iter import zip_smart
->>>
+
 >>> for a, b, c in zip_smart(
 >>>     ("A", "B", "C", "D"),
 >>>     [1, 2, 3, 4],
@@ -62,11 +65,15 @@ D 4 True
 ```
 
 ### plot
+Boilerplate code to advance Python plots.
+
+It combines the best of the matplotlib and the plotly worlds.
+
 ```python
 >>> @toolbox.plot.lineplot_advanced
 >>> def plot(*xy, add_trace=None, **kwargs):
 >>>     add_trace(*xy, **kwargs)
->>>
+
 >>> plot([0,4,6,7], [1,2,4,8])
 [plotly figure]
 

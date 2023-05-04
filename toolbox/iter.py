@@ -1,4 +1,4 @@
-"""Tools to iterate python objects."""
+"""Tools to iterate Python objects."""
 
 from warnings import warn
 

@@ -5,17 +5,18 @@ It combines the best of the matplotlib and the plotly worlds.
 
 Example:
 ```
->>> @tb.plot.lineplot_advanced
->>> def plot(*xy, add_trace=None, **kw_xy):
->>>     add_trace(*xy, **kw_xy)
+>>> @toolbox.plot.lineplot_advanced
+>>> def plot(*xy, add_trace=None, **kwargs):
+>>>     add_trace(*xy, **kwargs)
 
->>> plot([1,2,4,8])
+>>> plot([0,4,6,7], [1,2,4,8])
 [plotly figure]
 
->>> plot(
->>>     [0,4,6,7], [1,2,4,8],
+>>> plot([0,4,6,7], [1,2,4,8],
 >>>     interactive=False,
 >>>     title="matploblib static figure",
+>>>     xlabel="X",
+>>>     ylabel="Y",
 >>> )
 [matplotlib figure]
 ```
