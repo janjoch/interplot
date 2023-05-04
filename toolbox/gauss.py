@@ -4,7 +4,7 @@ import numpy as np
 
 
 def gauss(x, A, mu=None, sigma=None):
-    if mu == None:
+    if mu is None:
         A, mu, sigma = A
     return (
         A

@@ -5,7 +5,7 @@ Parse str timestamps to datetime.datetime.
 Source: https://github.com/janjoch/toolbox
 
 Examples:
-    
+
 ```
 >>> import toolbox.datetimeparser as dtp
 
@@ -91,7 +91,9 @@ def generic(
     datetime.datetime if the pattern was able to match
     """
     auto_year_complete = (
-        auto_year_complete if auto_year_complete is not None else AUTO_YEAR_COMPLETE
+        auto_year_complete
+        if auto_year_complete is not None
+        else AUTO_YEAR_COMPLETE
     )
     match = re.match(pattern, time_str)
     if match:
