@@ -1,6 +1,9 @@
 # toolbox
 Janosch's small Python code snippets making life a bit easier.
 
+## Licence
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+
 ## Install
 ```pip install git+https://github.com/janjoch/toolbox#egg=toolbox```
 
@@ -67,9 +70,11 @@ D 4 True
 >>> plot([0,4,6,7], [1,2,4,8])
 [plotly figure]
 
->>> plot([0,4,6,7], [1,2,4,8], interactive=False, title="matploblib static figure", xlabel="X", ylabel="Y")
+>>> plot([0,4,6,7], [1,2,4,8],
+>>>     interactive=False,
+>>>     title="matploblib static figure",
+>>>     xlabel="X",
+>>>     ylabel="Y",
+>>> )
 [matplotlib figure]
 ```
-
-## Licence
-[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
