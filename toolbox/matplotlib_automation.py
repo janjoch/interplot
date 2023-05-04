@@ -8,8 +8,7 @@ import os
 import matplotlib.pyplot as plt
 
 
-class GenericClass():
-
+class GenericClass:
     def _generate_plot_prepare(self, plotFormat={}):
         """
         sets display options for plots
@@ -20,7 +19,8 @@ class GenericClass():
 
         plt.rcParams["axes.facecolor"] = plotFormatInt["faceColorPlot"]
         plt.figure(
-            facecolor=plotFormatInt["faceColor"], figsize=plotFormatInt["figsize"]
+            facecolor=plotFormatInt["faceColor"],
+            figsize=plotFormatInt["figsize"],
         )
 
         for line in plotFormatInt["xLines"]:
@@ -61,7 +61,14 @@ class GenericClass():
                 xmax=preset["range"][1],
             )
 
-    def _generate_plot_line(self, x, y=None, lineStyle="x-", c=None, label=None):
+    def _generate_plot_line(
+        self,
+        x,
+        y=None,
+        lineStyle="x-",
+        c=None,
+        label=None,
+    ):
         """
         Draws a line into the plot
         """
@@ -126,13 +133,18 @@ class GenericClass():
             plotFormatInt["exportName"] += "." + plotFormatInt["exportType"]
 
             plotFormatInt["exportName"] = (
-                plotFormatInt["exportName"].replace("/", "_").replace("\\", "_")
+                plotFormatInt["exportName"]
+                .replace("/", "_").replace("\\", "_")
             )
 
             path = os.path.join(
                 plotFormatInt["exportPath"], plotFormatInt["exportName"]
             )
-            plt.savefig(path, facecolor=plotFormatInt["faceColor"], bbox_inches="tight")
+            plt.savefig(
+                path,
+                facecolor=plotFormatInt["faceColor"],
+                bbox_inches="tight",
+            )
 
         if plotFormatInt["showPlot"]:
             plt.show()

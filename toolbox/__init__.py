@@ -1,9 +1,8 @@
 """Janosch's small Python code snippets making life a bit easier."""
 
 import pkg_resources
-from pathlib import Path
 
-__all__ = [
+__all__ = [  # noqa F405
     "accelerate",
     "arraytools",
     "color",
@@ -14,8 +13,7 @@ __all__ = [
     "plot",
 ]
 
-from . import *
-#from .toolbox import *
+from . import *  # noqa F403
 
 try:  # try except because of sphinx build --> DistributionNotFound Error
     __version__ = pkg_resources.get_distribution("toolbox").version

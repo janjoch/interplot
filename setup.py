@@ -6,7 +6,10 @@ with open("requirements.txt", "r", encoding="utf-8") as f:
 setup(
     name='toolbox',
     version='0.2.1',
-    description="Janosch's small Python code snippets making life a bit easier",
+    description=(
+        "Janosch's small Python code snippets "
+        "making life a bit easier"
+    ),
     url='https://github.com/janjoch/toolbox',
     author='Janosch Jörg',
     author_email='git-janjoch@janjo.ch',
@@ -17,7 +20,7 @@ setup(
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Intended Audience :: Science/Research',
-        'License :: OSI Approved :: BSD License',  
+        'License :: OSI Approved :: BSD License',
         'Operating System :: MacOS :: MacOS X',
         'Operating System :: Microsoft :: Windows',
         'Programming Language :: Python :: 3',

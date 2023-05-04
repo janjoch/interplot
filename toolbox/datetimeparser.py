@@ -33,11 +33,10 @@ AUTO_YEAR_COMPLETE = 2000
 
 
 class DateTimeParsingError(Exception):
-
-    def __init__(self, value): 
+    def __init__(self, value):
         self.value = value
 
-    def __str__(self): 
+    def __str__(self):
         return "Error: %s" % self.value
 
 
@@ -56,7 +55,7 @@ def generic(
     Parse str timestamps to datetime.datetime.
 
     Source: https://github.com/janjoch/toolbox
-    
+
     Parameters
     ----------
     time_str: str
@@ -91,34 +90,36 @@ def generic(
     -------
     datetime.datetime if the pattern was able to match
     """
-    auto_year_complete = auto_year_complete if auto_year_complete is not None else AUTO_YEAR_COMPLETE
+    auto_year_complete = (
+        auto_year_complete if auto_year_complete is not None else AUTO_YEAR_COMPLETE
+    )
     match = re.match(pattern, time_str)
-    if(match):
+    if match:
         ints = np.array(match.groups(default=0), dtype=int)
     else:
         raise DateTimeParsingError(
-            (
-                "No timestamp found.\n\ntime_str:\n{}"
-                "\n\npattern:\n{}"
-            ).format(time_str, pattern)
+            ("No timestamp found.\n\ntime_str:\n{}" "\n\npattern:\n{}").format(
+                time_str, pattern
+            )
         )
-    if(order is None):
+    if order is None:
         for s in swap:
             ints[s[0]], ints[s[1]] = ints[s[1]], ints[s[0]]
     else:
         ints = ints[order]
     ints = list(start) + list(ints) + list(end)
-    if(microsecond_shift):
-        if(len(ints) >= 7):
+    if microsecond_shift:
+        if len(ints) >= 7:
             ints[6] = ints[6] * 10**microsecond_shift
         else:
             print(
                 "Warning: no sub-second information is present in the pattern,"
                 " but a microsecond shift was provided."
             )
-    if(ints[0] < 100):
+    if ints[0] < 100:
         ints[0] = ints[0] + auto_year_complete
     return dt.datetime(*ints, tzinfo=tzinfo)
+
 
 def ymd(
     time_str,
@@ -172,17 +173,18 @@ def ymd(
     return generic(
         time_str=time_str,
         pattern=(
-            r'{0}([0-9]+)'
-            r'{1}([0-9]+)'
-            r'{1}([0-9]+)'
-            r'(?:{2}([0-9]+)'
-            r'{3}([0-9]+))?'
-            r'(?:{3}([0-9]+))?'
-            r'(?:{3}([0-9]+))?{4}'
+            r"{0}([0-9]+)"
+            r"{1}([0-9]+)"
+            r"{1}([0-9]+)"
+            r"(?:{2}([0-9]+)"
+            r"{3}([0-9]+))?"
+            r"(?:{3}([0-9]+))?"
+            r"(?:{3}([0-9]+))?{4}"
         ).format(start, date_delimiter, space, time_delimiter, end),
         microsecond_shift=microsecond_shift,
         auto_year_complete=auto_year_complete,
     )
+
 
 def dmy(
     time_str,
@@ -237,18 +239,19 @@ def dmy(
     return generic(
         time_str=time_str,
         pattern=(
-            r'{0}([0-9]+)'
-            r'{1}([0-9]+)'
-            r'(?:{1}([0-9]+))?'
-            r'(?:{2}([0-9]+)'
-            r'{3}([0-9]+))?'
-            r'(?:{3}([0-9]+))?'
-            r'(?:{3}([0-9]+))?{4}'
+            r"{0}([0-9]+)"
+            r"{1}([0-9]+)"
+            r"(?:{1}([0-9]+))?"
+            r"(?:{2}([0-9]+)"
+            r"{3}([0-9]+))?"
+            r"(?:{3}([0-9]+))?"
+            r"(?:{3}([0-9]+))?{4}"
         ).format(start, date_delimiter, space, time_delimiter, end),
-        swap=((0,2),),
+        swap=((0, 2),),
         microsecond_shift=microsecond_shift,
         auto_year_complete=auto_year_complete,
     )
+
 
 def mdy(
     time_str,
@@ -303,15 +306,18 @@ def mdy(
     return generic(
         time_str=time_str,
         pattern=(
-            r'{0}([0-9]+)'
-            r'{1}([0-9]+)'
-            r'(?:{1}([0-9]+))?'
-            r'(?:{2}([0-9]+)'
-            r'{3}([0-9]+))?'
-            r'(?:{3}([0-9]+))?'
-            r'(?:{3}([0-9]+))?{4}'
+            r"{0}([0-9]+)"
+            r"{1}([0-9]+)"
+            r"(?:{1}([0-9]+))?"
+            r"(?:{2}([0-9]+)"
+            r"{3}([0-9]+))?"
+            r"(?:{3}([0-9]+))?"
+            r"(?:{3}([0-9]+))?{4}"
         ).format(start, date_delimiter, space, time_delimiter, end),
-        swap=((0,1),(0,2),),
+        swap=(
+            (0, 1),
+            (0, 2),
+        ),
         microsecond_shift=microsecond_shift,
         auto_year_complete=auto_year_complete,
     )

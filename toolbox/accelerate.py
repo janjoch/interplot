@@ -4,6 +4,7 @@ import numpy as np
 
 from .convert import Convert
 
+
 class Accel:
     """Simulate acceleration behaviour of a stepper motor."""
 
@@ -13,8 +14,8 @@ class Accel:
         steps_per_r,
         speed_max,
         accel_max,
-        start_delay=0.,
-        stop_delay=0.,
+        start_delay=0.0,
+        stop_delay=0.0,
         si_units=False,
     ):
         """
@@ -47,14 +48,22 @@ class Accel:
         else:
             self.v_mot_max = Convert.rpm_to_radpsec(speed_max)
             self.a_mot_max = Convert.rpmps_to_radpsec2(accel_max)
-        
+
         self.start_delay = start_delay
         self.stop_delay = stop_delay
 
         # no movement
-        if(steps == 0):
-            self.t = [0, start_delay, start_delay + stop_delay, ]
-            self.v = [0, 0, 0, ]
+        if steps == 0:
+            self.t = [
+                0,
+                start_delay,
+                start_delay + stop_delay,
+            ]
+            self.v = [
+                0,
+                0,
+                0,
+            ]
 
         # movement
         else:
@@ -63,7 +72,7 @@ class Accel:
 
             # calculate max acceleration graph
             self.t_accel_max = self.v_mot_max / self.a_mot_max
-            self.s_accel_max = self.a_mot_max * self.t_accel_max ** 2 / 2
+            self.s_accel_max = self.a_mot_max * self.t_accel_max**2 / 2
 
             # case speed limit not reached
             # v ^
@@ -71,7 +80,7 @@ class Accel:
             #   |  /  \
             #   |_/____\__> t
             #
-            if(2 * self.s_accel_max >= self.s_tot):
+            if 2 * self.s_accel_max >= self.s_tot:
                 self.s_accel = self.s_tot / 2
                 self.t_accel = math.sqrt(2 * self.s_accel / self.a_mot_max)
                 self.s_lin = 0

@@ -1,7 +1,7 @@
 def change_hex_brightness(color, factor, to_white=False, hash_out=True):
     """
     Change the brightness of a hex color.
-    
+
     Parameters
     ----------
     color: str
@@ -11,7 +11,8 @@ def change_hex_brightness(color, factor, to_white=False, hash_out=True):
         >1 will brighten up.
         <1 will darken.
     to_white: bool, optional
-        Instead of multiplying the brightness, divide the remainder to full white.
+        Instead of multiplying the brightness,
+        divide the remainder to full white.
         Default False.
     hash_out: bool, optional
         Return the color with a hash.
@@ -22,29 +23,29 @@ def change_hex_brightness(color, factor, to_white=False, hash_out=True):
     str:
         New color, with leading hash (default)
     """
-    if(len(color) != 6):
-        if(len(color) == 7 and color[0] == "#"):
+    if len(color) != 6:
+        if len(color) == 7 and color[0] == "#":
             color = color[1:]
         else:
             raise ValueError("Expected 6 digit hex color.")
-        if(factor<0):
+        if factor < 0:
             raise ValueError("Factor must be a positive value!")
 
     out = "#" if hash_out else ""
 
     for i in range(3):
-        if(to_white):
-            c = int(color[2*i : 2*i+2], 16)
+        if to_white:
+            c = int(color[2 * i: 2 * i + 2], 16)
             rest = 256 - c
             c = 256 - (rest / factor)
-            if(c < 0):
+            if c < 0:
                 c = 0
             else:
                 c = int(c)
 
         else:
-            c = int(color[2*i : 2*i+2], 16) * factor
-            if(c > 255):
+            c = int(color[2 * i: 2 * i + 2], 16) * factor
+            if c > 255:
                 c = 255
             else:
                 c = int(c)

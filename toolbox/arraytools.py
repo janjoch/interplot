@@ -15,7 +15,7 @@ LISTLIKE_TYPES = (tuple, list, np.ndarray, pd.core.series.Series)
 
 
 def _new_pd_index(series, n):
-    return series.index[(n - 1) // 2 : -(n // 2)]
+    return series.index[(n - 1) // 2: -(n // 2)]
 
 
 def lowpass(data, n=101, new_index=None):
@@ -39,24 +39,23 @@ def lowpass(data, n=101, new_index=None):
     np.ndarray or pd.Series
     """
     # input verification
-    if(n == 1):
+    if n == 1:
         return data
 
     # pandas Series
-    if(isinstance(data, pd.core.series.Series)):
+    if isinstance(data, pd.core.series.Series):
         new_index = _new_pd_index(data, n) if new_index is None else new_index
         return pd.Series(
             lowpass_core(np.array(data), n),
             index=new_index,
         )
-    
+
     # np.array, list or tuple
-    if(isinstance(data, LISTLIKE_TYPES)):
+    if isinstance(data, LISTLIKE_TYPES):
         return lowpass_core(np.array(data), n)
-    
+
     # fail if no supported data type
     raise TypeError("Data type not supported:\n{}".format(type(data)))
-
 
 
 @nb.jit(nopython=True, parallel=True)
@@ -79,7 +78,7 @@ def lowpass_core(data, n):
 
     array = np.empty(size, dtype=data.dtype)
     for i in nb.prange(size):
-        array[i] = np.mean(data[i : i + n])
+        array[i] = np.mean(data[i: i + n])
 
     return array
 
@@ -91,8 +90,8 @@ def highpass(
 ):
     """
     Filter out low-frequency drift.
-    
-    Offsets each datapoint by the average of the surrounding n data points. 
+
+    Offsets each datapoint by the average of the surrounding n data points.
     N must be odd.
 
     Parameters
@@ -110,35 +109,32 @@ def highpass(
     np.ndarray or pd.Series
     """
     # input verification
-    if(n == 1):
+    if n == 1:
         return data
-    if(n % 2 == 0):
+    if n % 2 == 0:
         raise ValueError("n must be odd!")
-    
+
     # pandas Series
-    if(isinstance(data, pd.core.series.Series)):
+    if isinstance(data, pd.core.series.Series):
         new_index = _new_pd_index(data, n) if new_index is None else new_index
-        return (
-            data[((n - 1) // 2) : -((n - 1) // 2)]
-            - lowpass(np.array(data), n, new_index=new_index)
+        return data[((n - 1) // 2): -((n - 1) // 2)] - lowpass(
+            np.array(data), n, new_index=new_index
         )
 
     # np.array, list or tuple
-    if(isinstance(data, LISTLIKE_TYPES)):
-        return np.array(
-            data[((n - 1) // 2) : -((n - 1) // 2)]
-        ) - lowpass_core(np.array(data), n)
+    if isinstance(data, LISTLIKE_TYPES):
+        return np.array(data[((n - 1) // 2): -((n - 1) // 2)]) - lowpass_core(
+            np.array(data), n
+        )
 
     # fail if no supported data type
     raise TypeError("Data type not supported:\n{}".format(type(data)))
-
-    return(np.array(data[int((n - 1) / 2) : -int((n - 1) / 2)] - lowpass(data, n)))
 
 
 def interp(array, pos):
     """
     Linearly interpolate between neighboring indexes.
-    
+
     Parameters
     ----------
     array: 1D list-like
@@ -149,10 +145,10 @@ def interp(array, pos):
     float
         interpolated value
     """
-    if(math.floor(pos)==math.ceil(pos)):
+    if math.floor(pos) == math.ceil(pos):
         return array[int(pos)]
 
     i = math.floor(pos)
     w = pos - i
-    d = array[i+1] - array[i]
+    d = array[i + 1] - array[i]
     return array[i] + w * d

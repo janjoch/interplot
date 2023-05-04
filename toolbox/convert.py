@@ -1,7 +1,7 @@
 import math
 
-class Convert:
 
+class Convert:
     def __init__(self):
         """Convert A to B."""
         pass

@@ -7,9 +7,7 @@ from pandas.core.series import Series as pd_Series
 
 
 ITERABLE_TYPES = (tuple, list, dict, np_ndarray, pd_Series)
-CUSTOM_DIGESTION = (
-    (dict, (lambda dct: [elem for _, elem in dct.items()])),
-)
+CUSTOM_DIGESTION = ((dict, (lambda dct: [elem for _, elem in dct.items()])),)
 
 
 def zip_smart(*iterables, iterable_types=None, strict=True):
@@ -40,23 +38,24 @@ def zip_smart(*iterables, iterable_types=None, strict=True):
     iterables = list(iterables)
     maxlen = 1
     for arg in iterables:
-        if(isinstance(arg, iterable_types)):
-            if(len(arg) > maxlen):
+        if isinstance(arg, iterable_types):
+            if len(arg) > maxlen:
                 maxlen = len(arg)
     iterables = [
-        arg
-        if isinstance(arg, iterable_types)
-        else (arg, ) * maxlen
+        arg if isinstance(arg, iterable_types) else (arg,) * maxlen
         for arg
         in iterables
     ]
     try:
         return zip(*iterables, strict=strict)
-    
+
     # strict mode not implemented in Python<3.10
     except TypeError:
-        if(strict):
-            warn("zip's strict mode not supported in Python<3.10.\n\nFalling back to non-strict mode.")
+        if strict:
+            warn(
+                "zip's strict mode not supported in Python<3.10.\n\n"
+                "Falling back to non-strict mode."
+            )
         return zip(*iterables)
 
 
@@ -70,7 +69,7 @@ def sum_nested(
     Add up all values in iterable objects.
 
     Nested structures are added up recursively.
-    Dictionaries are 
+    Dictionaries are
 
     Parameters
     ----------
@@ -91,7 +90,8 @@ def sum_nested(
                 type or tuple of types,
                 lambda function to digest the elements,
             )
-        The result of the lambda function will then be treated like the new type.
+        The result of the lambda function will then be treated
+        like the new type.
         By default, toolbox.iter.CUSTOM_DIGESTION will be used:
             Dicts will be digested to a list of their values.
 
@@ -106,20 +106,23 @@ def sum_nested(
 
     # custom digestion
     for type_, lambda_ in custom_digestion:
-        if(isinstance(inp, type_)):
+        if isinstance(inp, type_):
             inp = lambda_(inp)
 
     # if is not iterable, return as-is
-    if(not isinstance(inp, ITERABLE_TYPES)):
-        return(inp)
+    if not isinstance(inp, ITERABLE_TYPES):
+        return inp
 
     # check recursion level
-    if(depth is None or depth==0):
-        raise TypeError((
-            "Iterable type detected, but recursion has reached its maximum depth.\n\n"
-            "Element:\n{}\n\n"
-            "Type:\n{}"
-        ).format(str(inp), str(type(inp))))
+    if depth is None or depth == 0:
+        raise TypeError(
+            (
+                "Iterable type detected, but recursion has reached "
+                "its maximum depth.\n\n"
+                "Element:\n{}\n\n"
+                "Type:\n{}"
+            ).format(str(inp), str(type(inp)))
+        )
 
     # iterate
     val = 0
@@ -129,8 +132,8 @@ def sum_nested(
         val += sum_nested(
             elem,
             iterable_types=iterable_types,
-            depth=depth-1,
+            depth=depth - 1,
             custom_digestion=custom_digestion,
         )
 
-    return(val)
+    return val

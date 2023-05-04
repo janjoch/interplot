@@ -1,5 +1,5 @@
 """
-Boilerplate code to advance Python line plots.
+Boilerplate code to advance Python plots.
 
 It combines the best of the matplotlib and the plotly worlds.
 
@@ -12,7 +12,11 @@ Example:
 >>> plot([1,2,4,8])
 [plotly figure]
 
->>> plot([0,4,6,7], [1,2,4,8], interactive=False, title="matploblib static figure")
+>>> plot(
+>>>     [0,4,6,7], [1,2,4,8],
+>>>     interactive=False,
+>>>     title="matploblib static figure",
+>>> )
 [matplotlib figure]
 ```
 """
@@ -58,8 +62,9 @@ DOC_LINEPLOT = """
         Default: None
     pty_update_layout: dict, optional
          PLOTLY ONLY.
-        Pass keyword arguments to plotly's fig.update_layout(**pty_update_layout)
-        Thus, take full control over 
+        Pass keyword arguments to plotly's
+        fig.update_layout(**pty_update_layout)
+        Thus, take full control over
         Default: None
     pty_custom_func: function, optional
         PLOTLY ONLY.
@@ -83,7 +88,10 @@ DOC_LINEPLOT = """
 
 
 class NotebookInteraction:
-    """Calls the child's show()._repr_html_() for automatic display in Jupyter Notebooks"""
+    """
+    Calls the child's show()._repr_html_()
+    for automatic display in Jupyter Notebooks
+    """
 
     def _repr_html_(self):
         # look for show() method
@@ -96,7 +104,6 @@ class NotebookInteraction:
 
 
 class Plot:
-
     def __init__(
         self,
         interactive,
@@ -115,7 +122,7 @@ class Plot:
         self.legend_title = legend_title
 
         # init plotly
-        if(self.interactive):
+        if self.interactive:
             self.fig = px.line()
             height, width = fig_size if fig_size is not None else (None, None)
             self.fig.update_layout(
@@ -127,8 +134,8 @@ class Plot:
                 width=width,
             )
             self.fig.update_xaxes(range=xlim)
-            self.fig.update_yaxes(range=ylim)  
-        
+            self.fig.update_yaxes(range=ylim)
+
         # init matplotlib
         else:
             self.fig, self.ax = plt.subplots(figsize=fig_size)
@@ -143,12 +150,13 @@ class Plot:
         pty_update_layout=None,
         pty_custom_func=None,
         mpl_custom_func=None,
+        save_fig=None,
     ):
         # PLOTLY
-        if(self.interactive):
-            if(pty_update_layout is not None):
+        if self.interactive:
+            if pty_update_layout is not None:
                 self.fig.update_layout(**pty_update_layout)
-            if(pty_custom_func is not None):
+            if pty_custom_func is not None:
                 self.fig = pty_custom_func(self.fig)
 
         # MATPLOTLIB
@@ -158,19 +166,23 @@ class Plot:
             self.ax.set_ylabel(ylabel)
             self.ax.set_xlim(xlim)
             self.ax.set_ylim(ylim)
-            if(self.legend_loc or self.count > 1):
+            if self.legend_loc or self.count > 1:
                 self.legend_loc = self.legend_loc or "best"
                 self.ax.legend(loc=self.legend_loc, title=self.legend_title)
-            if(mpl_custom_func is not None):
+            plt.tight_layout(pad=1.5)
+            if mpl_custom_func is not None:
                 self.fig, self.ax = mpl_custom_func(self.fig, self.ax)
+
+        if save_fig is not None:
+            self.save(save_fig)
 
     def save(self, path, **kwargs):
 
         # PLOTLY
-        if(self.interactive):
+        if self.interactive:
 
             # HTML
-            if(str(path)[-5:] == ".html"):
+            if str(path)[-5:] == ".html":
                 self.fig.write_html(path, **kwargs)
 
             # image
@@ -179,16 +191,22 @@ class Plot:
 
         # MATPLOTLIB
         else:
-            self.fig.savefig(path, **kwargs)
+            self.fig.savefig(
+                path,
+                face_color="white",
+                bbox_inches="tight",
+                **kwargs,
+            )
 
+        print("saved figure at {}".format(str(path)))
 
     def _repr_html_(self):
-        if(self.interactive):
+        if self.interactive:
             return self.fig._repr_html_()
         return self.fig.show()
 
-class LinePlot(Plot):
 
+class LinePlot(Plot):
     def add_trace(self, x, y=None, label=None, color=None):
         """
         Add a new histogram to the plot.
@@ -205,13 +223,13 @@ class LinePlot(Plot):
             Trace color.
         """
         # input verification
-        if(y is None):
+        if y is None:
             y = x
             x = np.arange(len(y))
         self.count += 1
 
         # PLOTLY
-        if(self.interactive):
+        if self.interactive:
             self.fig.add_trace(
                 go.Scatter(
                     x=x,
@@ -227,7 +245,6 @@ class LinePlot(Plot):
 
 
 class HistPlot(Plot):
-
     def add_trace(self, x, bins=None, label=None, color=None):
         """
         Add a new histogram to the plot.
@@ -247,7 +264,7 @@ class HistPlot(Plot):
         """
         self.count += 1
         # PLOTLY
-        if(self.interactive):
+        if self.interactive:
             self.fig.add_trace(
                 go.Histogram(
                     x=x,
@@ -260,11 +277,11 @@ class HistPlot(Plot):
         # MATPLOTLIB
         else:
             self.ax.hist(x, label=label, bins=bins, color=color)
-    
+
     def post_process(self, *args, **kwargs):
         # overlay histograms by default
-        if(self.interactive):
-            self.fig.update_layout(barmode='overlay')
+        if self.interactive:
+            self.fig.update_layout(barmode="overlay")
         super().post_process(*args, **kwargs)
 
 
@@ -292,12 +309,12 @@ def _rewrite_docstring(doc, doc_insert):
         Rewritten docstring
     """
     # check rewrite flag
-    if(not REWRITE_DOCSTRING):
+    if not REWRITE_DOCSTRING:
         return doc
 
     # input check
     doc = "" if doc is None else doc
-    
+
     # find indentation level of doc
     match = re.match("^\n?(?P<indent>[ \t]*)", doc)
     indent = match.group("indent") if match else ""
@@ -308,39 +325,49 @@ def _rewrite_docstring(doc, doc_insert):
 
     # search "[decorator parameters]"
     match = re.search(r"\n[ \t]*\[decorator.*?]", doc)
-    if(match):
+    if match:
         return re.sub(
             r"\n[ \t]*\[decorator.*?]",
-            re.sub(r"\n{}".format(insert_indent), r"\n{}".format(indent), doc_insert),
+            re.sub(
+                r"\n{}".format(insert_indent),
+                r"\n{}".format(indent),
+                doc_insert,
+            ),
             doc,
         )
-    
+
     # test for numpy-style docstring
     docstring_query = (
-        r"(?P<desc>(?:.*\n)*?)" # desc
-        r"(?P<params>(?P<indent>[ \t]*)Parameters[ \t]*" # params header
-        r"(?:\n(?!(?:[ \t]*\n)|(?:[ \t]*$)).*)*)" # anything but a whitespace line
+        r"(?P<desc>(?:.*\n)*?)"  # desc
+        r"(?P<params>(?P<indent>[ \t]*)Parameters[ \t]*"  # params header
+        r"(?:\n(?!(?:[ \t]*\n)|(?:[ \t]*$)).*)*)"  # non-whitespace lines
         r"(?P<rest>(?:.*\n)*.*$)"
     )
     match = re.match(docstring_query, doc)
-    if(match):
+    if match:
         doc_parts = match.groupdict()
         return (
             doc_parts["desc"]
             + doc_parts["params"]
-            + re.sub(r"\n{}".format(insert_indent), r"\n{}".format(doc_parts["indent"]), doc_insert)
+            + re.sub(
+                r"\n{}".format(insert_indent),
+                r"\n{}".format(doc_parts["indent"]),
+                doc_insert,
+            )
             + doc_parts["rest"]
         )
 
     # non-numpy docstring, just append in the end
-    return doc + re.sub(r"\n{}".format(insert_indent), r"\n{}".format(indent), doc_insert)
+    return doc + re.sub(
+        r"\n{}".format(insert_indent), r"\n{}".format(indent), doc_insert
+    )
 
 
 def generic_plot_advanced(core, PlotClass):
     """
     Boilerplate code to advance Python plots.
     """
-    #@functools.wraps(core)
+    # @functools.wraps(core)
     def wrapper(
         *args,
         interactive=True,
@@ -355,6 +382,7 @@ def generic_plot_advanced(core, PlotClass):
         pty_update_layout=None,
         pty_custom_func=None,
         mpl_custom_func=None,
+        save_fig=None,
         **kwargs
     ):
         # preparation
@@ -383,53 +411,77 @@ def generic_plot_advanced(core, PlotClass):
             pty_update_layout,
             pty_custom_func,
             mpl_custom_func,
+            save_fig,
         )
 
         # return
         return plot
 
     # rewrite docstring
-    wrapper.__doc__ = _rewrite_docstring(core.__doc__, DOC_INTERACTIVE + DOC_LINEPLOT)
+    wrapper.__doc__ = _rewrite_docstring(
+        core.__doc__,
+        DOC_INTERACTIVE + DOC_LINEPLOT,
+    )
 
     return wrapper
+
 
 def lineplot_advanced(core, *args_dec, **kwargs_dec):
     """
     Boilerplate code to advance Python line plots.
     """
+
     @functools.wraps(generic_plot_advanced)
     def wrapper(*args, **kwargs):
-        return generic_plot_advanced(core, PlotClass=LinePlot, *args_dec, **kwargs_dec)(*args, **kwargs)
+        return generic_plot_advanced(
+            core,
+            PlotClass=LinePlot,
+            *args_dec,
+            **kwargs_dec,
+        )(*args, **kwargs)
 
     return wrapper
+
 
 def histplot_advanced(core, *args_dec, **kwargs_dec):
     """
     Boilerplate code to advance Python line plots.
     """
+
     @functools.wraps(core)
     def wrapper(*args, **kwargs):
-        return generic_plot_advanced(core, PlotClass=HistPlot, *args_dec, **kwargs_dec)(*args, **kwargs)
-    
+        return generic_plot_advanced(
+            core,
+            PlotClass=HistPlot,
+            *args_dec,
+            **kwargs_dec,
+        )(*args, **kwargs)
+
     wrapper.__doc__ = _rewrite_docstring(core.__doc__, DOC_LINEPLOT)
 
     return wrapper
+
 
 def lineplot_static(core, *args_dec, **kwargs_dec):
     """Enforce a static matplotlib plot upon lineplot_advanced"""
-    #@functools.wraps(core)
+
     def wrapper(*args, **kwargs):
-        return lineplot_advanced(core, *args_dec, **kwargs_dec)(*args, interactive=False, **kwargs)
-    
+        return lineplot_advanced(core, *args_dec, **kwargs_dec)(
+            *args, interactive=False, **kwargs
+        )
+
     wrapper.__doc__ = _rewrite_docstring(core.__doc__, DOC_LINEPLOT)
 
     return wrapper
 
+
 def lineplot_dynamic(core, *args_dec, **kwargs_dec):
     """Enforce a dynamic plotly plot upon lineplot_advanced"""
-    #@functools.wraps(core)
+
     def wrapper(*args, **kwargs):
-        return lineplot_advanced(core, *args_dec, **kwargs_dec)(*args, interactive=True, **kwargs)
+        return lineplot_advanced(core, *args_dec, **kwargs_dec)(
+            *args, interactive=True, **kwargs
+        )
 
     wrapper.__doc__ = _rewrite_docstring(core.__doc__, DOC_LINEPLOT)
 
