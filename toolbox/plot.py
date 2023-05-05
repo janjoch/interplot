@@ -293,7 +293,7 @@ def _adjust_indent(indent_decorator, indent_core, docstring):
     )
 
 
-def _rewrite_docstring(doc_core, doc_decorator=None, **kwargs_remove):
+def _rewrite_docstring(doc_core, doc_decorator=None, kwargs_remove=()):
     """
     Appends arguments to a DOCSTRING_DECORATOR.
 
@@ -343,7 +343,7 @@ def _rewrite_docstring(doc_core, doc_decorator=None, **kwargs_remove):
             (
                 r"\n{0}"  # indent
                 r"{1}[ ]*:"  # kwarg_key followed by colon
-                r".*(?:\n{0}[ \t]+.*)"  # the following further indented lines
+                r".*(?:\n{0}[ \t]+.*)*"  # the following further indented lines
             ).format(
                 indent_decorator,
                 kwarg_key,
@@ -482,27 +482,29 @@ def magic_plot(core, doc_decorator=None):
 
 def magic_plot_preset(doc_decorator=None, **kwargs_preset):
     """Pre-configure the magic_plot decorator"""
+    strict_preset = kwargs_preset.get("strict_preset", False)
+    if "strict_preset" in kwargs_preset:
+        del kwargs_preset["strict_preset"]
 
     def decorator(core):
 
         def inner(*args_inner, **kwargs_inner):
             # input clash check
-            # user defines override_preset
-            if kwargs_inner.get("override_preset", False):
-                del kwargs_inner["override_preset"]
-                for kwarg_inner in kwargs_inner:
-                    if kwarg_inner in kwargs_preset:
-                        del kwargs_preset[kwarg_inner]
-
-            # throw error if not manually set to override_preset
-            else:
-                for kwarg_inner in kwargs_inner:
-                    if kwarg_inner in kwargs_preset:
+            # decorator is set to strict presets
+            if strict_preset:
+                for kwarg in kwargs_inner:
+                    if kwarg in kwargs_preset:
                         raise ValueError(
-                            "Keyword argument '"
-                            + kwarg_inner + "' cannot be set.\n"
-                            "Set keyword argument override_preset=True to deactivate."
+                            "Keyword argument '" + kwarg + "' cannot be set.\n"
+                            "Overriding keyword arguments was deactivated with"
+                            " strict_preset=True in the decorator function."
                         )
+
+            # default behaviour: presets can be overridden
+            else:
+                for kwarg in kwargs_inner:
+                    if kwarg in kwargs_preset:
+                        del kwargs_preset[kwarg]
 
             return magic_plot(core, doc_decorator=doc_decorator)(
                 *args_inner,
@@ -514,7 +516,7 @@ def magic_plot_preset(doc_decorator=None, **kwargs_preset):
         inner.__doc__ = _rewrite_docstring(
             core.__doc__,
             doc_decorator,
-            **kwargs_preset,
+            kwargs_remove=kwargs_preset if strict_preset else (),
         )
         return inner
 
