@@ -24,7 +24,6 @@ Example:
 
 
 import re
-import functools
 
 import numpy as np
 
@@ -36,12 +35,11 @@ import plotly.express as px
 
 REWRITE_DOCSTRING = True
 
-DOC_INTERACTIVE = """
+DOCSTRING_DECORATOR = """
     interactive: bool, optional
         Display an interactive plotly line plot
         instead of the default matplotlib figure.
-        Default: False"""
-DOC_LINEPLOT = """
+        Default: False
     title: str, optional
         Plot title.
         Default: None
@@ -62,7 +60,7 @@ DOC_LINEPLOT = """
     legend_title: str, optional
         Default: None
     pty_update_layout: dict, optional
-         PLOTLY ONLY.
+        PLOTLY ONLY.
         Pass keyword arguments to plotly's
         fig.update_layout(**pty_update_layout)
         Thus, take full control over
@@ -133,6 +131,7 @@ class Plot:
                 legend_title=legend_title,
                 height=height,
                 width=width,
+                barmode="overlay",
             )
             self.fig.update_xaxes(range=xlim)
             self.fig.update_yaxes(range=ylim)
@@ -140,6 +139,84 @@ class Plot:
         # init matplotlib
         else:
             self.fig, self.ax = plt.subplots(figsize=fig_size)
+
+    def add_line(self, x, y=None, label=None, color=None):
+        """
+        Add a new histogram to the plot.
+
+        Parameters
+        ----------
+        x: array-like
+        y: array-like, optional
+            If only x is defined, it will be assumed as x,
+            and x will be the index, starting from 0.
+        label: str, optional
+            Trace label for legend.
+        color: str, optional
+            Trace color.
+        """
+        # input verification
+        if y is None:
+            y = x
+            x = np.arange(len(y))
+        self.count += 1
+
+        # PLOTLY
+        if self.interactive:
+            self.fig.add_trace(
+                go.Scatter(
+                    x=x,
+                    y=y,
+                    name=label,
+                    marker_color=color,
+                ),
+            )
+
+        # MATPLOTLIB
+        else:
+            self.ax.plot(x, y, label=label, color=color)
+
+    def add_hist(self, x=None, y=None, bins=None, label=None, color=None):
+        """
+        Add a new histogram to the plot.
+
+        Parameters
+        ----------
+        x: array-like
+            Histogram data.
+        bins: int, optional
+            Number of bins.
+            If undefined, plotly/matplotlib will detect automatically.
+            Default: None
+        label: str, optional
+            Trace label for legend.
+        color: str, optional
+            Trace color.
+        """
+        # input verification
+        if x is None and y is None:
+            raise ValueError("Either x or y must be defined.")
+        if x is not None and y is not None:
+            raise ValueError("x and y cannot be defined both.")
+
+        bins_attribute = dict(nbinsx=bins) if y is None else dict(nbinsy=bins)
+        self.count += 1
+
+        # PLOTLY
+        if self.interactive:
+            self.fig.add_trace(
+                go.Histogram(
+                    x=x,
+                    y=y,
+                    name=label,
+                    **bins_attribute,
+                    marker_color=color,
+                ),
+            )
+
+        # MATPLOTLIB
+        else:
+            self.ax.hist(x, label=label, bins=bins, color=color)
 
     def post_process(
         self,
@@ -207,90 +284,20 @@ class Plot:
         return self.fig.show()
 
 
-class LinePlot(Plot):
-    def add_trace(self, x, y=None, label=None, color=None):
-        """
-        Add a new histogram to the plot.
-
-        Parameters
-        ----------
-        x: array-like
-        y: array-like, optional
-            If only x is defined, it will be assumed as x,
-            and x will be the index, starting from 0.
-        label: str, optional
-            Trace label for legend.
-        color: str, optional
-            Trace color.
-        """
-        # input verification
-        if y is None:
-            y = x
-            x = np.arange(len(y))
-        self.count += 1
-
-        # PLOTLY
-        if self.interactive:
-            self.fig.add_trace(
-                go.Scatter(
-                    x=x,
-                    y=y,
-                    name=label,
-                    marker_color=color,
-                ),
-            )
-
-        # MATPLOTLIB
-        else:
-            self.ax.plot(x, y, label=label, color=color)
+def _adjust_indent(indent_decorator, indent_core, docstring):
+    """Adjust indentation of docstsrings."""
+    return re.sub(
+        r"\n{}".format(indent_decorator),
+        r"\n{}".format(indent_core),
+        docstring,
+    )
 
 
-class HistPlot(Plot):
-    def add_trace(self, x, bins=None, label=None, color=None):
-        """
-        Add a new histogram to the plot.
-
-        Parameters
-        ----------
-        x: array-like
-            Histogram data.
-        bins: int, optional
-            Number of bins.
-            If undefined, plotly/matplotlib will detect automatically.
-            Default: None
-        label: str, optional
-            Trace label for legend.
-        color: str, optional
-            Trace color.
-        """
-        self.count += 1
-        # PLOTLY
-        if self.interactive:
-            self.fig.add_trace(
-                go.Histogram(
-                    x=x,
-                    name=label,
-                    nbinsx=bins,
-                    marker_color=color,
-                ),
-            )
-
-        # MATPLOTLIB
-        else:
-            self.ax.hist(x, label=label, bins=bins, color=color)
-
-    def post_process(self, *args, **kwargs):
-        # overlay histograms by default
-        if self.interactive:
-            self.fig.update_layout(barmode="overlay")
-        super().post_process(*args, **kwargs)
-
-
-def _rewrite_docstring(doc, doc_insert):
+def _rewrite_docstring(doc_core, doc_decorator=None, **kwargs_remove):
     """
-    Appends arguments to a docstring.
+    Appends arguments to a DOCSTRING_DECORATOR.
 
-    Returns original docstring if REWRITE_DOCSTRING is set to False.
+    Returns original DOCSTRING_DECORATOR if REWRITE_DOCSTRING is set to False.
 
     Attempts:
     1. Search for [decorator.*?].
@@ -299,76 +306,122 @@ def _rewrite_docstring(doc, doc_insert):
 
     Parameters
     ----------
-    doc: str
-        Original docstring.
-    doc_insert: str,
-        Docstring to insert.
+    doc_core: str
+        Original DOCSTRING_DECORATOR.
+    doc_decorator: str,
+        DOCSTRING_DECORATOR to insert.
 
     Returns
     -------
     str:
-        Rewritten docstring
+        Rewritten DOCSTRING_DECORATOR
     """
     # check rewrite flag
     if not REWRITE_DOCSTRING:
-        return doc
+        return doc_core
 
     # input check
-    doc = "" if doc is None else doc
+    doc_core = "" if doc_core is None else doc_core
+    doc_decorator = (
+        DOCSTRING_DECORATOR
+        if doc_decorator is None
+        else doc_decorator
+    )
 
-    # find indentation level of doc
-    match = re.match("^\n?(?P<indent>[ \t]*)", doc)
-    indent = match.group("indent") if match else ""
+    # find indentation level of doc_core
+    match = re.match("^\n?(?P<indent_core>[ \t]*)", doc_core)
+    indent_core = match.group("indent_core") if match else ""
 
-    # find indentation level of doc_insert
-    match = re.match("^\n?(?P<indent>[ \t]*)", doc_insert)
-    insert_indent = match.group("indent") if match else ""
+    # find indentation level of doc_decorator
+    match = re.match("^\n?(?P<indent_core>[ \t]*)", doc_decorator)
+    indent_decorator = match.group("indent_core") if match else ""
+
+    # remove kwargs from doc_decorator
+    for kwarg_key in kwargs_remove:
+        # remove docstring entry if it is the only argument
+        doc_decorator = re.sub(
+            (
+                r"\n{0}"  # indent
+                r"{1}[ ]*:"  # kwarg_key followed by colon
+                r".*(?:\n{0}[ \t]+.*)"  # the following further indented lines
+            ).format(
+                indent_decorator,
+                kwarg_key,
+            ),
+            r"",
+            doc_decorator,
+        )
+
+        # remove docstring key if it is found in a list
+        doc_decorator = re.sub(
+            (
+                (  # preceding kwarg_key
+                    r"(?P<front>"  # named group
+                    # r"\n{0}(?:[a-zA-Z_]+(?:[ ]*,[ ]*)?)*?
+                    r"\n{0}"  # indentation
+                    r"(?:[a-zA-Z_]+)??"  # first arg
+                    r"(?:[ ]*,[ ]*[a-zA-Z_]+)??"  # following args
+                    r")"  # end named group
+                ) +
+                (  # kwarg_key
+                    r"(?P<leading_coma>[ ]*,[ ]*)?"  # leading coma
+                    r"{1}"  # kwarg_key
+                    r"(?(leading_coma)|(?:[ ]*,[ ]*)?)"  # following coma if no leading coma  # noqa: E501
+                ) +
+                r"(?P<back>(?:[ ]*,[ ]*[a-zA-Z_]+)*[ ]*?)"  # following arguments  # noqa: E501
+            ).format(indent_decorator, kwarg_key),
+            r"\g<front>\g<back>",
+            doc_decorator,
+        )
 
     # search "[decorator parameters]"
-    match = re.search(r"\n[ \t]*\[decorator.*?]", doc)
+    match = re.search(r"\n[ \t]*\[decorator.*?]", doc_core)
     if match:
         return re.sub(
             r"\n[ \t]*\[decorator.*?]",
-            re.sub(
-                r"\n{}".format(insert_indent),
-                r"\n{}".format(indent),
-                doc_insert,
-            ),
-            doc,
+            _adjust_indent(indent_decorator, indent_core, doc_decorator),
+            doc_core,
         )
 
-    # test for numpy-style docstring
+    # test for numpy-style doc_core
     docstring_query = (
         r"(?P<desc>(?:.*\n)*?)"  # desc
-        r"(?P<params>(?P<indent>[ \t]*)Parameters[ \t]*"  # params header
+        r"(?P<params>(?P<indent_core>[ \t]*)Parameters[ \t]*"  # params header
         r"(?:\n(?!(?:[ \t]*\n)|(?:[ \t]*$)).*)*)"  # non-whitespace lines
         r"(?P<rest>(?:.*\n)*.*$)"
     )
-    match = re.match(docstring_query, doc)
+    match = re.match(docstring_query, doc_core)
     if match:
         doc_parts = match.groupdict()
         return (
             doc_parts["desc"]
             + doc_parts["params"]
-            + re.sub(
-                r"\n{}".format(insert_indent),
-                r"\n{}".format(doc_parts["indent"]),
-                doc_insert,
+            + _adjust_indent(
+                indent_decorator,
+                doc_parts["indent_core"],
+                doc_decorator,
             )
             + doc_parts["rest"]
         )
 
-    # non-numpy docstring, just append in the end
-    return doc + re.sub(
-        r"\n{}".format(insert_indent), r"\n{}".format(indent), doc_insert
+    # non-numpy DOCSTRING_DECORATOR, just append in the end
+    return doc_core + _adjust_indent(
+        indent_decorator,
+        indent_core,
+        doc_decorator,
     )
 
 
-def generic_plot_advanced(core, PlotClass):
+def magic_plot(core, doc_decorator=None):
     """
     Boilerplate code to advance Python plots.
     """
-    # @functools.wraps(core)
+    doc_decorator = (
+        DOCSTRING_DECORATOR
+        if doc_decorator is None
+        else doc_decorator
+    )
+
     def wrapper(
         *args,
         interactive=True,
@@ -384,10 +437,10 @@ def generic_plot_advanced(core, PlotClass):
         pty_custom_func=None,
         mpl_custom_func=None,
         save_fig=None,
-        **kwargs
+        **kwargs,
     ):
         # preparation
-        plot = PlotClass(
+        fig = Plot(
             interactive,
             title,
             xlabel,
@@ -400,10 +453,10 @@ def generic_plot_advanced(core, PlotClass):
         )
 
         # execute core method
-        core(*args, add_trace=plot.add_trace, **kwargs)
+        core(*args, fig=fig, **kwargs)
 
         # post-processing
-        plot.post_process(
+        fig.post_process(
             title,
             xlabel,
             ylabel,
@@ -416,74 +469,53 @@ def generic_plot_advanced(core, PlotClass):
         )
 
         # return
-        return plot
+        return fig
 
-    # rewrite docstring
+    # rewrite DOCSTRING_DECORATOR
     wrapper.__doc__ = _rewrite_docstring(
         core.__doc__,
-        DOC_INTERACTIVE + DOC_LINEPLOT,
+        doc_decorator,
     )
 
     return wrapper
 
 
-def lineplot_advanced(core, *args_dec, **kwargs_dec):
-    """
-    Boilerplate code to advance Python line plots.
-    """
+def magic_plot_preset(doc_decorator=None, **kwargs_preset):
+    """Pre-configure the magic_plot decorator"""
 
-    @functools.wraps(generic_plot_advanced)
-    def wrapper(*args, **kwargs):
-        return generic_plot_advanced(
-            core,
-            PlotClass=LinePlot,
-            *args_dec,
-            **kwargs_dec,
-        )(*args, **kwargs)
+    def decorator(core):
 
-    return wrapper
+        def inner(*args_inner, **kwargs_inner):
+            # input clash check
+            # user defines override_preset
+            if kwargs_inner.get("override_preset", False):
+                del kwargs_inner["override_preset"]
+                for kwarg_inner in kwargs_inner:
+                    if kwarg_inner in kwargs_preset:
+                        del kwargs_preset[kwarg_inner]
 
+            # throw error if not manually set to override_preset
+            else:
+                for kwarg_inner in kwargs_inner:
+                    if kwarg_inner in kwargs_preset:
+                        raise ValueError(
+                            "Keyword argument '"
+                            + kwarg_inner + "' cannot be set.\n"
+                            "Set keyword argument override_preset=True to deactivate."
+                        )
 
-def histplot_advanced(core, *args_dec, **kwargs_dec):
-    """
-    Boilerplate code to advance Python line plots.
-    """
+            return magic_plot(core, doc_decorator=doc_decorator)(
+                *args_inner,
+                **kwargs_inner,
+                **kwargs_preset,
+            )
 
-    @functools.wraps(core)
-    def wrapper(*args, **kwargs):
-        return generic_plot_advanced(
-            core,
-            PlotClass=HistPlot,
-            *args_dec,
-            **kwargs_dec,
-        )(*args, **kwargs)
-
-    wrapper.__doc__ = _rewrite_docstring(core.__doc__, DOC_LINEPLOT)
-
-    return wrapper
-
-
-def lineplot_static(core, *args_dec, **kwargs_dec):
-    """Enforce a static matplotlib plot upon lineplot_advanced"""
-
-    def wrapper(*args, **kwargs):
-        return lineplot_advanced(core, *args_dec, **kwargs_dec)(
-            *args, interactive=False, **kwargs
+        # rewrite DOCSTRING_DECORATOR
+        inner.__doc__ = _rewrite_docstring(
+            core.__doc__,
+            doc_decorator,
+            **kwargs_preset,
         )
+        return inner
 
-    wrapper.__doc__ = _rewrite_docstring(core.__doc__, DOC_LINEPLOT)
-
-    return wrapper
-
-
-def lineplot_dynamic(core, *args_dec, **kwargs_dec):
-    """Enforce a dynamic plotly plot upon lineplot_advanced"""
-
-    def wrapper(*args, **kwargs):
-        return lineplot_advanced(core, *args_dec, **kwargs_dec)(
-            *args, interactive=True, **kwargs
-        )
-
-    wrapper.__doc__ = _rewrite_docstring(core.__doc__, DOC_LINEPLOT)
-
-    return wrapper
+    return decorator
