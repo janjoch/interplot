@@ -5,9 +5,9 @@ It combines the best of the matplotlib and the plotly worlds.
 
 Example:
 ```
->>> @toolbox.plot.lineplot_advanced
->>> def plot(*xy, add_trace=None, **kwargs):
->>>     add_trace(*xy, **kwargs)
+>>> @toolbox.plot.magic_plot
+>>> def plot(*xy, fig=None, **kwargs):
+>>>     fig.add_line(*xy, **kwargs)
 
 >>> plot([0,4,6,7], [1,2,4,8])
 [plotly figure]
@@ -24,6 +24,7 @@ Example:
 
 
 import re
+from warnings import warn
 
 import numpy as np
 
@@ -140,9 +141,9 @@ class Plot:
         else:
             self.fig, self.ax = plt.subplots(figsize=fig_size)
 
-    def add_line(self, x, y=None, label=None, color=None):
+    def add_line(self, x, y=None, label=None, color=None, **kwargs):
         """
-        Add a new histogram to the plot.
+        Add a line to the plot.
 
         Parameters
         ----------
@@ -154,6 +155,8 @@ class Plot:
             Trace label for legend.
         color: str, optional
             Trace color.
+        **kwargs: optional
+            Pass specific keyword arguments to the core methods.
         """
         # input verification
         if y is None:
@@ -169,16 +172,25 @@ class Plot:
                     y=y,
                     name=label,
                     marker_color=color,
+                    **kwargs,
                 ),
             )
 
         # MATPLOTLIB
         else:
-            self.ax.plot(x, y, label=label, color=color)
+            self.ax.plot(x, y, label=label, color=color, **kwargs)
 
-    def add_hist(self, x=None, y=None, bins=None, label=None, color=None):
+    def add_hist(
+        self,
+        x=None,
+        y=None,
+        bins=None,
+        label=None,
+        color=None,
+        **kwargs,
+    ):
         """
-        Add a new histogram to the plot.
+        Add a histogram to the plot.
 
         Parameters
         ----------
@@ -192,6 +204,8 @@ class Plot:
             Trace label for legend.
         color: str, optional
             Trace color.
+        **kwargs: optional
+            Pass specific keyword arguments to the core methods.
         """
         # input verification
         if x is None and y is None:
@@ -211,12 +225,122 @@ class Plot:
                     name=label,
                     **bins_attribute,
                     marker_color=color,
+                    **kwargs,
                 ),
             )
 
         # MATPLOTLIB
         else:
-            self.ax.hist(x, label=label, bins=bins, color=color)
+            self.ax.hist(x, label=label, bins=bins, color=color, **kwargs)
+
+    def add_heatmap(
+        self,
+        data,
+        lim=(None, None),
+        invert_x=False,
+        invert_y=False,
+        cmap="rainbow",
+        cmap_under=None,
+        cmap_over=None,
+        cmap_bad=None,
+        **kwargs,
+    ):
+        """
+        Add a heatmap to the plot.
+
+        Parameters
+        ----------
+        data: 2D array-like
+            2D data to show heatmap.
+        lim: list/tuple of 2x float, optional
+            Lower and upper limits of the color map.
+        cmap: str, optional
+            Color map to use.
+            https://matplotlib.org/stable/gallery/color/colormap_reference.html
+            Note: Not all cmaps are available for both libraries,
+            and may differ slightly.
+            Default: "rainbow"
+        cmap_under, cmap_over, cmap_bad: str, optional
+            Colors to display if under/over range or a pixel is invalid,
+            e.g. in case of np.nan.
+            cmap_bad is not available for interactive plotly plots.
+        **kwargs: optional
+            Pass specific keyword arguments to the core methods.
+        """
+        # input verification
+        if lim is None:
+            lim = [None, None]
+        else:
+            lim = list(lim)
+        if len(lim) != 2:
+            raise ValueError("lim must be a tuple or dict with two items.")
+
+        # PLOTLY
+        if self.interactive:
+            # input verification
+            if cmap_bad is not None:
+                warn("cmap_bad is not supported for plotly.")
+
+            # add colorscale limits
+            if cmap_under is not None or cmap_over is not None:
+                # crappy workaround to make plotly translate named cmap to list
+                cmap = _plotly_colormap_extremes(
+                    px.imshow(
+                        img=[[0, 0], [0, 0]],
+                        color_continuous_scale=cmap,
+                    ).layout.coloraxis.colorscale,
+                    cmap_under,
+                    cmap_over,
+                )
+                if lim != [None, None]:
+                    delta = lim[1] - lim[0]
+                    lim[0] = lim[0] - 0.000001 * delta
+                    lim[1] = lim[1] + 0.000001 * delta
+
+            self.fig.add_trace(
+                go.Heatmap(
+                    z=data,
+                    zmin=lim[0],
+                    zmax=lim[1],
+                    colorscale=cmap,
+                    **kwargs,
+                )
+            )
+            self.fig.update_yaxes(
+                scaleanchor="x",
+                scaleratio=1,
+            )
+            self.fig["layout"]["xaxis"]["autorange"] = (
+                "reversed"
+                if invert_x
+                else None
+            )
+            self.fig["layout"]["yaxis"]["autorange"] = (
+                "reversed"
+                if invert_y
+                else None
+            )
+
+        # MATPLOTLIB
+        else:
+            cmap = _plt_cmap_extremes(
+                cmap,
+                under=cmap_under,
+                over=cmap_over,
+                bad=cmap_bad,
+            )
+            imshow = self.ax.imshow(
+                data,
+                cmap=cmap,
+                vmin=lim[0],
+                vmax=lim[1],
+                **kwargs,
+            )
+            self.fig.colorbar(imshow)
+            if invert_x:
+                self.ax.axes.invert_xaxis()
+            if not invert_y:
+                self.ax.axes.invert_yaxis()
 
     def post_process(
         self,
@@ -282,6 +406,58 @@ class Plot:
         if self.interactive:
             return self.fig._repr_html_()
         return self.fig.show()
+
+
+def _plt_cmap_extremes(cmap, under=None, over=None, bad=None):
+    """
+    Get cmap with under and over range colors.
+
+    Parameters
+    ----------
+    cmap: str or plt cmap
+        Colormap to use.
+        https://matplotlib.org/stable/gallery/color/colormap_reference.html
+    under, over, bad: color, optional
+        Color to use for under / over range values and bad values.
+
+    Returns
+    -------
+    cmap: plt cmap
+        Provide cmap to plt: plt.imshow(cmap=cmap)
+    """
+    cmap = plt.get_cmap(cmap).copy()
+    if under:
+        cmap.set_under(under)
+    if over:
+        cmap.set_over(over)
+    if bad:
+        cmap.set_bad(bad)
+    return cmap
+
+
+def _plotly_colormap_extremes(cs, under=None, over=None):
+    """
+    Append under and over range colors to plotly figure.
+
+    Parameters
+    ----------
+    fig: plotly.Figure
+        Plotly Figure instance which contains a colormap.
+    under, over: color, optional
+        Color to use for under / over range values.
+
+    Returns
+    -------
+    fig: plotly.Figure
+    """
+    cs = [[b for b in a] for a in cs]  # convert tuple to list
+    if under:
+        cs[0][0] = 0.0000001
+        cs = [[0, under]] + cs
+    if over:
+        cs[-1][0] = 0.9999999
+        cs = cs + [[1.0, over]]
+    return cs
 
 
 def _adjust_indent(indent_decorator, indent_core, docstring):
