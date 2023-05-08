@@ -8,7 +8,7 @@ setup(
     version='0.2.1',
     description=(
         "Janosch's small Python code snippets "
-        "making life a bit easier"
+        "making life a bit easier."
     ),
     url='https://github.com/janjoch/toolbox',
     author='Janosch Jörg',

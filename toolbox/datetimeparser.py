@@ -20,16 +20,34 @@ datetime.datetime(2023, 2, 1, 18, 40, 59, 123000)
 
 >>> dtp.ymd("Recording started on 2023-12-31 11:30:59.123456 in Zurich")
 datetime.datetime(2023, 12, 31, 11, 30, 59, 123456)
+
+>>> dtp.time("It is now 14:30:12")
+datetime.time(14, 30, 12)
 ```
 """
 
 import datetime as dt
 import re
+from warnings import warn
 
 import numpy as np
 
 
 AUTO_YEAR_COMPLETE = 2000
+AUTO_YEAR_THRESHOLD = 100
+
+REGEX_START = r".*?"
+REGEX_END = r".*"
+DELIMITER_SPACE = r"[\sTt_]"
+DELIMITER_DATE = r"[-./]"
+DELIMITER_TIME = r"[:.-]"
+
+REGEX_TIME = (
+    r"(?:{2}([0-9]{{1,2}})"  # hour
+    r"{3}([0-9]{{1,2}}))?"  # minute
+    r"(?:{3}([0-9]{{1,2}}))?"  # second
+    r"(?:{3}([0-9]{{1,6}}))?{4}"  # sub-second
+)
 
 
 class DateTimeParsingError(Exception):
@@ -59,10 +77,10 @@ def generic(
     Parameters
     ----------
     time_str: str
-        String to Parse.
+        String to parse.
     pattern: str
         Regular expression pattern.
-    order: list, optional
+    order: tuple or list, optional
         If numbers are not in order (starting with year),
         define the order in which they are found in the pattern.
         Overrides swap.
@@ -81,20 +99,23 @@ def generic(
         Example: To convert ms to us, use microseconds_shift=3.
     auto_year_complete: int, optional
         If the parsed year is below 100, add a number of years.
-        Default 2000.
+        Default: 2000
         Provide 0 to deactivate.
     tzinfo: datetime.tzinfo, optional
-        Pass time zone information to datetime.datetime
+        Pass time zone information to datetime.datetime.
 
     Returns
     -------
     datetime.datetime if the pattern was able to match
     """
+    # input verification
     auto_year_complete = (
-        auto_year_complete
-        if auto_year_complete is not None
-        else AUTO_YEAR_COMPLETE
+        AUTO_YEAR_COMPLETE
+        if auto_year_complete is None
+        else auto_year_complete
     )
+
+    # parse time_str
     match = re.match(pattern, time_str)
     if match:
         ints = np.array(match.groups(default=0), dtype=int)
@@ -104,47 +125,62 @@ def generic(
                 time_str, pattern
             )
         )
+
+    # sort numbers year...miliseconds
     if order is None:
         for s in swap:
             ints[s[0]], ints[s[1]] = ints[s[1]], ints[s[0]]
     else:
+        order = list(order)
+        if len(ints) != len(order):
+            warn(
+                "The length of the order specification does not match"
+                " the length of the detected numbers.\n"
+                "This may lead to errors or incomplete timestamps."
+            )
         ints = ints[order]
     ints = list(start) + list(ints) + list(end)
+
+    # convert to microseconds
     if microsecond_shift:
         if len(ints) >= 7:
             ints[6] = ints[6] * 10**microsecond_shift
         else:
-            print(
-                "Warning: no sub-second information is present in the pattern,"
+            warn(
+                "No sub-second information is present in the pattern,"
                 " but a microsecond shift was provided."
             )
-    if ints[0] < 100:
+
+    # abbrevated year completion
+    if ints[0] < AUTO_YEAR_THRESHOLD:
         ints[0] = ints[0] + auto_year_complete
+
     return dt.datetime(*ints, tzinfo=tzinfo)
 
 
 def ymd(
     time_str,
-    start=r".*?",
-    end=r".*",
-    space=r"[\sTt_]",
-    date_delimiter=r"[-.]",
-    time_delimiter=r"[:.-]",
+    regex_start=None,
+    regex_end=None,
+    delimiter_date=None,
+    delimiter_space=None,
+    delimiter_time=None,
     microsecond_shift=None,
     auto_year_complete=None,
+    tzinfo=None,
 ):
     r"""
-    Parse timestamps to datetime.datetime.
+    Parse year-month-day date-/timestamps to datetime.datetime.
 
-    Input accepts year-month-day[ -hour-minute[-second[-microsecond]]]
+    Input accepts [year-]month-day[ -hour-minute[-second[-microsecond]]]
 
     Input format examples:
         23.12.31
         2023.12.31
-        2023.12.31 11:30
-        2023.12.31 11:30:59
-        2023.12.31 11:30:59.123456
-        2023-12-31_11-30-59-123456
+        2023.12.31 23:59
+        2023.12.31 23:59:59
+        2023.12.31 23:59:59.123456
+        2023-12-31T23:59:59.123456Z (ISO 8601)
 
     Output Format datetime.datetime
 
@@ -153,53 +189,95 @@ def ymd(
     Parameters
     ----------
     time_str: str
-        String to Parse.
-    start, end: str, optional
-        Regex patterns that precedes / follows the timestamp.
-        Default: [ \t\n\r\f\v] and more
-    space: str, optional
+        String to parse.
+    regex_start: str, optional
+        Regex patterns that precedes the timestamp.
+        Default: .*?
+    regex_end: str, optional
+        Regex patterns that follows the timestamp.
+        Default: .*
+    delimiter_date: str, optional
+        Regex patterns in between date integers.
+        Default: [-./]
+    delimiter_space: str, optional
         Regex pattern in between date and time.
-    date_delimiter, time_delimiter: str, optional
-        Regex patterns in between date or time integers respectively.
+        Default: [\sTt_]
+    delimiter_time: str, optional
+        Regex patterns in between time integers.
+        Default: [-./]
     microsecond_shift: int, optional
         Number of decimal places to shift sub-second value right
         to get microseconds.
         Example: To convert ms to us, use microseconds_shift=3.
     auto_year_complete: int, optional
         If the parsed year is below 100, add a number of years.
+    tzinfo: datetime.tzinfo, optional
+        Pass time zone information to datetime.datetime.
 
     Returns
     -------
     datetime.datetime
     """
+    # input verification
+    regex_start = (
+        REGEX_START
+        if regex_start is None
+        else regex_start
+    )
+    regex_end = (
+        REGEX_END
+        if regex_end is None
+        else regex_end
+    )
+    delimiter_date = (
+        DELIMITER_DATE
+        if delimiter_date is None
+        else delimiter_date
+    )
+    delimiter_space = (
+        DELIMITER_SPACE
+        if delimiter_space is None
+        else delimiter_space
+    )
+    delimiter_time = (
+        DELIMITER_TIME
+        if delimiter_time is None
+        else delimiter_time
+    )
+
     return generic(
         time_str=time_str,
         pattern=(
-            r"{0}([0-9]+)"
-            r"{1}([0-9]+)"
-            r"{1}([0-9]+)"
-            r"(?:{2}([0-9]+)"
-            r"{3}([0-9]+))?"
-            r"(?:{3}([0-9]+))?"
-            r"(?:{3}([0-9]+))?{4}"
-        ).format(start, date_delimiter, space, time_delimiter, end),
+            r"{0}(?:([0-9]{{2,4}}){1})?"  # year
+            r"([0-9]{{1,2}})"  # month
+            r"{1}([0-9]{{1,2}})"  # day
+            + REGEX_TIME
+        ).format(
+            regex_start,
+            delimiter_date,
+            delimiter_space,
+            delimiter_time,
+            regex_end,
+        ),
         microsecond_shift=microsecond_shift,
         auto_year_complete=auto_year_complete,
+        tzinfo=tzinfo,
     )
 
 
 def dmy(
     time_str,
-    start=r".*?",
-    end=r".*",
-    space=r"[\s_]",
-    date_delimiter=r"[-.]",
-    time_delimiter=r"[:.-]",
+    regex_start=None,
+    regex_end=None,
+    delimiter_date=None,
+    delimiter_space=None,
+    delimiter_time=None,
     microsecond_shift=None,
     auto_year_complete=None,
+    tzinfo=None,
 ):
     r"""
-    Parse timestamps to datetime.datetime.
+    Parse day-month-year date-/timestamps to datetime.datetime.
 
     Input accepts day-month[-year][ -hour-minute[-second[-microsecond]]]
 
@@ -207,10 +285,10 @@ def dmy(
         31.12
         31.12.23
         31.12.2023
-        31.12.2023 11:30
-        31.12.2023 11:30:59
-        31.12.2023 11:30:59.123456
-        31-12-2023_11-30-59-123456
+        31.12.2023 23:59
+        31.12.2023 23:59:59
+        31.12.2023 23:59:59.123456
+        31-12-2023_23-59-59-123456
 
     Output Format datetime.datetime
 
@@ -219,54 +297,96 @@ def dmy(
     Parameters
     ----------
     time_str: str
-        String to Parse.
-    start, end: str, optional
-        Regex patterns that precedes / follows the timestamp.
-        Default: [ \t\n\r\f\v] and more
-    space: str, optional
+        String to parse.
+    regex_start: str, optional
+        Regex patterns that precedes the timestamp.
+        Default: .*?
+    regex_end: str, optional
+        Regex patterns that follows the timestamp.
+        Default: .*
+    delimiter_date: str, optional
+        Regex patterns in between date integers.
+        Default: [-./]
+    delimiter_space: str, optional
         Regex pattern in between date and time.
-    date_delimiter, time_delimiter: str, optional
-        Regex patterns in between date or time integers respectively.
+        Default: [\sTt_]
+    delimiter_time: str, optional
+        Regex patterns in between time integers.
+        Default: [-./]
     microsecond_shift: int, optional
         Number of decimal places to shift sub-second value right
         to get microseconds.
         Example: To convert ms to us, use microseconds_shift=3.
     auto_year_complete: int, optional
         If the parsed year is below 100, add a number of years.
+    tzinfo: datetime.tzinfo, optional
+        Pass time zone information to datetime.datetime.
 
     Returns
     -------
     datetime.datetime
     """
+    # input verification
+    regex_start = (
+        REGEX_START
+        if regex_start is None
+        else regex_start
+    )
+    regex_end = (
+        REGEX_END
+        if regex_end is None
+        else regex_end
+    )
+    delimiter_date = (
+        DELIMITER_DATE
+        if delimiter_date is None
+        else delimiter_date
+    )
+    delimiter_space = (
+        DELIMITER_SPACE
+        if delimiter_space is None
+        else delimiter_space
+    )
+    delimiter_time = (
+        DELIMITER_TIME
+        if delimiter_time is None
+        else delimiter_time
+    )
+
     return generic(
         time_str=time_str,
         pattern=(
-            r"{0}([0-9]+)"
-            r"{1}([0-9]+)"
-            r"(?:{1}([0-9]+))?"
-            r"(?:{2}([0-9]+)"
-            r"{3}([0-9]+))?"
-            r"(?:{3}([0-9]+))?"
-            r"(?:{3}([0-9]+))?{4}"
-        ).format(start, date_delimiter, space, time_delimiter, end),
+            r"{0}([0-9]{{1,2}})"  # day
+            r"{1}([0-9]{{1,2}})"  # month
+            r"(?:{1}([0-9]{{2,4}}))?"  # year
+            + REGEX_TIME
+        ).format(
+            regex_start,
+            delimiter_date,
+            delimiter_space,
+            delimiter_time,
+            regex_end,
+        ),
         swap=((0, 2),),
         microsecond_shift=microsecond_shift,
         auto_year_complete=auto_year_complete,
+        tzinfo=tzinfo,
     )
 
 
 def mdy(
     time_str,
-    start=r".*?",
-    end=r".*",
-    space=r"[\s_]",
-    date_delimiter=r"[-./]",
-    time_delimiter=r"[:./-]",
+    regex_start=None,
+    regex_end=None,
+    delimiter_date=None,
+    delimiter_space=None,
+    delimiter_time=None,
     microsecond_shift=None,
     auto_year_complete=None,
+    tzinfo=None,
 ):
     r"""
-    Parse timestamps to datetime.datetime.
+    Parse month-day-year date-/timestamps to datetime.datetime.
 
     Input accepts month-day[-year][ -hour-minute[-second[-microsecond]]]
 
@@ -274,10 +394,10 @@ def mdy(
         12/31
         12/31/23
         12/31/2023
-        12/31/2023 11:30
-        12/31/2023 11:30:59
-        12/31/2023 11:30:59.123456
-        12-31-2023_11-30-59-123456
+        12/31/2023 23:59
+        12/31/2023 23:59:59
+        12/31/2023 23:59:59.123456
+        12-31-2023_23-59-59-123456
 
     Output Format datetime.datetime
 
@@ -286,40 +406,249 @@ def mdy(
     Parameters
     ----------
     time_str: str
-        String to Parse.
-    start, end: str, optional
-        Regex patterns that precedes / follows the timestamp.
-        Default: [ \t\n\r\f\v] and more
-    space: str, optional
+        String to parse.
+    regex_start: str, optional
+        Regex patterns that precedes the timestamp.
+        Default: .*?
+    regex_end: str, optional
+        Regex patterns that follows the timestamp.
+        Default: .*
+    delimiter_date: str, optional
+        Regex patterns in between date integers.
+        Default: [-./]
+    delimiter_space: str, optional
         Regex pattern in between date and time.
-    date_delimiter, time_delimiter: str, optional
-        Regex patterns in between date or time integers respectively.
+        Default: [\sTt_]
+    delimiter_time: str, optional
+        Regex patterns in between time integers.
+        Default: [-./]
     microsecond_shift: int, optional
         Number of decimal places to shift sub-second value right
         to get microseconds.
         Example: To convert ms to us, use microseconds_shift=3.
     auto_year_complete: int, optional
         If the parsed year is below 100, add a number of years.
+    tzinfo: datetime.tzinfo, optional
+        Pass time zone information to datetime.datetime.
 
     Returns
     -------
     datetime.datetime
     """
+    # input verification
+    regex_start = (
+        REGEX_START
+        if regex_start is None
+        else regex_start
+    )
+    regex_end = (
+        REGEX_END
+        if regex_end is None
+        else regex_end
+    )
+    delimiter_date = (
+        DELIMITER_DATE
+        if delimiter_date is None
+        else delimiter_date
+    )
+    delimiter_space = (
+        DELIMITER_SPACE
+        if delimiter_space is None
+        else delimiter_space
+    )
+    delimiter_time = (
+        DELIMITER_TIME
+        if delimiter_time is None
+        else delimiter_time
+    )
+
     return generic(
         time_str=time_str,
         pattern=(
-            r"{0}([0-9]+)"
-            r"{1}([0-9]+)"
-            r"(?:{1}([0-9]+))?"
-            r"(?:{2}([0-9]+)"
-            r"{3}([0-9]+))?"
-            r"(?:{3}([0-9]+))?"
-            r"(?:{3}([0-9]+))?{4}"
-        ).format(start, date_delimiter, space, time_delimiter, end),
+            r"{0}([0-9]+)"  # month
+            r"{1}([0-9]+)"  # day
+            r"(?:{1}([0-9]+))"  # year
+            + REGEX_TIME
+        ).format(
+            regex_start,
+            delimiter_date,
+            delimiter_space,
+            delimiter_time,
+            regex_end,
+        ),
         swap=(
             (0, 1),
             (0, 2),
         ),
         microsecond_shift=microsecond_shift,
         auto_year_complete=auto_year_complete,
+        tzinfo=tzinfo,
+    )
+
+
+def time(
+    time_str,
+    date=None,
+    regex_start=None,
+    regex_end=None,
+    delimiter_time=None,
+    microsecond_shift=None,
+    auto_year_complete=None,
+    tzinfo=None,
+):
+    r"""
+    Parse timestamps to datetime.datetime.
+
+    Input accepts hour-minute[-second[-microsecond]]
+
+    Input format examples:
+        11:30
+        11:30:59
+        11:30:59.123456
+        11-30-59-123456
+
+    Output Format datetime.datetime
+
+    Source: https://github.com/janjoch/toolbox
+
+    Parameters
+    ----------
+    time_str: str
+        String to parse.
+    date: datetime.datetime or list, optional
+        Date to complete the timestamp
+        A list must provide [year, month, day]
+        If no date is provided, the method will return
+        a datetime.time object instead of datetime.datetime
+        Default: None
+    regex_start: str, optional
+        Regex patterns that precedes the timestamp.
+        Default: .*?
+    regex_end: str, optional
+        Regex patterns that follows the timestamp.
+        Default: .*
+    delimiter_time: str, optional
+        Regex patterns in between time integers.
+        Default: [-./]
+    microsecond_shift: int, optional
+        Number of decimal places to shift sub-second value right
+        to get microseconds.
+        Example: To convert ms to us, use microseconds_shift=3.
+    auto_year_complete: int, optional
+        If the parsed year is below 100, add a number of years.
+    tzinfo: datetime.tzinfo, optional
+        Pass time zone information to datetime.datetime.
+
+    Returns
+    -------
+    if date is None:
+        datetime.time
+    else:
+        datetime.datetime
+    """
+    # input verification
+    regex_start = (
+        REGEX_START
+        if regex_start is None
+        else regex_start
+    )
+    regex_end = (
+        REGEX_END
+        if regex_end is None
+        else regex_end
+    )
+    delimiter_time = (
+        DELIMITER_TIME
+        if delimiter_time is None
+        else delimiter_time
+    )
+    return_time = date is None
+    if return_time:
+        date = [2001, 1, 1]
+    elif isinstance(date, dt.datetime):
+        date = tuple(date.timetuple())[:3]
+    elif len(date) != 3:
+        raise ValueError(
+            "date parameter must be a list or tuple "
+            "containing [year, month, day]"
+        )
+
+    result = generic(
+        time_str=time_str,
+        pattern=REGEX_TIME.format(
+            None,
+            None,
+            regex_start,
+            delimiter_time,
+            regex_end,
+        ),
+        start=date,
+        microsecond_shift=microsecond_shift,
+        auto_year_complete=auto_year_complete,
+        tzinfo=tzinfo,
+    )
+
+    # no date specified: datetime.time
+    if return_time:
+        return result.time()
+
+    # date specified: datetime.datetime
+    return result
+
+
+def iso_tight(
+    time_str,
+    regex_start=r"^",
+    regex_end=r"$",
+    tzinfo=None,
+):
+    r"""
+    Parse tight ISO 8601 date-/timestamp.
+
+    Format: 20233112T2359[59][Z]
+
+    Output Format datetime.datetime
+
+    Source: https://github.com/janjoch/toolbox
+
+    Parameters
+    ----------
+    time_str: str
+        String to parse.
+    regex_start: str, optional
+        Regex patterns that precedes the timestamp.
+        Default: ^
+        (Only matches at the beginning of the string.)
+        Provide None to override with wildcard regex.
+    regex_end: str, optional
+        Regex patterns that follows the timestamp.
+        Default: $
+        (Only matches at the end of the string.)
+        Provide None to override with wildcard regex.
+    tzinfo: datetime.tzinfo, optional
+        Pass time zone information to datetime.datetime.
+
+    Returns
+    -------
+    datetime.datetime
+    """
+    # input verification
+    regex_start = (
+        REGEX_START
+        if regex_start is None
+        else regex_start
+    )
+    regex_end = (
+        REGEX_END
+        if regex_end is None
+        else regex_end
+    )
+
+    return generic(
+        time_str=time_str,
+        pattern=(
+            r"{}([0-9]{{4}})([0-9]{{2}})([0-9]{{2}})"
+            r"T([0-9]{{2}})([0-9]{{2}})([0-9]{{2}})?Z?{}"
+        ).format(regex_start, regex_end),
+        tzinfo=tzinfo,
     )
