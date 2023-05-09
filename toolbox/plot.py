@@ -131,9 +131,10 @@ class Plot:
         legend_title=None,
     ):
         self.interactive = interactive
-        self.count = 0
         self.legend_loc = legend_loc
         self.legend_title = legend_title
+        self.dpi = dpi
+        self.count = 0
 
         # init plotly
         if self.interactive:
@@ -173,7 +174,7 @@ class Plot:
         color: str, optional
             Trace color.
         **kwargs: optional
-            Pass specific keyword arguments to the core methods.
+            Pass specific keyword arguments to the line core method.
         """
         # input verification
         if y is None:
@@ -222,7 +223,7 @@ class Plot:
         color: str, optional
             Trace color.
         **kwargs: optional
-            Pass specific keyword arguments to the core methods.
+            Pass specific keyword arguments to the hist core method.
         """
         # input verification
         if x is None and y is None:
@@ -282,7 +283,7 @@ class Plot:
             e.g. in case of np.nan.
             cmap_bad is not available for interactive plotly plots.
         **kwargs: optional
-            Pass specific keyword arguments to the core methods.
+            Pass specific keyword arguments to the heatmap core method.
         """
         # input verification
         if lim is None:
@@ -406,7 +407,12 @@ class Plot:
 
             # image
             else:
-                self.fig.write_image(path, **kwargs)
+                scale = None if self.dpi is None else self.dpi / 100.
+                self.fig.write_image(
+                    path,
+                    scale=scale,
+                    **kwargs,
+                )
 
         # MATPLOTLIB
         else:
@@ -719,3 +725,86 @@ def magic_plot_preset(doc_decorator=None, **kwargs_preset):
         return inner
 
     return decorator
+
+
+@magic_plot
+def line(
+    *args,
+    fig,
+    **kwargs,
+):
+    """
+    Draw a simple line plot.
+
+    Parameters
+    ----------
+    x: array-like
+    y: array-like, optional
+        If only x is defined, it will be assumed as x,
+        and x will be the index, starting from 0.
+    label: str, optional
+        Trace label for legend.
+    color: str, optional
+        Trace color.
+    **kwargs: optional
+        Pass specific keyword arguments to the line core method.
+    """
+    fig.add_line(*args, **kwargs)
+
+
+@magic_plot
+def hist(
+    *args,
+    fig,
+    **kwargs,
+):
+    """
+    Draw a simple histogram.
+
+    Parameters
+    ----------
+    x: array-like
+        Histogram data.
+    bins: int, optional
+        Number of bins.
+        If undefined, plotly/matplotlib will detect automatically.
+        Default: None
+    label: str, optional
+        Trace label for legend.
+    color: str, optional
+        Trace color.
+    **kwargs: optional
+        Pass specific keyword arguments to the hist core method.
+    """
+    fig.add_hist(*args, **kwargs)
+
+
+@magic_plot
+def heatmap(
+    *args,
+    fig,
+    **kwargs,
+):
+    """
+    Draw a simple heatmap.
+
+    Parameters
+    ----------
+    data: 2D array-like
+        2D data to show heatmap.
+    lim: list/tuple of 2x float, optional
+        Lower and upper limits of the color map.
+    cmap: str, optional
+        Color map to use.
+        https://matplotlib.org/stable/gallery/color/colormap_reference.html
+        Note: Not all cmaps are available for both libraries,
+        and may differ slightly.
+        Default: "rainbow"
+    cmap_under, cmap_over, cmap_bad: str, optional
+        Colors to display if under/over range or a pixel is invalid,
+        e.g. in case of np.nan.
+        cmap_bad is not available for interactive plotly plots.
+    **kwargs: optional
+        Pass specific keyword arguments to the hist core method.
+    """
+    fig.add_heatmap(*args, **kwargs)
