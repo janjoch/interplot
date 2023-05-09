@@ -1,5 +1,7 @@
 """
-Use snippets from the following code if you want to control matplotlib.pyplot
+Deprecated. Use toolbox.plot instead.
+
+However, some code snippets might still be valuable to copy&paste.
 """
 
 
