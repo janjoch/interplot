@@ -1,3 +1,6 @@
+"""Change the brightness of a hex color."""
+
+
 def change_hex_brightness(color, factor, to_white=False, hash_out=True):
     """
     Change the brightness of a hex color.
@@ -23,13 +26,14 @@ def change_hex_brightness(color, factor, to_white=False, hash_out=True):
     str:
         New color, with leading hash (default)
     """
+    # input validation
     if len(color) != 6:
         if len(color) == 7 and color[0] == "#":
             color = color[1:]
         else:
             raise ValueError("Expected 6 digit hex color.")
         if factor < 0:
-            raise ValueError("Factor must be a positive value!")
+            raise ValueError("Factor must be a positive value.")
 
     out = "#" if hash_out else ""
 

@@ -27,7 +27,9 @@ def zip_smart(*iterables, iterable_types=None, strict=True):
         repeating.
         Default: (tuple, list, np.ndarray, pandas.Series)
     strict: bool, optional
-        Fail if iterables are not the same length. The default is True.
+        Fail if iterables are not the same length.
+        Not supported in Python < 3.10.
+        Default: True
 
     Returns
     -------
@@ -69,7 +71,7 @@ def sum_nested(
     Add up all values in iterable objects.
 
     Nested structures are added up recursively.
-    Dictionaries are
+    In dictionaries, only the values are used.
 
     Parameters
     ----------

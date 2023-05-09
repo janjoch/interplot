@@ -1,12 +1,14 @@
+"""Simulate acceleration behavior of a stepper motor."""
+
 import math
 
 import numpy as np
 
-from .convert import Convert
+from . import convert
 
 
 class Accel:
-    """Simulate acceleration behaviour of a stepper motor."""
+    """Simulate acceleration behavior of a stepper motor."""
 
     def __init__(
         self,
@@ -46,8 +48,8 @@ class Accel:
             self.v_mot_max = speed_max
             self.a_mot_max = accel_max
         else:
-            self.v_mot_max = Convert.rpm_to_radpsec(speed_max)
-            self.a_mot_max = Convert.rpmps_to_radpsec2(accel_max)
+            self.v_mot_max = convert.rpm_to_radpsec(speed_max)
+            self.a_mot_max = convert.rpmps_to_radpsec2(accel_max)
 
         self.start_delay = start_delay
         self.stop_delay = stop_delay
@@ -124,4 +126,4 @@ class Accel:
         self.t_tot = self.t[-1]
 
         self.v_si = np.array(self.v)
-        self.v_rpm = Convert.radpsec_to_rpm(self.v_si)
+        self.v_rpm = convert.radpsec_to_rpm(self.v_si)

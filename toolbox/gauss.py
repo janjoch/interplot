@@ -1,3 +1,6 @@
+"""Gaussian probability density function."""
+
+
 import math
 
 import numpy as np

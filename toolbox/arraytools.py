@@ -1,6 +1,4 @@
-"""
-Work with 1D arrays.
-"""
+"""Work with 1D arrays."""
 
 
 import math

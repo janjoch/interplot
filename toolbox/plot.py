@@ -1,24 +1,28 @@
 """
-Boilerplate code to advance Python plots.
+Create matplotlib/plotly hybrid plots with a few lines of code.
 
 It combines the best of the matplotlib and the plotly worlds.
+All the necessary boilerplate code is contained in this module.
+
+Currently supported:
+* line plots (scatter)
+* histograms
+* heatmaps
 
 Example:
 ```
->>> @toolbox.plot.magic_plot
->>> def plot(*xy, fig=None, **kwargs):
->>>     fig.add_line(*xy, **kwargs)
-
->>> plot([0,4,6,7], [1,2,4,8])
+>>> toolbox.plot.line([0,4,6,7], [1,2,4,8])
 [plotly figure]
 
->>> plot([0,4,6,7], [1,2,4,8],
+>>> toolbox.plot.line(
+>>>     [0,4,6,7],
+>>>     [1,2,4,8],
 >>>     interactive=False,
 >>>     title="matploblib static figure",
 >>>     xlabel="X",
 >>>     ylabel="Y",
 >>> )
-[matplotlib figure]
+[matplotlib figure "matploblib static figure"]
 ```
 """
 

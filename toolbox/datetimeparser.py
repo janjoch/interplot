@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Parse str timestamps to datetime.datetime.
 
@@ -9,20 +8,23 @@ Examples:
 ```
 >>> import toolbox.datetimeparser as dtp
 
+>>> dtp.ymd("2023-05-08T14:30:02Z")
+datetime.datetime(2023, 5, 8, 14, 30, 2)
+
 >>> dtp.dmy("31.12.2023")
 datetime.datetime(2023, 12, 31, 0, 0)
 
->>> dtp.dmy("1.2.23 18:40:59.123456")
-datetime.datetime(2023, 2, 1, 18, 40, 59, 123456)
+>>> dtp.dmy("31.12.23 14:30:02.123", microsecond_shift=3)
+datetime.datetime(2023, 12, 31, 14, 30, 2, 123000)
 
->>> dtp.dmy("1.2.23 18:40:59.123", microsecond_shift=3)
-datetime.datetime(2023, 2, 1, 18, 40, 59, 123000)
-
->>> dtp.ymd("Recording started on 2023-12-31 11:30:59.123456 in Zurich")
-datetime.datetime(2023, 12, 31, 11, 30, 59, 123456)
+>>> dtp.dmy("The moonlanding happened on 20.07.1969 20:17:40")
+datetime.datetime(1969, 7, 20, 20, 17, 40)
 
 >>> dtp.time("It is now 14:30:12")
 datetime.time(14, 30, 12)
+
+>>> dtp.iso_tight("20230508T143002Z")
+datetime.datetime(2023, 5, 8, 14, 30, 2)
 ```
 """
 
