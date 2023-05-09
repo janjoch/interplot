@@ -419,6 +419,9 @@ class Plot:
 
         print("saved figure at {}".format(str(path)))
 
+    def show(self):
+        return self.fig.show()
+
     def _repr_html_(self):
         if self.interactive:
             return self.fig._repr_html_()

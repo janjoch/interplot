@@ -70,18 +70,21 @@ Boilerplate code to advance Python plots.
 It combines the best of the matplotlib and the plotly worlds.
 
 ```python
->>> @toolbox.plot.lineplot_advanced
->>> def plot(*xy, add_trace=None, **kwargs):
->>>     add_trace(*xy, **kwargs)
+>>> @toolbox.plot.magic_plot
+>>> def plot(*xy, fig, **kwargs):
+>>>     fig.add_line(*xy, **kwargs)
 
 >>> plot([0,4,6,7], [1,2,4,8])
 [plotly figure]
 
 >>> plot([0,4,6,7], [1,2,4,8],
 >>>     interactive=False,
->>>     title="matploblib static figure",
+>>>     xlim=(0, 10),
+>>>     title="Matploblib Static Figure",
 >>>     xlabel="X",
 >>>     ylabel="Y",
+>>>     save_fig="export/path/export.png",
+>>>     dpi=300,
 >>> )
 [matplotlib figure]
 ```
