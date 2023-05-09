@@ -36,6 +36,9 @@ import matplotlib.pyplot as plt
 
 import plotly.graph_objects as go
 import plotly.express as px
+import plotly.subplots as sp
+
+from .iter import zip_smart
 
 
 REWRITE_DOCSTRING = True
@@ -124,6 +127,8 @@ class Plot:
     def __init__(
         self,
         interactive,
+        rows=1,
+        cols=1,
         title=None,
         xlabel=None,
         ylabel=None,
@@ -135,6 +140,8 @@ class Plot:
         legend_title=None,
     ):
         self.interactive = interactive
+        self.rows = rows
+        self.cols = cols
         self.legend_loc = legend_loc
         self.legend_title = legend_title
         self.dpi = dpi
@@ -142,12 +149,12 @@ class Plot:
 
         # init plotly
         if self.interactive:
-            self.fig = px.line()
+            self.fig = sp.make_subplots(rows=rows, cols=cols)
             height, width = fig_size if fig_size is not None else (None, None)
             self.fig.update_layout(
                 title=title,
-                xaxis_title=xlabel,
-                yaxis_title=ylabel,
+                # xaxis_title=xlabel,
+                # yaxis_title=ylabel,
                 legend_title=legend_title,
                 height=height,
                 width=width,
@@ -155,6 +162,10 @@ class Plot:
             )
             self.fig.update_xaxes(range=xlim)
             self.fig.update_yaxes(range=ylim)
+            for text, i_col in zip_smart(xlabel, range(1, cols+1)):
+                self.fig.update_xaxes(title_text=text, row=rows, col=i_col)
+            for text, i_row in zip_smart(ylabel, range(1, rows+1)):
+                self.fig.update_yaxes(title_text=text, row=i_row, col=1)
 
         # init matplotlib
         else:
@@ -163,7 +174,16 @@ class Plot:
                 dpi=dpi,
             )
 
-    def add_line(self, x, y=None, label=None, color=None, **kwargs):
+    def add_line(
+        self,
+        x,
+        y=None,
+        label=None,
+        color=None,
+        row=None,
+        col=None,
+        **kwargs,
+    ):
         """
         Add a line to the plot.
 
@@ -196,6 +216,8 @@ class Plot:
                     marker_color=color,
                     **kwargs,
                 ),
+                row=row,
+                col=col,
             )
 
         # MATPLOTLIB
@@ -209,6 +231,8 @@ class Plot:
         bins=None,
         label=None,
         color=None,
+        row=None,
+        col=None,
         **kwargs,
     ):
         """
@@ -249,6 +273,8 @@ class Plot:
                     marker_color=color,
                     **kwargs,
                 ),
+                row=row,
+                col=col,
             )
 
         # MATPLOTLIB
@@ -265,6 +291,8 @@ class Plot:
         cmap_under=None,
         cmap_over=None,
         cmap_bad=None,
+        row=None,
+        col=None,
         **kwargs,
     ):
         """
@@ -326,7 +354,9 @@ class Plot:
                     zmax=lim[1],
                     colorscale=cmap,
                     **kwargs,
-                )
+                ),
+                row=row,
+                col=col,
             )
             self.fig.update_yaxes(
                 scaleanchor="x",
@@ -631,6 +661,8 @@ def magic_plot(core, doc_decorator=None):
     def wrapper(
         *args,
         interactive=True,
+        rows=1,
+        cols=1,
         title=None,
         xlabel=None,
         ylabel=None,
@@ -648,16 +680,18 @@ def magic_plot(core, doc_decorator=None):
     ):
         # preparation
         fig = Plot(
-            interactive,
-            title,
-            xlabel,
-            ylabel,
-            xlim,
-            ylim,
-            fig_size,
-            dpi,
-            legend_loc,
-            legend_title,
+            interactive=interactive,
+            rows=rows,
+            cols=cols,
+            title=title,
+            xlabel=xlabel,
+            ylabel=ylabel,
+            xlim=xlim,
+            ylim=ylim,
+            fig_size=fig_size,
+            dpi=dpi,
+            legend_loc=legend_loc,
+            legend_title=legend_title,
         )
 
         # execute core method
@@ -665,15 +699,15 @@ def magic_plot(core, doc_decorator=None):
 
         # post-processing
         fig.post_process(
-            title,
-            xlabel,
-            ylabel,
-            xlim,
-            ylim,
-            pty_update_layout,
-            pty_custom_func,
-            mpl_custom_func,
-            save_fig,
+            title=title,
+            xlabel=xlabel,
+            ylabel=ylabel,
+            xlim=xlim,
+            ylim=ylim,
+            pty_update_layout=pty_update_layout,
+            pty_custom_func=pty_custom_func,
+            mpl_custom_func=mpl_custom_func,
+            save_fig=save_fig,
         )
 
         # return

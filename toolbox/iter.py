@@ -6,7 +6,7 @@ from numpy import ndarray as np_ndarray
 from pandas.core.series import Series as pd_Series
 
 
-ITERABLE_TYPES = (tuple, list, dict, np_ndarray, pd_Series)
+ITERABLE_TYPES = (tuple, list, dict, np_ndarray, pd_Series, range)
 CUSTOM_DIGESTION = ((dict, (lambda dct: [elem for _, elem in dct.items()])),)
 
 
