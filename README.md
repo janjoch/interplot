@@ -18,7 +18,7 @@ Note: This is just a sneak peek. Refer to /demo and ultimately /toolbox to see e
 array([2, 3, 4])
 
 # highpass
->>> toolbox.arraytools.highpass(array, n=3)
+>>> toolbox.arraytools.highpass([1,2,3,4,5], n=3)
 array([0, 0, 0])
 
 # interpolate between two array elements
@@ -87,4 +87,16 @@ It combines the best of the matplotlib and the plotly worlds.
 >>>     dpi=300,
 >>> )
 [matplotlib figure]
+
+>>> class ReadTrace(toolbox.plot.NotebookInteraction):
+>>> 
+>>>     def __init__(self, file):
+>>>         self.data = pd.read_csv(file)
+>>>     
+>>>     @toolbox.plot.magic_plot_preset(title="Automatic callback of show() in a Jupyter notebook")
+>>>     def show(self, col="signal", fig=None):
+>>>         fig.add_line(self.data[col])
+
+>>> ReadTrace("path/to/data.csv")
+[plotly figure is shown automatically]
 ```
