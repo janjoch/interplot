@@ -51,6 +51,10 @@ DOCSTRING_DECORATOR = """
         Default: None
         PLOTLY: dimensions in px.
         MATPLOTLIB: dimensions in inch.
+    dpi: int, optional
+        MATPLOTLIB ONLY.
+        Plot resolution.
+        Default 100.
     xlim, ylim: tuple of 2 numbers, optional
         Axis range limits.
     legend_loc: str, optional
@@ -93,6 +97,15 @@ class NotebookInteraction:
     for automatic display in Jupyter Notebooks
     """
 
+    def __call__(self, *args, **kwargs):
+        # look for show() method
+        try:
+            return self.show(*args, **kwargs)
+
+        # fall back to plot() method
+        except AttributeError:
+            return self.plot(*args, **kwargs)
+
     def _repr_html_(self):
         # look for show() method
         try:
@@ -113,6 +126,7 @@ class Plot:
         xlim=None,
         ylim=None,
         fig_size=None,
+        dpi=None,
         legend_loc=None,
         legend_title=None,
     ):
@@ -139,7 +153,10 @@ class Plot:
 
         # init matplotlib
         else:
-            self.fig, self.ax = plt.subplots(figsize=fig_size)
+            self.fig, self.ax = plt.subplots(
+                figsize=fig_size,
+                dpi=dpi,
+            )
 
     def add_line(self, x, y=None, label=None, color=None, **kwargs):
         """
@@ -607,6 +624,7 @@ def magic_plot(core, doc_decorator=None):
         xlim=None,
         ylim=None,
         fig_size=None,
+        dpi=None,
         legend_loc=None,
         legend_title=None,
         pty_update_layout=None,
@@ -624,6 +642,7 @@ def magic_plot(core, doc_decorator=None):
             xlim,
             ylim,
             fig_size,
+            dpi,
             legend_loc,
             legend_title,
         )
