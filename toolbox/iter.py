@@ -6,11 +6,60 @@ from numpy import ndarray as np_ndarray
 from pandas.core.series import Series as pd_Series
 
 
-ITERABLE_TYPES = (tuple, list, dict, np_ndarray, pd_Series)
+ITERABLE_TYPES = (tuple, list, dict, np_ndarray, pd_Series, range)
 CUSTOM_DIGESTION = ((dict, (lambda dct: [elem for _, elem in dct.items()])),)
 
+MUTE_STRICT_ZIP_WARNING = False
 
-def zip_smart(*iterables, iterable_types=None, strict=True):
+
+class NoZip:
+    """Avoid iteration in zip() and zip_smart()"""
+    def __init__(self, iterable):
+        """
+        Avoid iteration of an iterable data type in the zip function.
+
+        Class allows iteration and subscription.
+
+        Call the instance to release the original variable.
+
+        Parameters
+        ----------
+        iterable
+            Iterable variable which should be "hidden".
+        """
+        self.iterable = iterable
+
+    def __iter__(self):
+        return iter(self.iterable)
+
+    def __getitem__(self, item):
+        return self.iterable[item]
+
+    def __call__(self):
+        return self.release()
+
+    def __repr__(self):
+        return "NoZip({})".format(self.iterable.__repr__())
+
+    def release(self):
+        """Return the original iterable variable."""
+        return self.iterable
+
+
+def _repeat(arg, iterable_types, maxlen, unpack_nozip):
+    """
+    If arg is not an instance of iterable_types, repeat maxlen times.
+
+    Unpacks NoZip instances by default.
+    """
+    if isinstance(arg, iterable_types):
+        return arg
+    if unpack_nozip and isinstance(arg, NoZip):
+        arg = arg()
+    return (arg,) * maxlen
+
+
+def zip_smart(*iterables, iterable_types=None, unpack_nozip=True, strict=True):
     """
     Iterate over several iterables in parallel,
     producing tuples with an item from each one.
@@ -26,6 +75,9 @@ def zip_smart(*iterables, iterable_types=None, strict=True):
         If iterable is one of these types, hand to zip() directly without
         repeating.
         Default: (tuple, list, np.ndarray, pandas.Series)
+    unpack_nozip: bool, optional
+        Unpack a NoZip-wrapped iterable.
+        Default: True
     strict: bool, optional
         Fail if iterables are not the same length.
         Not supported in Python < 3.10.
@@ -44,7 +96,7 @@ def zip_smart(*iterables, iterable_types=None, strict=True):
             if len(arg) > maxlen:
                 maxlen = len(arg)
     iterables = [
-        arg if isinstance(arg, iterable_types) else (arg,) * maxlen
+        _repeat(arg, iterable_types, maxlen, unpack_nozip=unpack_nozip)
         for arg
         in iterables
     ]
@@ -54,10 +106,11 @@ def zip_smart(*iterables, iterable_types=None, strict=True):
     # strict mode not implemented in Python<3.10
     except TypeError:
         if strict:
-            warn(
-                "zip's strict mode not supported in Python<3.10.\n\n"
-                "Falling back to non-strict mode."
-            )
+            if not MUTE_STRICT_ZIP_WARNING:
+                warn(
+                    "zip's strict mode not supported in Python<3.10.\n\n"
+                    "Falling back to non-strict mode."
+                )
         return zip(*iterables)
 
 
@@ -139,3 +192,29 @@ def sum_nested(
         )
 
     return val
+
+
+def filter_nozip(iterable, no_iter_types=None, recursive=False, length=2):
+    # input validation
+    no_iter_types = (float, int) if no_iter_types is None else no_iter_types
+
+    # non-iterable
+    if not isinstance(iterable, ITERABLE_TYPES):
+        return iterable
+
+    # catch forbidden iterable
+    if isinstance(iterable, ITERABLE_TYPES) and len(iterable) == length:
+        all_allowed = True
+        for elem in iterable:
+            if not isinstance(elem, no_iter_types):
+                all_allowed = False
+                break
+        if all_allowed:
+            return NoZip(iterable)
+
+    # otherwise recursively
+    if recursive:
+        return [filter_nozip(i, no_iter_types, length) for i in iterable]
+
+    # no hit
+    return iterable
