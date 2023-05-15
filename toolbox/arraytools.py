@@ -203,10 +203,14 @@ class LinearRegression:
             t: float
                 t statistics
             ...
+
+        Code derived from pylang's StackOverflow post:
+        https://stackoverflow.com/questions/27164114/show-confidence-limits-and-prediction-limits-in-scatter-plot
         """
         self.x = x
         self.y = y
         self.p = p
+
         # parameters and covariance from of the fit of 1-D polynom.
         self.poly, self.cov = np.polyfit(
             x,
@@ -285,6 +289,8 @@ class LinearRegression:
         """
         Plot the correlation analysis.
 
+        Parameters
+        ----------
         plot_ci, plot_pi: bool, optional
             Plot the confidence and prediction intervals.
             Default: True
