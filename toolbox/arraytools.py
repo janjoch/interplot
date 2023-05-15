@@ -11,6 +11,9 @@ import pandas as pd
 
 import numba as nb
 
+from . import plot
+
+
 LISTLIKE_TYPES = (tuple, list, np.ndarray, pd.core.series.Series)
 
 
@@ -154,22 +157,40 @@ def interp(array, pos):
     return array[i] + w * d
 
 
-class Regression:
+class LinearRegression:
     def __init__(
         self,
         x,
         y,
-        linspace=100,
+        p=0.05,
+        linspace=101,
     ):
         """
         Model regression and its parameters.
 
-        Instance will provide:
+        Parameters
+        ----------
+        x, y: array-like
+            Data points.
+        p: float, optional
+            p-value.
+            Default: 0.05
+        linspace: int, optional
+            Number of data points for linear regression model
+            and conficence and prediction intervals.
+            Default: 101
+
+        The instance will provide the following data attributes:
             x, y: array-like
-                The original data
-            p: np.ndarray
-                Polynom parameters
+                The original data.
+            p: float
+                The original p-value.
+            poly: np.ndarray
+                Polynom parameters.
             cov: float
+                Covariance matrix of the polynomial coefficient estimates.
+                See for poly, cov:
+                https://numpy.org/doc/stable/reference/generated/numpy.polyfit.html
             y_model: np.ndarray
                 The regression modeled y values for the input x
             n: int
@@ -181,14 +202,13 @@ class Regression:
                 n - m
             t: float
                 t statistics
-
-
-
+            ...
         """
         self.x = x
         self.y = y
+        self.p = p
         # parameters and covariance from of the fit of 1-D polynom.
-        self.p, self.cov = np.polyfit(
+        self.poly, self.cov = np.polyfit(
             x,
             y,
             1,
@@ -197,16 +217,16 @@ class Regression:
         self.y_model = (
             # model using the fit parameters; NOTE: parameters here are
             np.polyval(
-                self.p,
+                self.poly,
                 x,
             )
         )
 
         self.n = y.size  # number of observations
-        self.m = self.p.size  # number of parameters
+        self.m = self.poly.size  # number of parameters
         self.dof = self.n - self.m  # degrees of freedom
         self.t = sp_stats.t.ppf(  # t-statistic; used for CI and PI bands
-            0.975,
+            1 - p / 2,
             self.n - self.m,
         )
 
@@ -224,8 +244,8 @@ class Regression:
             np.sum(self.resid**2) / self.dof
         )
 
-        self.x2 = np.linspace(np.min(self.x), np.max(self.x), 100)
-        self.y2 = np.polyval(self.p, self.x2)
+        self.x2 = np.linspace(np.min(self.x), np.max(self.x), linspace)
+        self.y2 = np.polyval(self.poly, self.x2)
 
         # confidence interval
         self.ci = (
@@ -239,7 +259,7 @@ class Regression:
         )
 
         # prediction interval
-        self.pi = (
+        self.polyi = (
             self.t
             * self.s_err
             * np.sqrt(
@@ -249,3 +269,49 @@ class Regression:
                 / np.sum((self.x - np.mean(self.x)) ** 2)
             )
         )
+
+    @plot.magic_plot
+    def plot(
+        self,
+        fig=None,  # inserted by plot.magic_plot decorator
+        plot_ci=True,
+        plot_pi=True,
+        label_data="data",
+        label_regression="regression",
+        label_ci="confidence interval",
+        label_pi="prediction interval",
+        **kwargs,
+    ):
+        """
+        Plot the correlation analysis.
+
+        plot_ci, plot_pi: bool, optional
+            Plot the confidence and prediction intervals.
+            Default: True
+        label_data, label_regression, label_ci, label_pi: str
+            Trace labels.
+        **kwargs: dict, optional
+            Keyword arguments to pass to fig.add_line.
+
+        Returns
+        -------
+        plot.Plot instance
+        """
+        if fig.interactive:
+            kwargs_data = dict(mode="markers")
+        else:
+            kwargs_data = dict(linestyle="", marker="o")
+
+        fig.add_line(self.x, self.y, label=label_data, **kwargs_data, **kwargs)
+
+        fig.add_line(self.x2, self.y2, label=label_regression, **kwargs)
+
+        if plot_ci:
+            fig.add_line(self.x2, self.y2 + self.ci, label=label_ci, **kwargs)
+            fig.add_line(self.x2, self.y2 - self.ci, label=label_ci, **kwargs)
+
+        if plot_pi:
+            fig.add_line(self.x2, self.y2 + self.polyi, label=label_pi,
+                         **kwargs)
+            fig.add_line(self.x2, self.y2 - self.polyi, label=label_pi,
+                         **kwargs)

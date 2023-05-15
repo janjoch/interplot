@@ -953,6 +953,8 @@ def magic_plot(core, doc_decorator=None):
         interactive=True,
         rows=1,
         cols=1,
+        fig=None,
+        skip_post_process=False,
         title=None,
         xlabel=None,
         ylabel=None,
@@ -972,35 +974,37 @@ def magic_plot(core, doc_decorator=None):
         mpl_custom_func=None,
         **kwargs,
     ):
-        # preparation
-        fig = Plot(
-            interactive=interactive,
-            rows=rows,
-            cols=cols,
-            title=title,
-            xlabel=xlabel,
-            ylabel=ylabel,
-            xlim=xlim,
-            ylim=ylim,
-            shared_xaxes=shared_xaxes,
-            shared_yaxes=shared_yaxes,
-            column_widths=column_widths,
-            row_heights=row_heights,
-            fig_size=fig_size,
-            dpi=dpi,
-            legend_loc=legend_loc,
-            legend_title=legend_title,
-            save_fig=save_fig,
-            pty_update_layout=pty_update_layout,
-            pty_custom_func=pty_custom_func,
-            mpl_custom_func=mpl_custom_func,
-        )
+        # init Plot
+        if fig is None:
+            fig = Plot(
+                interactive=interactive,
+                rows=rows,
+                cols=cols,
+                title=title,
+                xlabel=xlabel,
+                ylabel=ylabel,
+                xlim=xlim,
+                ylim=ylim,
+                shared_xaxes=shared_xaxes,
+                shared_yaxes=shared_yaxes,
+                column_widths=column_widths,
+                row_heights=row_heights,
+                fig_size=fig_size,
+                dpi=dpi,
+                legend_loc=legend_loc,
+                legend_title=legend_title,
+                save_fig=save_fig,
+                pty_update_layout=pty_update_layout,
+                pty_custom_func=pty_custom_func,
+                mpl_custom_func=mpl_custom_func,
+            )
 
         # execute core method
         core(*args, fig=fig, **kwargs)
 
         # post-processing
-        fig.post_process()
+        if not skip_post_process:
+            fig.post_process()
 
         # return
         return fig
