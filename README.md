@@ -7,6 +7,10 @@ Janosch's small Python code snippets making life a bit easier.
 ## Install
 ```pip install git+https://github.com/janjoch/toolbox#egg=toolbox```
 
+### dev installation
+1. Navigate to toolbox dir
+2. ```pip install -e .```
+
 ## Modules
 
 Note: This is just a sneak peek. Refer to /demo and ultimately /toolbox to see everything.

@@ -185,8 +185,9 @@ class LinearRegression:
                 The original data.
             p: float
                 The original p-value.
-            poly: np.ndarray
-                Polynom parameters.
+            poly: np.ndarray of 2x float
+                Polynomial coefficients.
+                [a, b] -> a * x + b.
             cov: float
                 Covariance matrix of the polynomial coefficient estimates.
                 See for poly, cov:
@@ -263,7 +264,7 @@ class LinearRegression:
         )
 
         # prediction interval
-        self.polyi = (
+        self.pi = (
             self.t
             * self.s_err
             * np.sqrt(
@@ -317,7 +318,5 @@ class LinearRegression:
             fig.add_line(self.x2, self.y2 - self.ci, label=label_ci, **kwargs)
 
         if plot_pi:
-            fig.add_line(self.x2, self.y2 + self.polyi, label=label_pi,
-                         **kwargs)
-            fig.add_line(self.x2, self.y2 - self.polyi, label=label_pi,
-                         **kwargs)
+            fig.add_line(self.x2, self.y2 + self.pi, label=label_pi, **kwargs)
+            fig.add_line(self.x2, self.y2 - self.pi, label=label_pi, **kwargs)

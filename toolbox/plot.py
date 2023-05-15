@@ -37,8 +37,23 @@ import matplotlib.pyplot as plt
 import plotly.graph_objects as go
 import plotly.express as px
 import plotly.subplots as sp
+import plotly.offline
 
 from .iter import ITERABLE_TYPES, zip_smart, filter_nozip
+
+
+def init_notebook_mode(connected=False):
+    """
+    Initialize plotly.js in the browser if not already done.
+
+    Parameters
+    ----------
+    connected: bool, optional
+        If True, the plotly.js library will be loaded from an online CDN.
+        If False, the plotly.js library will be loaded locally.
+        Default: False
+    """
+    plotly.offline.init_notebook_mode(connected=connected)
 
 
 # if imported in notebook, init plotly notebook mode
@@ -48,8 +63,7 @@ try:
 except NameError:
     CALLED_FROM_NOTEBOOK = False
 if CALLED_FROM_NOTEBOOK:
-    import plotly.offline
-    plotly.offline.init_notebook_mode()
+    init_notebook_mode()
 
 
 REWRITE_DOCSTRING = True
@@ -329,6 +343,7 @@ class NotebookInteraction:
             return self.plot(*args, **kwargs)
 
     def _repr_html_(self):
+        init_notebook_mode()
         # look for show() method
         try:
             return self.show()._repr_html_()
@@ -933,6 +948,7 @@ class Plot:
 
     def _repr_html_(self):
         if self.interactive:
+            init_notebook_mode()
             return self.fig._repr_html_()
         return self.fig.show()
 
