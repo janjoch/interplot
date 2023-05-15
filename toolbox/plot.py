@@ -41,6 +41,17 @@ import plotly.subplots as sp
 from .iter import ITERABLE_TYPES, zip_smart, filter_nozip
 
 
+# if imported in notebook, init plotly notebook mode
+try:
+    __IPYTHON__  # type: ignore
+    CALLED_FROM_NOTEBOOK = True
+except NameError:
+    CALLED_FROM_NOTEBOOK = False
+if CALLED_FROM_NOTEBOOK:
+    import plotly.offline
+    plotly.offline.init_notebook_mode()
+
+
 REWRITE_DOCSTRING = True
 
 DOCSTRING_DECORATOR = """

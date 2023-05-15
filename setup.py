@@ -13,8 +13,9 @@ setup(
     url='https://github.com/janjoch/toolbox',
     author='Janosch Jörg',
     author_email='git-janjoch@janjo.ch',
-    license='CC BY-SA 4.0',
+    license='GPL v3',
     packages=['toolbox'],
+    package_dir={"": "toolbox"},
     install_requires=requirements,
 
     classifiers=[
