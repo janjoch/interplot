@@ -136,9 +136,9 @@ DOCSTRING_DECORATOR = """
 
 def _rewrite_docstring(doc_core, doc_decorator=None, kwargs_remove=()):
     """
-    Appends arguments to a DOCSTRING_DECORATOR.
+    Appends arguments to a docstring.
 
-    Returns original DOCSTRING_DECORATOR if REWRITE_DOCSTRING is set to False.
+    Returns original docstring if REWRITE_DOCSTRING is set to False.
 
     Attempts:
     1. Search for [decorator.*?].
@@ -148,14 +148,14 @@ def _rewrite_docstring(doc_core, doc_decorator=None, kwargs_remove=()):
     Parameters
     ----------
     doc_core: str
-        Original DOCSTRING_DECORATOR.
+        Original docstring.
     doc_decorator: str,
-        DOCSTRING_DECORATOR to insert.
+        docstring to insert.
 
     Returns
     -------
     str:
-        Rewritten DOCSTRING_DECORATOR
+        Rewritten docstring
     """
     # check rewrite flag
     if not REWRITE_DOCSTRING:
@@ -198,7 +198,6 @@ def _rewrite_docstring(doc_core, doc_decorator=None, kwargs_remove=()):
             (
                 (  # preceding kwarg_key
                     r"(?P<front>"  # named group
-                    # r"\n{0}(?:[a-zA-Z_]+(?:[ ]*,[ ]*)?)*?
                     r"\n{0}"  # indentation
                     r"(?:[a-zA-Z_]+)??"  # first arg
                     r"(?:[ ]*,[ ]*[a-zA-Z_]+)??"  # following args
