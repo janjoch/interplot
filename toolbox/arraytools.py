@@ -314,9 +314,15 @@ class LinearRegression:
         fig.add_line(self.x2, self.y2, label=label_regression, **kwargs)
 
         if plot_ci:
-            fig.add_line(self.x2, self.y2 + self.ci, label=label_ci, **kwargs)
-            fig.add_line(self.x2, self.y2 - self.ci, label=label_ci, **kwargs)
+            fig.add_fill(
+                self.x2,
+                self.y2 - self.ci,
+                self.y2 + self.ci,
+                label=label_ci,
+                **kwargs,
+            )
 
         if plot_pi:
             fig.add_line(self.x2, self.y2 + self.pi, label=label_pi, **kwargs)
-            fig.add_line(self.x2, self.y2 - self.pi, label=label_pi, **kwargs)
+            fig.i_color -= 1
+            fig.add_line(self.x2, self.y2 - self.pi, label=None, **kwargs)

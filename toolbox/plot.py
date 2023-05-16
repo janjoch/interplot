@@ -33,6 +33,7 @@ from warnings import warn
 import numpy as np
 
 import matplotlib.pyplot as plt
+import matplotlib.colors as mcolors
 
 import plotly.graph_objects as go
 import plotly.express as px
@@ -65,6 +66,11 @@ except NameError:
 if CALLED_FROM_NOTEBOOK:
     init_notebook_mode()
 
+
+COLOR_CYCLE = [  # optimised for color vision deficiencies
+    '#006BA4', '#FF800E', '#ABABAB', '#595959', '#5F9ED1',
+    '#C85200', '#898989', '#A2C8EC', '#FFBC79', '#CFCFCF',
+]
 
 REWRITE_DOCSTRING = True
 
@@ -419,11 +425,13 @@ class Plot:
         self.pty_custom_func = pty_custom_func
         self.mpl_custom_func = mpl_custom_func
         self.element_count = np.zeros((rows, cols), dtype=int)
+        self.i_color = 0
 
         # init plotly
         if self.interactive:
 
             # init fig
+            figure = go.Figure(layout=go.Layout(legend={'traceorder':'normal'}))
             self.fig = sp.make_subplots(
                 rows=rows,
                 cols=cols,
@@ -431,6 +439,7 @@ class Plot:
                 shared_yaxes=shared_yaxes,
                 row_heights=row_heights,
                 column_widths=column_widths,
+                figure=figure,
             )
 
             # unpacking
@@ -547,12 +556,54 @@ class Plot:
             else:
                 self.fig.supylabel(self.ylabel)
 
+    def _get_legend_args(self, label):
+        if label is None:
+            return dict(showlegend=False)
+        return dict(name=label)
+
+    def to_rgba(self, color, alpha=None):
+        """
+        Parse color with matplotlib.colors to a rgba array.
+
+        color: any color format matplotlib accepts
+            E.g. "blue", "#0000ff"
+        alpha: float, optional
+            Set alpha / opacity.
+            Overrides alpha contained in color input.
+            Default: None (use the value contained in color or default to 1)
+        plotly_str: bool, optional
+            Return in string format instead of a tuple.
+            Max values are 255, except for alpha/opacity.
+            Default: False
+        """
+        # if color undefined, cycle COLOR_CYCLE
+        if color is None:
+            if self.i_color >= len(COLOR_CYCLE):
+                self.i_color = 0
+            color = COLOR_CYCLE[self.i_color]
+            self.i_color += 1
+
+        rgba = list(mcolors.to_rgba(color))
+        if alpha is not None:
+            rgba[3] = alpha
+
+        # PLOTLY
+        if self.interactive:
+            return "rgba({},{},{},{})".format(
+                *[int(d * 255) for d in rgba[:3]],
+                rgba[3],
+            )
+
+        # MATPLOTLIB
+        return tuple(rgba)
+
     def add_line(
         self,
         x,
         y=None,
         label=None,
         color=None,
+        opacity=None,
         row=0,
         col=0,
         **kwargs,
@@ -564,12 +615,21 @@ class Plot:
         ----------
         x: array-like
         y: array-like, optional
-            If only x is defined, it will be assumed as x,
+            If only x is defined, it will be assumed as y,
             and x will be the index, starting from 0.
         label: str, optional
             Trace label for legend.
         color: str, optional
             Trace color.
+            Can be hex, rgb(a) or any named color that is understood
+            by matplotlib.
+            Default: None
+            In the default case, Plot will cycle through COLOR_CYCLE.
+        opacity: float, optional
+            Opacity (=alpha) of the fill.
+            Default: None
+            By default, fallback to alpha value provided with color argument,
+            or 1.
         row, col: int, optional
             If the plot contains a grid, provide the coordinates.
             Attention: Indexing starts with 0!
@@ -590,8 +650,8 @@ class Plot:
                 go.Scatter(
                     x=x,
                     y=y,
-                    name=label,
-                    marker_color=color,
+                    **self._get_legend_args(label),
+                    marker_color=self.to_rgba(color, opacity),
                     **kwargs,
                 ),
                 row=row,
@@ -600,7 +660,101 @@ class Plot:
 
         # MATPLOTLIB
         else:
-            self.ax[row, col].plot(x, y, label=label, color=color, **kwargs)
+            self.ax[row, col].plot(
+                x,
+                y,
+                label=label,
+                color=self.to_rgba(color, opacity),
+                **kwargs,
+            )
+
+    def add_fill(
+        self,
+        x,
+        y1,
+        y2=None,
+        label=None,
+        mode="lines",
+        color=None,
+        opacity=0.5,
+        row=0,
+        col=0,
+        **kwargs,
+    ):
+        """
+        Add a fill between two y lines.
+
+        Parameters
+        ----------
+        x: array-like
+        y1, y2: array-like, optional
+            If only x and y1 is defined, it will be assumed as y1 and y2,
+            and x will be the index, starting from 0.
+        label: str, optional
+            Trace label for legend.
+        color: str, optional
+            Trace color.
+            Can be hex, rgb(a) or any named color that is understood
+            by matplotlib.
+            Default: None
+            In the default case, Plot will cycle through COLOR_CYCLE.
+        opacity: float, optional
+            Opacity (=alpha) of the fill.
+            Default: 0.5
+            Set to None to use a value provided with the color argument.
+        row, col: int, optional
+            If the plot contains a grid, provide the coordinates.
+            Attention: Indexing starts with 0!
+        **kwargs: optional
+            Pass specific keyword arguments to the line core method.
+        """
+        # input verification
+        if y2 is None:
+            y1, y2 = x, y1
+            x = np.arange(len(y1))
+        self.element_count[row, col] += 1
+
+        # PLOTLY
+        if self.interactive:
+            row += 1
+            col += 1
+            self.fig.add_trace(
+                go.Scatter(
+                    x=x,
+                    y=y1,
+                    mode=mode,
+                    line=dict(width=0),
+                    showlegend=False,
+                    **kwargs,
+                ),
+                row=row,
+                col=col,
+            )
+            self.fig.add_trace(
+                go.Scatter(
+                    x=x,
+                    y=y2,
+                    mode=mode,
+                    name=label,
+                    line=dict(width=0),
+                    fill="tonexty",
+                    fillcolor=self.to_rgba(color, opacity),
+                    **kwargs,
+                ),
+                row=row,
+                col=col,
+            )
+
+        # MATPLOTLIB
+        else:
+            self.ax[row, col].fill_between(
+                x,
+                y1,
+                y2,
+                label=label,
+                color=self.to_rgba(color, opacity),
+                **kwargs,
+            )
 
     def add_hist(
         self,
@@ -609,6 +763,7 @@ class Plot:
         bins=None,
         label=None,
         color=None,
+        opacity=None,
         row=0,
         col=0,
         **kwargs,
@@ -628,6 +783,15 @@ class Plot:
             Trace label for legend.
         color: str, optional
             Trace color.
+            Can be hex, rgb(a) or any named color that is understood
+            by matplotlib.
+            Default: None
+            In the default case, Plot will cycle through COLOR_CYCLE.
+        opacity: float, optional
+            Opacity (=alpha) of the fill.
+            Default: None
+            By default, fallback to alpha value provided with color argument,
+            or 1.
         row, col: int, optional
             If the plot contains a grid, provide the coordinates.
             Attention: Indexing starts with 0!
@@ -651,9 +815,9 @@ class Plot:
                 go.Histogram(
                     x=x,
                     y=y,
-                    name=label,
+                    **self._get_legend_args(label),
                     **bins_attribute,
-                    marker_color=color,
+                    marker_color=self.to_rgba(color, opacity),
                     **kwargs,
                 ),
                 row=row,
@@ -671,10 +835,112 @@ class Plot:
                 x,
                 label=label,
                 bins=bins,
-                color=color,
+                color=self.to_rgba(color, opacity),
                 orientation=orientation,
                 **kwargs,
             )
+
+    def add_boxplot(
+        self,
+        x,
+        horizontal=False,
+        labels=None,
+        colors=None,
+        opacity=None,
+        row=0,
+        col=0,
+        _add_count=True,
+        **kwargs,
+    ):
+        """
+        Add a boxplot to the plot.
+
+        Parameters
+        ----------
+        x: array or sequence of vectors
+            Data to build boxplot from.
+        horizontal: bool, optional
+            Show boxplot horizontally.
+            Default: False
+        labels: tuple of strs, optional
+            Trace labels for legend.
+        colors: tuple of strs, optional
+            Trace colors.
+            Can be hex, rgb(a) or any named color that is understood
+            by matplotlib.
+            Default: None
+            In the default case, Plot will cycle through COLOR_CYCLE.
+        opacity: float, optional
+            Opacity (=alpha) of the fill.
+            Default: None
+            By default, fallback to alpha value provided with color argument,
+            or 1.
+        row, col: int, optional
+            If the plot contains a grid, provide the coordinates.
+            Attention: Indexing starts with 0!
+        **kwargs: optional
+            Pass specific keyword arguments to the boxplot core method.
+        """
+        # determine number of boxplots
+        if isinstance(x[0], (int, float)):
+            n = 1
+        else:
+            n = len(x)
+        # input validation
+        if not isinstance(labels, ITERABLE_TYPES):
+            labels = (labels, ) * n
+        if not isinstance(colors, ITERABLE_TYPES):
+            colors = (colors, ) * n
+        self.element_count[row, col] += n if _add_count else 0
+
+        # PLOTLY
+        if self.interactive:
+
+            # if x contains multiple datasets, iterate add_boxplot
+            if not n == 1:
+                for x_i, label, color in zip_smart(x, labels, colors):
+                    self.add_boxplot(
+                        x_i,
+                        horizontal=horizontal,
+                        labels=label,
+                        row=row,
+                        col=col,
+                        colors=color,
+                        opacity=opacity,
+                        _add_count=False,
+                        **kwargs,
+                    )
+
+            # draw a single plotly boxplot
+            else:
+                row += 1
+                col += 1
+                kw_data = "x" if horizontal else "y"
+                pty_kwargs = {
+                    kw_data: x,
+                }
+                self.fig.add_trace(
+                    go.Box(
+                        **pty_kwargs,
+                        **self._get_legend_args(labels[0]),
+                        marker_color=self.to_rgba(colors[0], opacity),
+                        **kwargs,
+                    ),
+                    row=row,
+                    col=col,
+                )
+
+        # MATPLOTLIB
+        else:
+            bplots = self.ax[row, col].boxplot(
+                x,
+                vert=not horizontal,
+                labels=labels,
+                patch_artist=True,
+                **kwargs,
+            )
+            for bplot, color in zip_smart(bplots["boxes"], colors):
+                bplot.set_facecolor(self.to_rgba(color, opacity))
 
     def add_heatmap(
         self,
