@@ -4,6 +4,9 @@ Janosch's small Python code snippets making life a bit easier.
 ## Licence
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
+## Demo
+View on [NBViewer &rarr;](https://nbviewer.org/github/janjoch/toolbox/tree/main/demo/).
+
 ## Install
 ```pip install git+https://github.com/janjoch/toolbox#egg=toolbox```
 
@@ -87,14 +90,15 @@ Currently supported:
 * heatmaps
 
 ```python
->>> @toolbox.plot.magic_plot
->>> def plot(*xy, fig, **kwargs):
->>>     fig.add_line(*xy, **kwargs)
-
->>> plot([0,4,6,7], [1,2,4,8])
+>>> toolbox.plot.line([0,4,6,7], [1,2,4,8])
 [plotly figure]
 
->>> plot([0,4,6,7], [1,2,4,8],
+>>> toolbox.plot.line([0,4,6,7], [1,2,4,8], interactive=False)
+[matplotlib figure]
+
+>>> toolbox.plot.line(
+>>>     [0,4,6,7],
+>>>     [1,2,4,8],
 >>>     interactive=False,
 >>>     xlim=(0, 10),
 >>>     title="Matploblib Static Figure",
@@ -103,7 +107,7 @@ Currently supported:
 >>>     save_fig="export/path/export.png",
 >>>     dpi=300,
 >>> )
-[matplotlib figure]
+[matplotlib figure, custom formatted]
 
 >>> class ReadTrace(toolbox.plot.NotebookInteraction):
 >>> 
