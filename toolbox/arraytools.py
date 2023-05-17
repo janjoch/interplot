@@ -282,9 +282,17 @@ class LinearRegression:
         plot_ci=True,
         plot_pi=True,
         label_data="data",
-        label_regression="regression",
+        label_reg="regression",
         label_ci="confidence interval",
         label_pi="prediction interval",
+        color_data=None,
+        color_reg=None,
+        color_ci=None,
+        color_pi=None,
+        kwargs_data=None,
+        kwargs_reg=None,
+        kwargs_ci=None,
+        kwargs_pi=None,
         **kwargs,
     ):
         """
@@ -295,23 +303,56 @@ class LinearRegression:
         plot_ci, plot_pi: bool, optional
             Plot the confidence and prediction intervals.
             Default: True
-        label_data, label_regression, label_ci, label_pi: str
+        label_data, label_reg, label_ci, label_pi: str
             Trace labels.
-        **kwargs: dict, optional
-            Keyword arguments to pass to fig.add_line.
+        color_data, color_reg, color_ci, color_pi: str, optional
+            Trace color.
+            Can be hex, rgb(a) or any named color that is understood
+            by matplotlib.
+            Default: None
+            In the default case, Plot will cycle through COLOR_CYCLE.
+        kwargs_data, kwargs_reg, kwargs_ci, kwargs_pi: dict, optional
+            Keyword arguments to pass to corresponding figure element.
+        **kwargs: optional
+            Keyword arguments to pass to each figure element.
 
         Returns
         -------
         plot.Plot instance
         """
+        # input validation
+        if kwargs_data is None:
+            kwargs_data = dict()
+        if kwargs_reg is None:
+            kwargs_reg = dict()
+        if kwargs_ci is None:
+            kwargs_ci = dict()
+        if kwargs_pi is None:
+            kwargs_pi = dict()
+
+        # data as dots
         if fig.interactive:
-            kwargs_data = dict(mode="markers")
+            kwargs_data.update(dict(mode="markers"))
         else:
-            kwargs_data = dict(linestyle="", marker="o")
+            kwargs_data.update(dict(linestyle="", marker="o"))
 
-        fig.add_line(self.x, self.y, label=label_data, **kwargs_data, **kwargs)
+        fig.add_line(
+            self.x,
+            self.y,
+            label=label_data,
+            color=color_data,
+            **kwargs_data,
+            **kwargs,
+        )
 
-        fig.add_line(self.x2, self.y2, label=label_regression, **kwargs)
+        fig.add_line(
+            self.x2,
+            self.y2,
+            label=label_reg,
+            color=color_reg,
+            **kwargs_reg,
+            **kwargs,
+        )
 
         if plot_ci:
             fig.add_fill(
@@ -319,10 +360,25 @@ class LinearRegression:
                 self.y2 - self.ci,
                 self.y2 + self.ci,
                 label=label_ci,
+                color=color_ci,
+                **kwargs_ci,
                 **kwargs,
             )
 
         if plot_pi:
-            fig.add_line(self.x2, self.y2 + self.pi, label=label_pi, **kwargs)
+            fig.add_line(
+                self.x2,
+                self.y2 + self.pi,
+                label=label_pi,
+                color=color_pi,
+                **kwargs_pi,
+                **kwargs,
+            )
             fig.i_color -= 1
-            fig.add_line(self.x2, self.y2 - self.pi, label=None, **kwargs)
+            fig.add_line(
+                self.x2,
+                self.y2 - self.pi,
+                label=None,
+                **kwargs_pi,
+                **kwargs,
+            )

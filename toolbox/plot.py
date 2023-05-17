@@ -29,6 +29,7 @@ Example:
 
 import re
 from warnings import warn
+from pathlib import Path
 
 import numpy as np
 
@@ -71,6 +72,16 @@ COLOR_CYCLE = [  # optimised for color vision deficiencies
     '#006BA4', '#FF800E', '#ABABAB', '#595959', '#5F9ED1',
     '#C85200', '#898989', '#A2C8EC', '#FFBC79', '#CFCFCF',
 ]
+
+EXPORT_FORMAT = "png"
+EXPORT_REPLACE = {
+    " ": "-",
+    "[@!?,:;+*%&()=#|'\"]": "",
+    r"/": "_",
+    r"\\": "_",
+    r"\s": "_",
+    r"<\s*br\s*/?\s*>": "_",
+}
 
 REWRITE_DOCSTRING = True
 
@@ -171,6 +182,8 @@ def _rewrite_docstring(doc_core, doc_decorator=None, kwargs_remove=()):
         Original docstring.
     doc_decorator: str,
         docstring to insert.
+    kwargs_remove: tuple of strs, optional
+        remove parameters in the docstring.
 
     Returns
     -------
@@ -338,6 +351,24 @@ class NotebookInteraction:
     Calls the child's show()._repr_html_()
     for automatic display in Jupyter Notebooks
     """
+    JS_RENDER_WARNING = '''
+        <div class="alert alert-block alert-warning"
+            id="notebook-js-warning">
+            <p>
+                Unable to render javascript-based plotly plot.<br>
+                Call toolbox.plot.init_notebook_mode() or re-run this cell.<br>
+                If viewing on GitHub, render the notebook in
+                <a href="https://nbviewer.org/" target="_blank">
+                    NBViewer</a> instead.
+            </p>
+        </div>
+        <script type="text/javascript">
+            var element = document.getElementById(
+                "notebook-js-warning"
+            );
+            element.parentNode.removeChild(element);
+        </script>
+    '''
 
     def __call__(self, *args, **kwargs):
         # look for show() method
@@ -350,16 +381,17 @@ class NotebookInteraction:
 
     def _repr_html_(self):
         init_notebook_mode()
+
         # look for show() method
         try:
-            return self.show()._repr_html_()
+            return self.JS_RENDER_WARNING + self.show()._repr_html_()
 
         # fall back to plot() method
         except AttributeError:
-            return self.plot()._repr_html_()
+            return self.JS_RENDER_WARNING + self.plot()._repr_html_()
 
 
-class Plot:
+class Plot(NotebookInteraction):
     """
     Create matplotlib/plotly hybrid plots with a flat API in few lines of code.
 
@@ -431,7 +463,9 @@ class Plot:
         if self.interactive:
 
             # init fig
-            figure = go.Figure(layout=go.Layout(legend={'traceorder':'normal'}))
+            figure = go.Figure(
+                layout=go.Layout(legend={'traceorder': 'normal'}),
+            )
             self.fig = sp.make_subplots(
                 rows=rows,
                 cols=cols,
@@ -556,32 +590,64 @@ class Plot:
             else:
                 self.fig.supylabel(self.ylabel)
 
-    def _get_legend_args(self, label):
-        if label is None:
-            return dict(showlegend=False)
-        return dict(name=label)
+    @staticmethod
+    def _get_plotly_legend_args(label, default_label=None, show=None):
+        """
+        Return keyword arguments for label configuration.
 
-    def to_rgba(self, color, alpha=None):
+        Parameters
+        ----------
+        label: str
+            Name to display.
+        default_label: str, optional
+            If label is None, fall back to default_label.
+            Default: None
+            By default, plotly will enumerate the unnamed traces itself.
+        show: bool, optional
+            Show label in legend.
+            Default: None
+            By default, the label will be displayed if it is not None
+            (in case of label=None, the automatic label will only be displayed
+            on hover)
+        """
+        legend_kwargs = dict(
+            name=default_label if label is None else label
+        )
+        if show:
+            legend_kwargs["showlegend"] = True
+        elif isinstance(show, bool) and not show:
+            legend_kwargs["showlegend"] = False
+        else:
+            legend_kwargs["showlegend"] = False if label is None else True
+
+        return legend_kwargs
+
+    def digest_color(self, color, alpha=None, increment=1):
         """
         Parse color with matplotlib.colors to a rgba array.
 
+        Parameters
+        ----------
         color: any color format matplotlib accepts
             E.g. "blue", "#0000ff"
         alpha: float, optional
             Set alpha / opacity.
             Overrides alpha contained in color input.
             Default: None (use the value contained in color or default to 1)
-        plotly_str: bool, optional
-            Return in string format instead of a tuple.
-            Max values are 255, except for alpha/opacity.
-            Default: False
+        increment: int, optional
+            If a color from the cycler is picked, increase the cycler by
+            this increment.
         """
         # if color undefined, cycle COLOR_CYCLE
         if color is None:
             if self.i_color >= len(COLOR_CYCLE):
                 self.i_color = 0
             color = COLOR_CYCLE[self.i_color]
-            self.i_color += 1
+            self.i_color += increment
+
+        # get index from COLOR_CYCLE
+        elif color[0] == "C" or color[0] == "c":
+            color = COLOR_CYCLE[int(color[1:])]
 
         rgba = list(mcolors.to_rgba(color))
         if alpha is not None:
@@ -606,6 +672,8 @@ class Plot:
         opacity=None,
         row=0,
         col=0,
+        kwargs_pty=None,
+        kwargs_mpl=None,
         **kwargs,
     ):
         """
@@ -633,7 +701,7 @@ class Plot:
         row, col: int, optional
             If the plot contains a grid, provide the coordinates.
             Attention: Indexing starts with 0!
-        **kwargs: optional
+        kwargs_pty, kwargs_mpl, **kwargs: optional
             Pass specific keyword arguments to the line core method.
         """
         # input verification
@@ -644,14 +712,17 @@ class Plot:
 
         # PLOTLY
         if self.interactive:
+            if kwargs_pty is None:
+                kwargs_pty = dict()
             row += 1
             col += 1
             self.fig.add_trace(
                 go.Scatter(
                     x=x,
                     y=y,
-                    **self._get_legend_args(label),
-                    marker_color=self.to_rgba(color, opacity),
+                    **self._get_plotly_legend_args(label),
+                    marker_color=self.digest_color(color, opacity),
+                    **kwargs_pty,
                     **kwargs,
                 ),
                 row=row,
@@ -660,11 +731,14 @@ class Plot:
 
         # MATPLOTLIB
         else:
+            if kwargs_mpl is None:
+                kwargs_mpl = dict()
             self.ax[row, col].plot(
                 x,
                 y,
                 label=label,
-                color=self.to_rgba(color, opacity),
+                color=self.digest_color(color, opacity),
+                **kwargs_mpl,
                 **kwargs,
             )
 
@@ -677,8 +751,13 @@ class Plot:
         mode="lines",
         color=None,
         opacity=0.5,
+        line_width=0.,
+        line_opacity=1.,
+        line_color=None,
         row=0,
         col=0,
+        kwargs_pty=None,
+        kwargs_mpl=None,
         **kwargs,
     ):
         """
@@ -692,21 +771,23 @@ class Plot:
             and x will be the index, starting from 0.
         label: str, optional
             Trace label for legend.
-        color: str, optional
+        color, line_color: str, optional
             Trace color.
             Can be hex, rgb(a) or any named color that is understood
             by matplotlib.
             Default: None
             In the default case, Plot will cycle through COLOR_CYCLE.
-        opacity: float, optional
+        opacity, line_opacity: float, optional
             Opacity (=alpha) of the fill.
             Default: 0.5
             Set to None to use a value provided with the color argument.
+        line_width: float, optional
+            Boundary line width.
         row, col: int, optional
             If the plot contains a grid, provide the coordinates.
             Attention: Indexing starts with 0!
-        **kwargs: optional
-            Pass specific keyword arguments to the line core method.
+        kwargs_pty, kwargs_mpl, **kwargs: optional
+            Pass specific keyword arguments to the fill core method.
         """
         # input verification
         if y2 is None:
@@ -716,6 +797,9 @@ class Plot:
 
         # PLOTLY
         if self.interactive:
+            if kwargs_pty is None:
+                kwargs_pty = dict()
+            legendgroup = "fill{}".format(self.element_count[row, col])
             row += 1
             col += 1
             self.fig.add_trace(
@@ -723,8 +807,13 @@ class Plot:
                     x=x,
                     y=y1,
                     mode=mode,
-                    line=dict(width=0),
-                    showlegend=False,
+                    **self._get_plotly_legend_args(
+                        label, "fill border 1", show=False),
+                    line=dict(width=line_width),
+                    marker_color=self.digest_color(
+                        line_color, line_opacity, increment=0),
+                    legendgroup=legendgroup,
+                    **kwargs_pty,
                     **kwargs,
                 ),
                 row=row,
@@ -735,10 +824,13 @@ class Plot:
                     x=x,
                     y=y2,
                     mode=mode,
-                    name=label,
-                    line=dict(width=0),
+                    **self._get_plotly_legend_args(label, "fill border 1"),
                     fill="tonexty",
-                    fillcolor=self.to_rgba(color, opacity),
+                    fillcolor=self.digest_color(color, opacity, increment=0),
+                    line=dict(width=line_width),
+                    marker_color=self.digest_color(line_color, line_opacity),
+                    legendgroup=legendgroup,
+                    **kwargs_pty,
                     **kwargs,
                 ),
                 row=row,
@@ -747,12 +839,18 @@ class Plot:
 
         # MATPLOTLIB
         else:
+            if kwargs_mpl is None:
+                kwargs_mpl = dict()
             self.ax[row, col].fill_between(
                 x,
                 y1,
                 y2,
                 label=label,
-                color=self.to_rgba(color, opacity),
+                linewidth=line_width,
+                edgecolor=self.digest_color(
+                    line_color, line_opacity, increment=0),
+                facecolor=self.digest_color(color, opacity),
+                **kwargs_mpl,
                 **kwargs,
             )
 
@@ -766,6 +864,8 @@ class Plot:
         opacity=None,
         row=0,
         col=0,
+        kwargs_pty=None,
+        kwargs_mpl=None,
         **kwargs,
     ):
         """
@@ -795,7 +895,7 @@ class Plot:
         row, col: int, optional
             If the plot contains a grid, provide the coordinates.
             Attention: Indexing starts with 0!
-        **kwargs: optional
+        kwargs_pty, kwargs_mpl, **kwargs: optional
             Pass specific keyword arguments to the hist core method.
         """
         # input verification
@@ -809,15 +909,18 @@ class Plot:
 
         # PLOTLY
         if self.interactive:
+            if kwargs_pty is None:
+                kwargs_pty = dict()
             row += 1
             col += 1
             self.fig.add_trace(
                 go.Histogram(
                     x=x,
                     y=y,
-                    **self._get_legend_args(label),
+                    **self._get_plotly_legend_args(label),
                     **bins_attribute,
-                    marker_color=self.to_rgba(color, opacity),
+                    marker_color=self.digest_color(color, opacity),
+                    **kwargs_pty,
                     **kwargs,
                 ),
                 row=row,
@@ -826,6 +929,8 @@ class Plot:
 
         # MATPLOTLIB
         else:
+            if kwargs_mpl is None:
+                kwargs_mpl = dict()
             if x is None:
                 x = y
                 orientation = "horizontal"
@@ -835,8 +940,9 @@ class Plot:
                 x,
                 label=label,
                 bins=bins,
-                color=self.to_rgba(color, opacity),
+                color=self.digest_color(color, opacity),
                 orientation=orientation,
+                **kwargs_mpl,
                 **kwargs,
             )
 
@@ -850,6 +956,8 @@ class Plot:
         row=0,
         col=0,
         _add_count=True,
+        kwargs_pty=None,
+        kwargs_mpl=None,
         **kwargs,
     ):
         """
@@ -878,7 +986,7 @@ class Plot:
         row, col: int, optional
             If the plot contains a grid, provide the coordinates.
             Attention: Indexing starts with 0!
-        **kwargs: optional
+        kwargs_pty, kwargs_mpl, **kwargs: optional
             Pass specific keyword arguments to the boxplot core method.
         """
         # determine number of boxplots
@@ -895,6 +1003,8 @@ class Plot:
 
         # PLOTLY
         if self.interactive:
+            if kwargs_pty is None:
+                kwargs_pty = dict()
 
             # if x contains multiple datasets, iterate add_boxplot
             if not n == 1:
@@ -908,6 +1018,7 @@ class Plot:
                         colors=color,
                         opacity=opacity,
                         _add_count=False,
+                        kwargs_pty=kwargs_pty,
                         **kwargs,
                     )
 
@@ -922,8 +1033,9 @@ class Plot:
                 self.fig.add_trace(
                     go.Box(
                         **pty_kwargs,
-                        **self._get_legend_args(labels[0]),
-                        marker_color=self.to_rgba(colors[0], opacity),
+                        **self._get_plotly_legend_args(labels[0]),
+                        marker_color=self.digest_color(colors[0], opacity),
+                        **kwargs_pty,
                         **kwargs,
                     ),
                     row=row,
@@ -932,15 +1044,18 @@ class Plot:
 
         # MATPLOTLIB
         else:
+            if kwargs_mpl is None:
+                kwargs_mpl = dict()
             bplots = self.ax[row, col].boxplot(
                 x,
                 vert=not horizontal,
                 labels=labels,
                 patch_artist=True,
+                **kwargs_mpl,
                 **kwargs,
             )
             for bplot, color in zip_smart(bplots["boxes"], colors):
-                bplot.set_facecolor(self.to_rgba(color, opacity))
+                bplot.set_facecolor(self.digest_color(color, opacity))
 
     def add_heatmap(
         self,
@@ -955,6 +1070,8 @@ class Plot:
         cmap_bad=None,
         row=0,
         col=0,
+        kwargs_pty=None,
+        kwargs_mpl=None,
         **kwargs,
     ):
         """
@@ -966,6 +1083,12 @@ class Plot:
             2D data to show heatmap.
         lim: list/tuple of 2x float, optional
             Lower and upper limits of the color map.
+        aspect: float, optional
+            Aspect ratio of the axes.
+            Default: 1
+        invert_x, invert_y: bool, optional
+            Invert the axes directions.
+            Default: False
         cmap: str, optional
             Color map to use.
             https://matplotlib.org/stable/gallery/color/colormap_reference.html
@@ -979,7 +1102,7 @@ class Plot:
         row, col: int, optional
             If the plot contains a grid, provide the coordinates.
             Attention: Indexing starts with 0!
-        **kwargs: optional
+        kwargs_pty, kwargs_mpl, **kwargs: optional
             Pass specific keyword arguments to the heatmap core method.
         """
         # input verification
@@ -994,6 +1117,8 @@ class Plot:
         # PLOTLY
         if self.interactive:
             # input verification
+            if kwargs_pty is None:
+                kwargs_pty = dict()
             if cmap_bad is not None:
                 warn("cmap_bad is not supported for plotly.")
             row += 1
@@ -1021,6 +1146,7 @@ class Plot:
                     zmin=lim[0],
                     zmax=lim[1],
                     colorscale=cmap,
+                    **kwargs_pty,
                     **kwargs,
                 ),
                 row=row,
@@ -1045,6 +1171,8 @@ class Plot:
 
         # MATPLOTLIB
         else:
+            if kwargs_mpl is None:
+                kwargs_mpl = dict()
             cmap = _plt_cmap_extremes(
                 cmap,
                 under=cmap_under,
@@ -1057,6 +1185,7 @@ class Plot:
                 aspect=aspect,
                 vmin=lim[0],
                 vmax=lim[1],
+                **kwargs_mpl,
                 **kwargs,
             )
             self.fig.colorbar(imshow)
@@ -1181,6 +1310,22 @@ class Plot:
             self.save(self.save_fig)
 
     def save(self, path, **kwargs):
+        # input verification
+        if isinstance(path, bool):
+            if path:
+                path = Path()
+            else:
+                return
+        else:
+            path = Path(path)
+
+        # auto-generate filename
+        if path.is_dir():
+            filename = self.title
+            for key, value in EXPORT_REPLACE.items():
+                filename = re.sub(key, value, filename)
+            filename += "." + EXPORT_FORMAT
+            path = path / filename
 
         # PLOTLY
         if self.interactive:
@@ -1215,7 +1360,7 @@ class Plot:
     def _repr_html_(self):
         if self.interactive:
             init_notebook_mode()
-            return self.fig._repr_html_()
+            return self.JS_RENDER_WARNING + self.fig._repr_html_()
         return self.fig.show()
 
 
@@ -1351,20 +1496,84 @@ def line(
     """
     Draw a simple line plot.
 
+    Add a line to the plot.
+
     Parameters
     ----------
     x: array-like
     y: array-like, optional
-        If only x is defined, it will be assumed as x,
+        If only x is defined, it will be assumed as y,
         and x will be the index, starting from 0.
     label: str, optional
         Trace label for legend.
     color: str, optional
         Trace color.
-    **kwargs: optional
+        Can be hex, rgb(a) or any named color that is understood
+        by matplotlib.
+        Default: None
+        In the default case, Plot will cycle through COLOR_CYCLE.
+    opacity: float, optional
+        Opacity (=alpha) of the fill.
+        Default: None
+        By default, fallback to alpha value provided with color argument,
+        or 1.
+    row, col: int, optional
+        If the plot contains a grid, provide the coordinates.
+        Attention: Indexing starts with 0!
+    kwargs_pty, kwargs_mpl, **kwargs: optional
         Pass specific keyword arguments to the line core method.
+    [decorator parameters added automatically]
+
+    Returns
+    -------
+    Plot() instance
     """
     fig.add_line(*args, **kwargs)
+
+
+@magic_plot
+def fill(
+    *args,
+    fig,
+    **kwargs,
+):
+    """
+    Draw a simple filled area plot.
+
+    Add a line to the plot.
+
+    Parameters
+    ----------
+    x: array-like
+    y1, y2: array-like, optional
+        If only x and y1 is defined, it will be assumed as y1 and y2,
+        and x will be the index, starting from 0.
+    label: str, optional
+        Trace label for legend.
+    color, line_color: str, optional
+        Trace color.
+        Can be hex, rgb(a) or any named color that is understood
+        by matplotlib.
+        Default: None
+        In the default case, Plot will cycle through COLOR_CYCLE.
+    opacity, line_opacity: float, optional
+        Opacity (=alpha) of the fill.
+        Default: 0.5
+        Set to None to use a value provided with the color argument.
+    line_width: float, optional
+        Boundary line width.
+    row, col: int, optional
+        If the plot contains a grid, provide the coordinates.
+        Attention: Indexing starts with 0!
+    kwargs_pty, kwargs_mpl, **kwargs: optional
+        Pass specific keyword arguments to the fill core method.
+    [decorator parameters added automatically]
+
+    Returns
+    -------
+    Plot() instance
+    """
+    fig.add_fill(*args, **kwargs)
 
 
 @magic_plot
@@ -1388,10 +1597,70 @@ def hist(
         Trace label for legend.
     color: str, optional
         Trace color.
-    **kwargs: optional
+        Can be hex, rgb(a) or any named color that is understood
+        by matplotlib.
+        Default: None
+        In the default case, Plot will cycle through COLOR_CYCLE.
+    opacity: float, optional
+        Opacity (=alpha) of the fill.
+        Default: None
+        By default, fallback to alpha value provided with color argument,
+        or 1.
+    row, col: int, optional
+        If the plot contains a grid, provide the coordinates.
+        Attention: Indexing starts with 0!
+    kwargs_pty, kwargs_mpl, **kwargs: optional
         Pass specific keyword arguments to the hist core method.
+    [decorator parameters added automatically]
+
+    Returns
+    -------
+    Plot() instance
     """
     fig.add_hist(*args, **kwargs)
+
+
+@magic_plot
+def boxplot(
+    *args,
+    fig,
+    **kwargs,
+):
+    """
+    Draw a simple boxplot.
+
+    Parameters
+    ----------
+    x: array or sequence of vectors
+        Data to build boxplot from.
+    horizontal: bool, optional
+        Show boxplot horizontally.
+        Default: False
+    labels: tuple of strs, optional
+        Trace labels for legend.
+    colors: tuple of strs, optional
+        Trace colors.
+        Can be hex, rgb(a) or any named color that is understood
+        by matplotlib.
+        Default: None
+        In the default case, Plot will cycle through COLOR_CYCLE.
+    opacity: float, optional
+        Opacity (=alpha) of the fill.
+        Default: None
+        By default, fallback to alpha value provided with color argument,
+        or 1.
+    row, col: int, optional
+        If the plot contains a grid, provide the coordinates.
+        Attention: Indexing starts with 0!
+    kwargs_pty, kwargs_mpl, **kwargs: optional
+        Pass specific keyword arguments to the boxplot core method.
+    [decorator parameters added automatically]
+
+    Returns
+    -------
+    Plot() instance
+    """
+    fig.add_boxplot(*args, **kwargs)
 
 
 @magic_plot
@@ -1409,6 +1678,12 @@ def heatmap(
         2D data to show heatmap.
     lim: list/tuple of 2x float, optional
         Lower and upper limits of the color map.
+    aspect: float, optional
+        Aspect ratio of the axes.
+        Default: 1
+    invert_x, invert_y: bool, optional
+        Invert the axes directions.
+        Default: False
     cmap: str, optional
         Color map to use.
         https://matplotlib.org/stable/gallery/color/colormap_reference.html
@@ -1419,7 +1694,15 @@ def heatmap(
         Colors to display if under/over range or a pixel is invalid,
         e.g. in case of np.nan.
         cmap_bad is not available for interactive plotly plots.
-    **kwargs: optional
-        Pass specific keyword arguments to the hist core method.
+    row, col: int, optional
+        If the plot contains a grid, provide the coordinates.
+        Attention: Indexing starts with 0!
+    kwargs_pty, kwargs_mpl, **kwargs: optional
+        Pass specific keyword arguments to the heatmap core method.
+    [decorator parameters added automatically]
+
+    Returns
+    -------
+    Plot() instance
     """
     fig.add_heatmap(*args, **kwargs)
