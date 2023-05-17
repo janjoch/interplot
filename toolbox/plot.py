@@ -30,6 +30,9 @@ Example:
 import re
 from warnings import warn
 from pathlib import Path
+from functools import wraps
+
+from IPython.core.display import display_html
 
 import numpy as np
 
@@ -136,6 +139,8 @@ DOCSTRING_DECORATOR = """
         Provide a path to export the plot.
         Possible formats: png, jpg, svg, html, ...
         The figure will only be saved on calling the instance's .post_process()
+        If a directory (or True for local directory) is provided,
+        the filename will be automatically generated based on the title.
     pty_update_layout: dict, optional
         PLOTLY ONLY.
         Pass keyword arguments to plotly's
@@ -162,7 +167,11 @@ DOCSTRING_DECORATOR = """
         >>>     fig.do_stuff()
         >>>     ax[0, 0].do_more()
         >>>     return fig, ax
-        Default: None"""
+        Default: None
+
+    Returns
+    -------
+    toolbox.plot.Plot() instance"""
 
 
 def _rewrite_docstring(doc_core, doc_decorator=None, kwargs_remove=()):
@@ -359,16 +368,20 @@ class NotebookInteraction:
                 Call toolbox.plot.init_notebook_mode() or re-run this cell.<br>
                 If viewing on GitHub, render the notebook in
                 <a href="https://nbviewer.org/" target="_blank">
-                    NBViewer</a> instead.
+                    NBViewer</a> instead.<br>
+                    <a onclick="hide_warning()">Hide</a>
             </p>
         </div>
         <script type="text/javascript">
-            var element = document.getElementById(
-                "notebook-js-warning"
-            );
-            element.parentNode.removeChild(element);
+            function hide_warning() {
+                var element = document.getElementById(
+                    "notebook-js-warning"
+                );
+                element.parentNode.removeChild(element);
+            }
+            hide_warning();
         </script>
-    '''
+    ''' if CALLED_FROM_NOTEBOOK else ""
 
     def __call__(self, *args, **kwargs):
         # look for show() method
@@ -461,6 +474,7 @@ class Plot(NotebookInteraction):
 
         # init plotly
         if self.interactive:
+            self.title = self._encode_html(self.title)
 
             # init fig
             figure = go.Figure(
@@ -489,7 +503,7 @@ class Plot(NotebookInteraction):
 
             # update layout
             self.fig.update_layout(
-                title=title,
+                title=self.title,
                 legend_title=legend_title,
                 height=height,
                 width=width,
@@ -621,6 +635,37 @@ class Plot(NotebookInteraction):
             legend_kwargs["showlegend"] = False if label is None else True
 
         return legend_kwargs
+
+    @staticmethod
+    def _get_plotly_anchor(axis, cols, row, col):
+        """
+        Get axis id based on row and col.
+
+        Parameters
+        ----------
+        axis: str
+            x or y.
+        cols: int
+            Number of columns.
+            Usually self.cols
+        row, col: int
+            Row and col index in plotly manner:
+            STARTING WITH 1.
+
+        Returns
+        -------
+        axis id: str
+        """
+        id = (row - 1) * cols + col
+        if id == 1:
+            return axis
+        return axis + str((row - 1) * cols + col)
+
+    @staticmethod
+    def _encode_html(text):
+        if text is None:
+            return None
+        return re.sub(r"\n", "<br>", text)
 
     def digest_color(self, color, alpha=None, increment=1):
         """
@@ -850,6 +895,138 @@ class Plot(NotebookInteraction):
                 edgecolor=self.digest_color(
                     line_color, line_opacity, increment=0),
                 facecolor=self.digest_color(color, opacity),
+                **kwargs_mpl,
+                **kwargs,
+            )
+
+    def add_text(
+        self,
+        x,
+        y,
+        text,
+        horizontal_alignment="center",
+        vertical_alignment="center",
+        text_alignment=None,
+        data_coords=None,
+        x_data_coords=True,
+        y_data_coords=True,
+        color="black",
+        opacity=None,
+        row=0,
+        col=0,
+        kwargs_pty=None,
+        kwargs_mpl=None,
+        **kwargs,
+    ):
+        """
+        Add text to the plot.
+
+        Parameters
+        ----------
+        x, y: float
+            Coordinates of the text.
+        text: str
+            Text to add.
+        horizontal_alignment, vertical_alignment: str, optional
+            Where the coordinates of the text box anchor.
+            Horizontal: ("left", "center", "right")
+            Vertical: ("top", "center", "bottom")
+            Default: "center"
+        text_alignment: str, optional
+            Set how text is aligned inside its box.
+            If left undefined, horizontal_alignment will be used.
+            Default: None
+        data_coords: bool, optional
+            Whether the x, y coordinates are provided in data coordinates
+            or in relation to the axes.
+            If set to False, x, y should be in the range (0, 1).
+            If data_coords is set, it will override
+            x_data_coords and y_data_coords.
+            Default: True
+        x_data_coords, y_data_coords: bool, optional
+            Specify the anchor for each axis separate.
+            Works with interactive plotly plots only.
+            Default: True
+        color: str, optional
+            Trace color.
+            Can be hex, rgb(a) or any named color that is understood
+            by matplotlib.
+            Default: "black"
+        opacity: float, optional
+            Opacity (=alpha) of the fill.
+            Default: None
+            By default, fallback to alpha value provided with color argument,
+            or 1.
+        row, col: int, optional
+            If the plot contains a grid, provide the coordinates.
+            Attention: Indexing starts with 0!
+        kwargs_pty, kwargs_mpl, **kwargs: optional
+            Pass specific keyword arguments to the line core method.
+        """
+        # input verification
+        if data_coords is not None:
+            x_data_coords = data_coords
+            y_data_coords = data_coords
+        text_alignment = (
+            horizontal_alignment
+            if text_alignment is None
+            else text_alignment
+        )
+
+        # PLOTLY
+        if self.interactive:
+            if kwargs_pty is None:
+                kwargs_pty = dict()
+            if vertical_alignment == "center":
+                vertical_alignment = "middle"
+            row += 1
+            col += 1
+            x_domain = "" if x_data_coords else " domain"
+            y_domain = "" if y_data_coords else " domain"
+            self.fig.add_annotation(
+                x=x,
+                y=y,
+                text=self._encode_html(text),
+                align=text_alignment,
+                xanchor=horizontal_alignment,
+                yanchor=vertical_alignment,
+                xref=self._get_plotly_anchor(
+                    "x", self.cols, row, col
+                ) + x_domain,
+                yref=self._get_plotly_anchor(
+                    "y", self.cols, row, col
+                ) + y_domain,
+                font=dict(color=self.digest_color(color, opacity)),
+                row=row,
+                col=col,
+                showarrow=False,
+                **kwargs_pty,
+            )
+
+        # MATPLOTLIB
+        else:
+            # input validation
+            if kwargs_mpl is None:
+                kwargs_mpl = dict()
+            if not x_data_coords == y_data_coords:
+                warn(
+                    "x_data_coords and y_data_coords must correspond "
+                    "for static matplotlib plot. x_data_coords was used."
+                )
+            transform = (
+                dict()
+                if x_data_coords
+                else dict(transform=self.ax[row, col].transAxes)
+            )
+            self.ax[row, col].text(
+                x,
+                y,
+                s=text,
+                color=self.digest_color(color, opacity),
+                horizontalalignment=horizontal_alignment,
+                verticalalignment=vertical_alignment,
+                multialignment=text_alignment,
+                **transform,
                 **kwargs_mpl,
                 **kwargs,
             )
@@ -1152,17 +1329,13 @@ class Plot(NotebookInteraction):
                 row=row,
                 col=col,
             )
-            if row == 1 and col == 1:
-                scaleanchor = "x"
-            else:
-                scaleanchor = "x{}".format((row-1)*self.cols + col)
             self.fig.update_xaxes(
                 autorange=("reversed" if invert_x else None),
                 row=row,
                 col=col,
             )
             self.fig.update_yaxes(
-                scaleanchor=scaleanchor,
+                scaleanchor=self._get_plotly_anchor("x", self.cols, row, col),
                 scaleratio=aspect,
                 autorange=("reversed" if invert_x else None),
                 row=row,
@@ -1347,7 +1520,7 @@ class Plot(NotebookInteraction):
         else:
             self.fig.savefig(
                 path,
-                face_color="white",
+                facecolor="white",
                 bbox_inches="tight",
                 **kwargs,
             )
@@ -1355,6 +1528,9 @@ class Plot(NotebookInteraction):
         print("saved figure at {}".format(str(path)))
 
     def show(self):
+        if self.interactive:
+            init_notebook_mode()
+            display_html(self.JS_RENDER_WARNING, raw=True)
         return self.fig.show()
 
     def _repr_html_(self):
@@ -1488,46 +1664,12 @@ def magic_plot_preset(doc_decorator=None, **kwargs_preset):
 
 
 @magic_plot
+@wraps(Plot.add_line)
 def line(
     *args,
     fig,
     **kwargs,
 ):
-    """
-    Draw a simple line plot.
-
-    Add a line to the plot.
-
-    Parameters
-    ----------
-    x: array-like
-    y: array-like, optional
-        If only x is defined, it will be assumed as y,
-        and x will be the index, starting from 0.
-    label: str, optional
-        Trace label for legend.
-    color: str, optional
-        Trace color.
-        Can be hex, rgb(a) or any named color that is understood
-        by matplotlib.
-        Default: None
-        In the default case, Plot will cycle through COLOR_CYCLE.
-    opacity: float, optional
-        Opacity (=alpha) of the fill.
-        Default: None
-        By default, fallback to alpha value provided with color argument,
-        or 1.
-    row, col: int, optional
-        If the plot contains a grid, provide the coordinates.
-        Attention: Indexing starts with 0!
-    kwargs_pty, kwargs_mpl, **kwargs: optional
-        Pass specific keyword arguments to the line core method.
-    [decorator parameters added automatically]
-
-    Returns
-    -------
-    Plot() instance
-    """
     fig.add_line(*args, **kwargs)
 
 
@@ -1538,9 +1680,7 @@ def fill(
     **kwargs,
 ):
     """
-    Draw a simple filled area plot.
-
-    Add a line to the plot.
+    Draw a filled area plot.
 
     Parameters
     ----------
@@ -1577,13 +1717,72 @@ def fill(
 
 
 @magic_plot
+def text(
+    *args,
+    fig,
+    **kwargs,
+):
+    """
+    Annotate a plot.
+
+    Parameters
+    ----------
+    x, y: float
+        Coordinates of the text.
+    text: str
+        Text to add.
+    horizontal_alignment, vertical_alignment: str, optional
+        Where the coordinates of the text box anchor.
+        Horizontal: ("left", "center", "right")
+        Vertical: ("top", "center", "bottom")
+        Default: "center"
+    text_alignment: str, optional
+        Set how text is aligned inside its box.
+        If left undefined, horizontal_alignment will be used.
+        Default: None
+    data_coords: bool, optional
+        Whether the x, y coordinates are provided in data coordinates
+        or in relation to the axes.
+        If set to False, x, y should be in the range (0, 1).
+        If data_coords is set, it will override
+        x_data_coords and y_data_coords.
+        Default: True
+    x_data_coords, y_data_coords: bool, optional
+        Specify the anchor for each axis separate.
+        Works with interactive plotly plots only.
+        Default: True
+    color: str, optional
+        Trace color.
+        Can be hex, rgb(a) or any named color that is understood
+        by matplotlib.
+        Default: "black"
+    opacity: float, optional
+        Opacity (=alpha) of the fill.
+        Default: None
+        By default, fallback to alpha value provided with color argument,
+        or 1.
+    row, col: int, optional
+        If the plot contains a grid, provide the coordinates.
+        Attention: Indexing starts with 0!
+    kwargs_pty, kwargs_mpl, **kwargs: optional
+        Pass specific keyword arguments to the line core method.
+    [decorator parameters added automatically]
+
+    Returns
+    -------
+    Plot() instance
+    """
+    fig.add_text(*args, **kwargs)
+
+
+@magic_plot
 def hist(
     *args,
     fig,
     **kwargs,
 ):
     """
-    Draw a simple histogram.
+    Draw a histogram plot.
 
     Parameters
     ----------
@@ -1627,7 +1826,7 @@ def boxplot(
     **kwargs,
 ):
     """
-    Draw a simple boxplot.
+    Draw a boxplot plot.
 
     Parameters
     ----------
@@ -1670,7 +1869,7 @@ def heatmap(
     **kwargs,
 ):
     """
-    Draw a simple heatmap.
+    Draw a heatmap plot.
 
     Parameters
     ----------
