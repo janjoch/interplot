@@ -32,8 +32,6 @@ from warnings import warn
 from pathlib import Path
 from functools import wraps
 
-from IPython.core.display import display_html
-
 import numpy as np
 
 import matplotlib.pyplot as plt
@@ -64,6 +62,7 @@ def init_notebook_mode(connected=False):
 # if imported in notebook, init plotly notebook mode
 try:
     __IPYTHON__  # type: ignore
+    from IPython.core.display import display_html
     CALLED_FROM_NOTEBOOK = True
 except NameError:
     CALLED_FROM_NOTEBOOK = False
@@ -368,8 +367,7 @@ class NotebookInteraction:
                 Call toolbox.plot.init_notebook_mode() or re-run this cell.<br>
                 If viewing on GitHub, render the notebook in
                 <a href="https://nbviewer.org/" target="_blank">
-                    NBViewer</a> instead.<br>
-                    <a onclick="hide_warning()">Hide</a>
+                    NBViewer</a> instead.
             </p>
         </div>
         <script type="text/javascript">
