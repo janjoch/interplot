@@ -1132,7 +1132,6 @@ class Plot(NotebookInteraction):
         opacity=None,
         row=0,
         col=0,
-        _add_count=True,
         kwargs_pty=None,
         kwargs_mpl=None,
         **kwargs,
@@ -1176,7 +1175,6 @@ class Plot(NotebookInteraction):
             labels = (labels, ) * n
         if not isinstance(colors, ITERABLE_TYPES):
             colors = (colors, ) * n
-        self.element_count[row, col] += n if _add_count else 0
 
         # PLOTLY
         if self.interactive:
@@ -1194,7 +1192,6 @@ class Plot(NotebookInteraction):
                         col=col,
                         colors=color,
                         opacity=opacity,
-                        _add_count=False,
                         kwargs_pty=kwargs_pty,
                         **kwargs,
                     )
