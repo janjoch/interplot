@@ -713,6 +713,7 @@ class Plot(NotebookInteraction):
         label=None,
         color=None,
         opacity=None,
+        linewidth=None,
         row=0,
         col=0,
         kwargs_pty=None,
@@ -765,6 +766,7 @@ class Plot(NotebookInteraction):
                     y=y,
                     **self._get_plotly_legend_args(label),
                     marker_color=self.digest_color(color, opacity),
+                    line=dict(width=linewidth),
                     **kwargs_pty,
                     **kwargs,
                 ),
@@ -781,6 +783,7 @@ class Plot(NotebookInteraction):
                 y,
                 label=label,
                 color=self.digest_color(color, opacity),
+                lw=linewidth,
                 **kwargs_mpl,
                 **kwargs,
             )
