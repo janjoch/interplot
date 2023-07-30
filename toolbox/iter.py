@@ -1,6 +1,7 @@
 """Tools to iterate Python objects."""
 
 from warnings import warn
+from datetime import datetime
 
 from numpy import ndarray as np_ndarray
 from pandas.core.series import Series as pd_Series
@@ -196,7 +197,11 @@ def sum_nested(
 
 def filter_nozip(iterable, no_iter_types=None, recursive=False, length=2):
     # input validation
-    no_iter_types = (float, int) if no_iter_types is None else no_iter_types
+    no_iter_types = (
+        (float, int, datetime)
+        if no_iter_types is None
+        else no_iter_types
+    )
 
     # non-iterable
     if not isinstance(iterable, ITERABLE_TYPES):

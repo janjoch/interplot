@@ -31,8 +31,14 @@ import re
 from warnings import warn
 from pathlib import Path
 from functools import wraps
+from datetime import datetime
 
 import numpy as np
+
+from pandas.core.series import Series as pd_Series
+from pandas.core.frame import DataFrame as pd_DataFrame
+
+from xarray.core.dataarray import DataArray as xr_DataArray
 
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
@@ -103,12 +109,12 @@ DOCSTRING_DECORATOR = """
         Either one title for the entire axis or one for each row/column.
         Default: None
     xlim, ylim: tuple of 2 numbers or nested, optional
+        Axis range limits.
         In case of multiple rows/cols:
         Provide either:
         - a tuple
         - a tuple for each row
         - a tuple for each row containing tuple for each column.
-        Axis range limits.
     shared_xaxes, shared_yaxes: str, optional
         Define how multiple subplots share there axes.
         Options:
@@ -354,6 +360,48 @@ def _adjust_indent(indent_decorator, indent_core, docstring):
     )
 
 
+def _serialize_2d(core):
+
+    @wraps(core)
+    def wrapper(self, x, y=None, **kwargs):
+        if y is None:
+
+            # xarray DataArray
+            if isinstance(x, xr_DataArray):
+                x = x.to_pandas()
+
+            # pd.Series
+            if isinstance(x, pd_Series):
+                index = x.index
+                y = x
+                x = index
+                if kwargs.get("label", None) is None:
+                    kwargs["label"] = y.name
+
+            # pd.DataFrame: split columns to pd.Series and iterate
+            elif isinstance(x, pd_DataFrame):
+                for _, series in x.items():
+                    self.add_line(series, **kwargs)
+                return
+
+            else:
+                if hasattr(x, 'copy') and callable(getattr(x, 'copy')):
+                    y = x.copy()
+                else:
+                    y = x
+                x = np.arange(len(y))
+
+        # 2D np.array
+        if isinstance(y, np.ndarray) and len(y.shape) == 2:
+            for y_ in y.T:
+                self.add_line(x, y_, **kwargs)
+            return
+
+        return core(self, x, y, **kwargs)
+
+    return wrapper
+
+
 class NotebookInteraction:
     """
     Calls the child's show()._repr_html_()
@@ -519,6 +567,14 @@ class Plot(NotebookInteraction):
                     filter_nozip(xlim_row),
                     filter_nozip(ylim_row),
                 ):
+                    if (
+                        xlim_tile is not None
+                        and isinstance(xlim_tile[0], datetime)
+                    ):
+                        xlim_tile = (
+                            xlim_tile[0].timestamp()*1000,
+                            xlim_tile[1].timestamp()*1000,
+                        )
                     self.fig.update_xaxes(
                         range=xlim_tile,
                         row=i_row,
@@ -706,6 +762,7 @@ class Plot(NotebookInteraction):
         # MATPLOTLIB
         return tuple(rgba)
 
+    @_serialize_2d
     def add_line(
         self,
         x,
@@ -727,8 +784,14 @@ class Plot(NotebookInteraction):
         ----------
         x: array-like
         y: array-like, optional
-            If only x is defined, it will be assumed as y,
-            and x will be the index, starting from 0.
+            If only x is defined, it will be assumed as y.
+            If a pandas Series is provided, the index will
+            be taken as x.
+            Else if a pandas DataFrame is provided, the method call
+            is looped for each column.
+            Else x will be an increment, starting from 0.
+            If a 2D numpy array is provided, the method call
+            is looped for each column.
         label: str, optional
             Trace label for legend.
         color: str, optional
@@ -748,10 +811,6 @@ class Plot(NotebookInteraction):
         kwargs_pty, kwargs_mpl, **kwargs: optional
             Pass specific keyword arguments to the line core method.
         """
-        # input verification
-        if y is None:
-            y = x
-            x = np.arange(len(y))
         self.element_count[row, col] += 1
 
         # PLOTLY
