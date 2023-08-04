@@ -361,9 +361,20 @@ def _adjust_indent(indent_decorator, indent_core, docstring):
 
 
 def _serialize_2d(core):
+    """Decorator to catch 2D arrays and other data types to unpack."""
 
     @wraps(core)
     def wrapper(self, x, y=None, **kwargs):
+        """
+        Wrapper function for a method.
+
+        If a pandas object is provided, the index will be used as x
+        if no x is provided.
+        In a pandas object, the name or column name is used as label
+        if none is provided.
+        xarray DataArrays will be convered to pandas and then handled
+        accordingly.
+        """
         if y is None:
 
             # xarray DataArray
