@@ -2010,10 +2010,11 @@ class ShowDataArray(NotebookInteraction):
         sel=None,
         isel=None,
         fig=None,
+        **kwargs,
     ):
         sel = {} if sel is None else sel
         isel = {} if isel is None else isel
-        fig.add_line(data.sel(**sel).isel(**isel))
+        fig.add_line(data.sel(**sel).isel(**isel), **kwargs)
 
     def plot(
         self,
