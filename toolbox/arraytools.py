@@ -157,7 +157,7 @@ def interp(array, pos):
     return array[i] + w * d
 
 
-class LinearRegression:
+class LinearRegression(plot.NotebookInteraction):
     def __init__(
         self,
         x,

@@ -404,8 +404,9 @@ def _serialize_2d(core):
 
         # 2D np.array
         if isinstance(y, np.ndarray) and len(y.shape) == 2:
-            for y_ in y.T:
-                self.add_line(x, y_, **kwargs)
+            labels = kwargs.pop("label", None)
+            for y_, label in zip_smart(y.T, labels):
+                self.add_line(x, y_, label=label, **kwargs)
             return
 
         return core(self, x, y, **kwargs)
@@ -1973,3 +1974,143 @@ def heatmap(
     Plot() instance
     """
     fig.add_heatmap(*args, **kwargs)
+
+
+class ShowDataArray(NotebookInteraction):
+    def __init__(
+        self,
+        data,
+        default_sel=None,
+        default_isel=None,
+    ):
+        """
+        Automatically display a xarray.DataArray in a Jupyter notebook.
+
+        If the DataArray has more than two dimensions, provide default
+        sel or isel selectors to reduce to two dimensions.
+
+        Parameters
+        ----------
+        data: xarray.DataArray
+        default_sel: dict, optional
+            Select a subset of a the DataArray by label.
+            Can be a slice or the type of the dimension.
+        default_isel: dict, optional
+            Select a subset of a the DataArray by integer count.
+            Can be a integer slice or an integer.
+        """
+        self.data = data
+        self.default_sel = default_sel
+        self.default_isel = default_isel
+
+    @magic_plot
+    def _plot_core(
+        self,
+        data,
+        sel=None,
+        isel=None,
+        fig=None,
+    ):
+        sel = {} if sel is None else sel
+        isel = {} if isel is None else isel
+        fig.add_line(data.sel(**sel).isel(**isel))
+
+    def plot(
+        self,
+        *args,
+        sel=None,
+        isel=None,
+        **kwargs,
+    ):
+        """
+        Show the DataArray.
+
+        Parameters
+        ----------
+        sel: dict, optional
+            Select a subset of a the DataArray by label.
+            Can be a slice or the type of the dimension.
+            If None, default_sel will be used.
+        isel: dict, optional
+            Select a subset of a the DataArray by integer count.
+            Can be a integer slice or an integer.
+            If None, default_isel will be used.
+
+        Returns
+        -------
+        Plot.fig
+        """
+        sel = self.default_sel if sel is None else sel
+        isel = self.default_isel if isel is None else isel
+        return self._plot_core(self.data, *args, sel=sel, isel=isel, **kwargs)
+
+
+class ShowDataset(ShowDataArray):
+    def __init__(
+        self,
+        data,
+        default_var=None,
+        default_sel=None,
+        default_isel=None,
+    ):
+        """
+        Automatically display a xarray.Dataset in a Jupyter notebook.
+
+        Provide a default variable to display from the Dataset for
+        automatic display.
+        If the Dataset has more than two dimensions, provide default
+        sel or isel selectors to reduce to two dimensions.
+
+        Parameters
+        ----------
+        data: xarray.DataArray
+        default_var: str, optional
+            Select the variable of the Dataset to display by label.
+        default_sel: dict, optional
+            Select a subset of a the Dataset by label.
+            Can be a slice or the type of the dimension.
+        default_isel: dict, optional
+            Select a subset of a the Dataset by integer count.
+            Can be a integer slice or an integer.
+        """
+        self.data = data
+        self.default_var = default_var
+        self.default_sel = default_sel
+        self.default_isel = default_isel
+
+    def plot(
+        self,
+        *args,
+        var=None,
+        sel=None,
+        isel=None,
+        **kwargs,
+    ):
+        """
+        Show a variable of the Dataset.
+
+        Parameters
+        ----------
+        var: str, optional
+            Select the variable of the Dataset to display by label.
+            If None, default_var will be used.
+        sel: dict, optional
+            Select a subset of a the DataArray by label.
+            Can be a slice or the type of the dimension.
+            If None, default_sel will be used.
+        isel: dict, optional
+            Select a subset of a the DataArray by integer count.
+            Can be a integer slice or an integer.
+            If None, default_isel will be used.
+
+        Returns
+        -------
+        Plot.fig
+        """
+
+        var = self.default_var if var is None else var
+        sel = self.default_sel if sel is None else sel
+        isel = self.default_isel if isel is None else isel
+        return super()._plot_core(
+            self.data[var], *args, sel=sel, isel=isel, **kwargs
+        )
