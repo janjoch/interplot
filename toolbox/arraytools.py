@@ -379,6 +379,7 @@ class LinearRegression(plot.NotebookInteraction):
                 self.x2,
                 self.y2 - self.pi,
                 label=None,
+                color=color_pi,
                 **kwargs_pi,
                 **kwargs,
             )

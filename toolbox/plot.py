@@ -691,7 +691,7 @@ class Plot(NotebookInteraction):
             on hover)
         """
         legend_kwargs = dict(
-            name=default_label if label is None else label
+            name=default_label if label is None else str(label)
         )
         if show:
             legend_kwargs["showlegend"] = True
@@ -733,14 +733,37 @@ class Plot(NotebookInteraction):
             return None
         return re.sub(r"\n", "<br>", text)
 
-    def digest_color(self, color, alpha=None, increment=1):
+    def get_cycle_color(self, increment=1):
+        """
+        Retrieves the next color in the color cycle.
+
+        Parameters
+        ----------
+        increment: int, optional
+            If the same color should be repeated, pass 0.
+            To jump the next color, pass 2.
+            Default: 1
+
+        Returns
+        -------
+        color: str
+            HEX color, with leading hashtag
+        """
+        if self.i_color >= len(COLOR_CYCLE):
+            self.i_color = 0
+        color = COLOR_CYCLE[self.i_color]
+        self.i_color += increment
+        return color
+
+    def digest_color(self, color=None, alpha=None, increment=1):
         """
         Parse color with matplotlib.colors to a rgba array.
 
         Parameters
         ----------
-        color: any color format matplotlib accepts
+        color: any color format matplotlib accepts, optional
             E.g. "blue", "#0000ff"
+            If None is provided, the next one from COLOR_CYCLE will be picked.
         alpha: float, optional
             Set alpha / opacity.
             Overrides alpha contained in color input.
@@ -751,10 +774,7 @@ class Plot(NotebookInteraction):
         """
         # if color undefined, cycle COLOR_CYCLE
         if color is None:
-            if self.i_color >= len(COLOR_CYCLE):
-                self.i_color = 0
-            color = COLOR_CYCLE[self.i_color]
-            self.i_color += increment
+            color = self.get_cycle_color(increment)
 
         # get index from COLOR_CYCLE
         elif color[0] == "C" or color[0] == "c":
