@@ -83,9 +83,9 @@ COLOR_CYCLE = [  # optimised for color vision deficiencies
 
 EXPORT_FORMAT = "png"
 EXPORT_REPLACE = {
+    "[ ]?/[ ]?": "_",
     " ": "-",
     "[@!?,:;+*%&()=#|'\"]": "",
-    r"/": "_",
     r"\\": "_",
     r"\s": "_",
     r"<\s*br\s*/?\s*>": "_",
@@ -733,7 +733,7 @@ class Plot(NotebookInteraction):
             return None
         return re.sub(r"\n", "<br>", text)
 
-    def get_cycle_color(self, increment=1):
+    def get_cycle_color(self, increment=1, i=None):
         """
         Retrieves the next color in the color cycle.
 
@@ -743,17 +743,23 @@ class Plot(NotebookInteraction):
             If the same color should be repeated, pass 0.
             To jump the next color, pass 2.
             Default: 1
+        i: int, optional
+            Get a fixed index of the color cycle instead of the next one.
+            This will not modify the regular color cycle iteration.
 
         Returns
         -------
         color: str
             HEX color, with leading hashtag
         """
-        if self.i_color >= len(COLOR_CYCLE):
-            self.i_color = 0
-        color = COLOR_CYCLE[self.i_color]
-        self.i_color += increment
-        return color
+        if i is None:
+            if self.i_color >= len(COLOR_CYCLE):
+                self.i_color = 0
+            color = COLOR_CYCLE[self.i_color]
+            self.i_color += increment
+            return color
+        else:
+            return COLOR_CYCLE[i]
 
     def digest_color(self, color=None, alpha=None, increment=1):
         """
@@ -1128,6 +1134,7 @@ class Plot(NotebookInteraction):
         x=None,
         y=None,
         bins=None,
+        density=False,
         label=None,
         color=None,
         opacity=None,
@@ -1180,6 +1187,8 @@ class Plot(NotebookInteraction):
         if self.interactive:
             if kwargs_pty is None:
                 kwargs_pty = dict()
+            if density:
+                kwargs_pty.update(dict(histnorm='probability'))
             row += 1
             col += 1
             self.fig.add_trace(
@@ -1209,6 +1218,7 @@ class Plot(NotebookInteraction):
                 x,
                 label=label,
                 bins=bins,
+                density=density,
                 color=self.digest_color(color, opacity),
                 orientation=orientation,
                 **kwargs_mpl,
@@ -1571,7 +1581,7 @@ class Plot(NotebookInteraction):
         if self.save_fig is not None:
             self.save(self.save_fig)
 
-    def save(self, path, **kwargs):
+    def save(self, path, export_format=None, **kwargs):
         # input verification
         if isinstance(path, bool):
             if path:
@@ -1586,7 +1596,9 @@ class Plot(NotebookInteraction):
             filename = self.title
             for key, value in EXPORT_REPLACE.items():
                 filename = re.sub(key, value, filename)
-            filename += "." + EXPORT_FORMAT
+            filename += "." + (
+                EXPORT_FORMAT if export_format is None else export_format
+            )
             path = path / filename
 
         # PLOTLY
