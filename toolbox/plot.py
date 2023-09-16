@@ -98,6 +98,9 @@ EXPORT_REPLACE = {
     r"\s": "_",
     r"<\s*br\s*/?\s*>": "_",
 }
+PTY_CONFIG = dict(
+    displaylogo=False,
+)
 
 REWRITE_DOCSTRING = True
 
@@ -154,6 +157,8 @@ DOCSTRING_DECORATOR = """
         The figure will only be saved on calling the instance's .post_process()
         If a directory (or True for local directory) is provided,
         the filename will be automatically generated based on the title.
+    save_format: str, optional
+        Provide a format for the exported plot.
     pty_update_layout: dict, optional
         PLOTLY ONLY.
         Pass keyword arguments to plotly's
@@ -510,6 +515,8 @@ class Plot(NotebookInteraction):
         legend_loc=None,
         legend_title=None,
         save_fig=None,
+        save_format=None,
+        save_config=None,
         pty_update_layout=None,
         pty_custom_func=None,
         mpl_custom_func=None,
@@ -532,6 +539,8 @@ class Plot(NotebookInteraction):
         self.legend_title = legend_title
         self.dpi = dpi
         self.save_fig = save_fig
+        self.save_format = save_format
+        self.save_config = save_config
         self.pty_update_layout = pty_update_layout
         self.pty_custom_func = pty_custom_func
         self.mpl_custom_func = mpl_custom_func
@@ -679,7 +688,7 @@ class Plot(NotebookInteraction):
                 self.fig.supylabel(self.ylabel)
 
     @staticmethod
-    def _get_plotly_legend_args(label, default_label=None, show=None):
+    def _get_plotly_legend_args(label, default_label=None, show_legend=None):
         """
         Return keyword arguments for label configuration.
 
@@ -691,7 +700,7 @@ class Plot(NotebookInteraction):
             If label is None, fall back to default_label.
             Default: None
             By default, plotly will enumerate the unnamed traces itself.
-        show: bool, optional
+        show_legend: bool, optional
             Show label in legend.
             Default: None
             By default, the label will be displayed if it is not None
@@ -701,9 +710,9 @@ class Plot(NotebookInteraction):
         legend_kwargs = dict(
             name=default_label if label is None else str(label)
         )
-        if show:
+        if show_legend:
             legend_kwargs["showlegend"] = True
-        elif isinstance(show, bool) and not show:
+        elif isinstance(show_legend, bool) and not show_legend:
             legend_kwargs["showlegend"] = False
         else:
             legend_kwargs["showlegend"] = False if label is None else True
@@ -814,6 +823,7 @@ class Plot(NotebookInteraction):
         x,
         y=None,
         label=None,
+        show_legend=None,
         color=None,
         opacity=None,
         linewidth=None,
@@ -840,6 +850,10 @@ class Plot(NotebookInteraction):
             is looped for each column.
         label: str, optional
             Trace label for legend.
+        show_legend: bool, optional
+            Whether to show the label in the legend.
+            In case of None, it will be shown if a label is defined.
+            Default: None
         color: str, optional
             Trace color.
             Can be hex, rgb(a) or any named color that is understood
@@ -869,7 +883,10 @@ class Plot(NotebookInteraction):
                 go.Scatter(
                     x=x,
                     y=y,
-                    **self._get_plotly_legend_args(label),
+                    **self._get_plotly_legend_args(
+                        label,
+                        show_legend=show_legend,
+                    ),
                     marker_color=self.digest_color(color, opacity),
                     line=dict(width=linewidth),
                     **kwargs_pty,
@@ -886,7 +903,7 @@ class Plot(NotebookInteraction):
             self.ax[row, col].plot(
                 x,
                 y,
-                label=label,
+                label=None if show_legend is False else label,
                 color=self.digest_color(color, opacity),
                 lw=linewidth,
                 **kwargs_mpl,
@@ -899,6 +916,7 @@ class Plot(NotebookInteraction):
         y1,
         y2=None,
         label=None,
+        show_legend=False,
         mode="lines",
         color=None,
         opacity=0.5,
@@ -959,7 +977,7 @@ class Plot(NotebookInteraction):
                     y=y1,
                     mode=mode,
                     **self._get_plotly_legend_args(
-                        label, "fill border 1", show=False),
+                        label, "fill border 1", show_legend=show_legend),
                     line=dict(width=line_width),
                     marker_color=self.digest_color(
                         line_color, line_opacity, increment=0),
@@ -996,7 +1014,7 @@ class Plot(NotebookInteraction):
                 x,
                 y1,
                 y2,
-                label=label,
+                label=None if show_legend is False else label,
                 linewidth=line_width,
                 edgecolor=self.digest_color(
                     line_color, line_opacity, increment=0),
@@ -1144,6 +1162,7 @@ class Plot(NotebookInteraction):
         bins=None,
         density=False,
         label=None,
+        show_legend=None,
         color=None,
         opacity=None,
         row=0,
@@ -1203,7 +1222,10 @@ class Plot(NotebookInteraction):
                 go.Histogram(
                     x=x,
                     y=y,
-                    **self._get_plotly_legend_args(label),
+                    **self._get_plotly_legend_args(
+                        label,
+                        show_legend=show_legend,
+                    ),
                     **bins_attribute,
                     marker_color=self.digest_color(color, opacity),
                     **kwargs_pty,
@@ -1224,7 +1246,7 @@ class Plot(NotebookInteraction):
                 orientation = "vertical"
             self.ax[row, col].hist(
                 x,
-                label=label,
+                label=None if show_legend is False else label,
                 bins=bins,
                 density=density,
                 color=self.digest_color(color, opacity),
@@ -1238,6 +1260,7 @@ class Plot(NotebookInteraction):
         x,
         horizontal=False,
         label=None,
+        show_legend=None,
         color=None,
         opacity=None,
         row=0,
@@ -1293,15 +1316,18 @@ class Plot(NotebookInteraction):
 
             # if x contains multiple datasets, iterate add_boxplot
             if not n == 1:
-                for x_i, label_, color_ in zip_smart(x, label, color):
+                for x_i, label_, show_legend_, color_, opacity_ in zip_smart(
+                    x, label, show_legend, color, opacity,
+                ):
                     self.add_boxplot(
                         x_i,
                         horizontal=horizontal,
-                        label=label,
+                        label=label_,
+                        show_legend=show_legend_,
                         row=row,
                         col=col,
-                        color=color,
-                        opacity=opacity,
+                        color=color_,
+                        opacity=opacity_,
                         kwargs_pty=kwargs_pty,
                         **kwargs,
                     )
@@ -1317,7 +1343,10 @@ class Plot(NotebookInteraction):
                 self.fig.add_trace(
                     go.Box(
                         **pty_kwargs,
-                        **self._get_plotly_legend_args(label[0]),
+                        **self._get_plotly_legend_args(
+                            label[0],
+                            show_legend=show_legend,
+                        ),
                         marker_color=self.digest_color(color[0], opacity),
                         **kwargs_pty,
                         **kwargs,
@@ -1333,7 +1362,7 @@ class Plot(NotebookInteraction):
             bplots = self.ax[row, col].boxplot(
                 x,
                 vert=not horizontal,
-                labels=label,
+                labels=None if show_legend is False else label,
                 patch_artist=True,
                 **kwargs_mpl,
                 **kwargs,
@@ -1629,7 +1658,7 @@ class Plot(NotebookInteraction):
                 self.fig, self.ax = mpl_custom_func(self.fig, self.ax)
 
         if self.save_fig is not None:
-            self.save(self.save_fig)
+            self.save(self.save_fig, self.save_format)
 
     def save(self, path, export_format=None, **kwargs):
         # input verification
@@ -1656,7 +1685,15 @@ class Plot(NotebookInteraction):
 
             # HTML
             if str(path)[-5:] == ".html":
-                self.fig.write_html(path, **kwargs)
+                self.fig.write_html(
+                    path,
+                    config=(
+                        PTY_CONFIG
+                        if self.save_config is None
+                        else self.save_config
+                    ),
+                    **kwargs,
+                )
 
             # image
             else:
@@ -1682,6 +1719,11 @@ class Plot(NotebookInteraction):
         if self.interactive:
             init_notebook_mode()
             display_html(self.JS_RENDER_WARNING, raw=True)
+            return self.fig.show(
+                config=PTY_CONFIG
+                if self.save_config is None
+                else self.save_config
+            )
         return self.fig.show()
 
     def _repr_html_(self):
@@ -1722,6 +1764,8 @@ def magic_plot(core, doc_decorator=None):
         legend_loc=None,
         legend_title=None,
         save_fig=None,
+        save_format=None,
+        save_config=None,
         pty_update_layout=None,
         pty_custom_func=None,
         mpl_custom_func=None,
@@ -1747,6 +1791,8 @@ def magic_plot(core, doc_decorator=None):
                 legend_loc=legend_loc,
                 legend_title=legend_title,
                 save_fig=save_fig,
+                save_format=save_format,
+                save_config=save_config,
                 pty_update_layout=pty_update_layout,
                 pty_custom_func=pty_custom_func,
                 mpl_custom_func=mpl_custom_func,
