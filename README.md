@@ -16,7 +16,7 @@ View on [NBViewer &rarr;](https://nbviewer.org/github/janjoch/toolbox/tree/main/
 
 ## Modules
 
-Note: This is just a sneak peek. Refer to /demo and ultimately /toolbox to see everything.
+Note: This is just a *sneak peek*. Refer to [/demo] and ultimately [/toolbox] to see everything.
 
 ### arraytools
 ```python
@@ -86,8 +86,15 @@ All the necessary boilerplate code is contained in this module.
 
 Currently supported:
 * line plots (scatter)
+* line fills
 * histograms
 * heatmaps
+* boxplot
+* linear regression
+
+* text annotations
+* 2D subplots
+* color cycling
 
 ```python
 >>> toolbox.plot.line([0,4,6,7], [1,2,4,8])
@@ -109,6 +116,7 @@ Currently supported:
 >>> )
 [matplotlib figure, custom formatted]
 
+>>> # toolbox.plot.NotebookInteraction searches the .show() or .plot() methods for Notebook representation
 >>> class ReadTrace(toolbox.plot.NotebookInteraction):
 >>> 
 >>>     def __init__(self, file):

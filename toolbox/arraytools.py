@@ -211,6 +211,7 @@ class LinearRegression(plot.NotebookInteraction):
         self.x = x
         self.y = y
         self.p = p
+        self.is_linreg = True
 
         # parameters and covariance from of the fit of 1-D polynom.
         self.poly, self.cov = np.polyfit(
@@ -285,6 +286,7 @@ class LinearRegression(plot.NotebookInteraction):
         label_reg="regression",
         label_ci="confidence interval",
         label_pi="prediction interval",
+        color=None,
         color_data=None,
         color_reg=None,
         color_ci=None,
@@ -340,7 +342,7 @@ class LinearRegression(plot.NotebookInteraction):
             self.x,
             self.y,
             label=label_data,
-            color=color_data,
+            color=color if color_data is None else color_data,
             **kwargs_data,
             **kwargs,
         )
@@ -349,7 +351,7 @@ class LinearRegression(plot.NotebookInteraction):
             self.x2,
             self.y2,
             label=label_reg,
-            color=color_reg,
+            color=color if color_reg is None else color_reg,
             **kwargs_reg,
             **kwargs,
         )
@@ -360,7 +362,7 @@ class LinearRegression(plot.NotebookInteraction):
                 self.y2 - self.ci,
                 self.y2 + self.ci,
                 label=label_ci,
-                color=color_ci,
+                color=color if color_ci is None else color_ci,
                 **kwargs_ci,
                 **kwargs,
             )
@@ -370,7 +372,7 @@ class LinearRegression(plot.NotebookInteraction):
                 self.x2,
                 self.y2 + self.pi,
                 label=label_pi,
-                color=color_pi,
+                color=color if color_pi is None else color_pi,
                 **kwargs_pi,
                 **kwargs,
             )
@@ -379,7 +381,7 @@ class LinearRegression(plot.NotebookInteraction):
                 self.x2,
                 self.y2 - self.pi,
                 label=None,
-                color=color_pi,
+                color=color if color_pi is None else color_pi,
                 **kwargs_pi,
                 **kwargs,
             )

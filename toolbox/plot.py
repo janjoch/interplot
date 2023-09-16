@@ -6,8 +6,15 @@ All the necessary boilerplate code is contained in this module.
 
 Currently supported:
 * line plots (scatter)
+* line fills
 * histograms
 * heatmaps
+* boxplot
+* linear regression
+
+* text annotations
+* 2D subplots
+* color cycling
 
 Example:
 ```
@@ -49,6 +56,7 @@ import plotly.subplots as sp
 import plotly.offline
 
 from .iter import ITERABLE_TYPES, zip_smart, filter_nozip
+from toolbox import arraytools
 
 
 def init_notebook_mode(connected=False):
@@ -1229,8 +1237,8 @@ class Plot(NotebookInteraction):
         self,
         x,
         horizontal=False,
-        labels=None,
-        colors=None,
+        label=None,
+        color=None,
         opacity=None,
         row=0,
         col=0,
@@ -1248,9 +1256,9 @@ class Plot(NotebookInteraction):
         horizontal: bool, optional
             Show boxplot horizontally.
             Default: False
-        labels: tuple of strs, optional
+        label: tuple of strs, optional
             Trace labels for legend.
-        colors: tuple of strs, optional
+        color: tuple of strs, optional
             Trace colors.
             Can be hex, rgb(a) or any named color that is understood
             by matplotlib.
@@ -1273,10 +1281,10 @@ class Plot(NotebookInteraction):
         else:
             n = len(x)
         # input validation
-        if not isinstance(labels, ITERABLE_TYPES):
-            labels = (labels, ) * n
-        if not isinstance(colors, ITERABLE_TYPES):
-            colors = (colors, ) * n
+        if not isinstance(label, ITERABLE_TYPES):
+            label = (label, ) * n
+        if not isinstance(color, ITERABLE_TYPES):
+            color = (color, ) * n
 
         # PLOTLY
         if self.interactive:
@@ -1285,14 +1293,14 @@ class Plot(NotebookInteraction):
 
             # if x contains multiple datasets, iterate add_boxplot
             if not n == 1:
-                for x_i, label, color in zip_smart(x, labels, colors):
+                for x_i, label_, color_ in zip_smart(x, label, color):
                     self.add_boxplot(
                         x_i,
                         horizontal=horizontal,
-                        labels=label,
+                        label=label,
                         row=row,
                         col=col,
-                        colors=color,
+                        color=color,
                         opacity=opacity,
                         kwargs_pty=kwargs_pty,
                         **kwargs,
@@ -1309,8 +1317,8 @@ class Plot(NotebookInteraction):
                 self.fig.add_trace(
                     go.Box(
                         **pty_kwargs,
-                        **self._get_plotly_legend_args(labels[0]),
-                        marker_color=self.digest_color(colors[0], opacity),
+                        **self._get_plotly_legend_args(label[0]),
+                        marker_color=self.digest_color(color[0], opacity),
                         **kwargs_pty,
                         **kwargs,
                     ),
@@ -1325,13 +1333,13 @@ class Plot(NotebookInteraction):
             bplots = self.ax[row, col].boxplot(
                 x,
                 vert=not horizontal,
-                labels=labels,
+                labels=label,
                 patch_artist=True,
                 **kwargs_mpl,
                 **kwargs,
             )
-            for bplot, color in zip_smart(bplots["boxes"], colors):
-                bplot.set_facecolor(self.digest_color(color, opacity))
+            for bplot, color_ in zip_smart(bplots["boxes"], color):
+                bplot.set_facecolor(self.digest_color(color_, opacity))
 
     def add_heatmap(
         self,
@@ -1465,6 +1473,48 @@ class Plot(NotebookInteraction):
                 self.ax[row, col].axes.invert_xaxis()
             if not invert_y:
                 self.ax[row, col].axes.invert_yaxis()
+
+    def add_regression(
+        self,
+        x,
+        y=None,
+        p=0.05,
+        linspace=101,
+        **kwargs,
+    ):
+        """
+        Generate a linear regression plot.
+
+        Parameters
+        ----------
+        x: array-like or toolbox.arraytools.LinearRegression instance
+            X axis data, or pre-existing LinearRegression instance.
+        y: array-like, optional
+            Y axis data.
+            If a LinearRegression instance is provided for x,
+            y can be omitted and will be ignored.
+        p: float, optional
+            p-value.
+            Default: 0.05
+        linspace: int, optional
+            Number of data points for linear regression model
+            and conficence and prediction intervals.
+            Default: 101
+        kwargs:
+            Keyword arguments for toolbox.arraytools.LinearRegression.plot.
+        """
+        if (
+            isinstance(x, arraytools.LinearRegression)
+            or hasattr(x, "is_linreg")
+        ):
+            x.plot(fig=self, **kwargs)
+        else:
+            arraytools.LinearRegression(
+                x,
+                y,
+                p=p,
+                linspace=linspace,
+            ).plot(fig=self, **kwargs)
 
     def post_process(
         self,
@@ -2006,6 +2056,40 @@ def heatmap(
     Plot() instance
     """
     fig.add_heatmap(*args, **kwargs)
+
+
+@magic_plot
+def regression(
+    *args,
+    fig,
+    **kwargs,
+):
+    """
+    Generate a linear regression plot.
+
+    Parameters
+    ----------
+    x: array-like or toolbox.arraytools.LinearRegression instance
+        X axis data, or pre-existing LinearRegression instance.
+    y: array-like, optional
+        Y axis data.
+        If a LinearRegression instance is provided for x,
+        y can be omitted and will be ignored.
+    p: float, optional
+        p-value.
+        Default: 0.05
+    linspace: int, optional
+        Number of data points for linear regression model
+        and conficence and prediction intervals.
+        Default: 101
+    kwargs:
+        Keyword arguments for toolbox.arraytools.LinearRegression.plot.
+
+    Returns
+    -------
+    Plot() instance
+    """
+    fig.add_regression(*args, **kwargs)
 
 
 class ShowDataArray(NotebookInteraction):
