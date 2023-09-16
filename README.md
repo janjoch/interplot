@@ -6,6 +6,7 @@ Janosch's small Python code snippets making life a bit easier.
 
 ## Demo
 View on NBViewer: [![NBViewer](https://raw.githubusercontent.com/jupyter/design/master/logos/Badges/nbviewer_badge.svg)](https://nbviewer.org/github/janjoch/toolbox/tree/main/demo/)
+
 Try on Binder: [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/janjoch/toolbox/HEAD)
 
 ## Install
