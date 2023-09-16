@@ -5,7 +5,8 @@ Janosch's small Python code snippets making life a bit easier.
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
 ## Demo
-View on [NBViewer &rarr;](https://nbviewer.org/github/janjoch/toolbox/tree/main/demo/).
+View on NBViewer: [![NBViewer](https://raw.githubusercontent.com/jupyter/design/master/logos/Badges/nbviewer_badge.svg)](https://nbviewer.org/github/janjoch/toolbox/tree/main/demo/)
+Try on Binder: [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/janjoch/toolbox/HEAD)
 
 ## Install
 ```pip install git+https://github.com/janjoch/toolbox#egg=toolbox```
