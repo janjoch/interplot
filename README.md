@@ -16,7 +16,7 @@ View on [NBViewer &rarr;](https://nbviewer.org/github/janjoch/toolbox/tree/main/
 
 ## Modules
 
-Note: This is just a **sneak peek**. Refer to (/demo) and ultimately (/toolbox) to see everything.
+Note: This is just a **sneak peek**. Refer to `/demo` and ultimately `/toolbox` to see everything.
 
 ### arraytools
 ```python
