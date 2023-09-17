@@ -208,8 +208,8 @@ class LinearRegression(plot.NotebookInteraction):
         Code derived from pylang's StackOverflow post:
         https://stackoverflow.com/questions/27164114/show-confidence-limits-and-prediction-limits-in-scatter-plot
         """
-        self.x = x
-        self.y = y
+        self.x = np.array(x)
+        self.y = np.array(y)
         self.p = p
         self.is_linreg = True
 
@@ -331,6 +331,8 @@ class LinearRegression(plot.NotebookInteraction):
             kwargs_ci = dict()
         if kwargs_pi is None:
             kwargs_pi = dict()
+        if color is None:
+            color = fig.get_cycle_color()
 
         # data as dots
         if fig.interactive:
@@ -368,20 +370,30 @@ class LinearRegression(plot.NotebookInteraction):
             )
 
         if plot_pi:
+            if fig.interactive:
+                legendgroup = "pi_" + str(len(fig.fig.data))
+            else:
+                legendgroup = None
             fig.add_line(
                 self.x2,
                 self.y2 + self.pi,
                 label=label_pi,
                 color=color if color_pi is None else color_pi,
+                kwargs_pty=dict(
+                    legendgroup=legendgroup,
+                ),
                 **kwargs_pi,
                 **kwargs,
             )
-            fig.i_color -= 1
             fig.add_line(
                 self.x2,
                 self.y2 - self.pi,
-                label=None,
+                label=label_pi,
+                show_legend=False,
                 color=color if color_pi is None else color_pi,
+                kwargs_pty=dict(
+                    legendgroup=legendgroup,
+                ),
                 **kwargs_pi,
                 **kwargs,
             )

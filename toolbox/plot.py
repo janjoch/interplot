@@ -757,7 +757,7 @@ class Plot(NotebookInteraction):
         Parameters
         ----------
         increment: int, optional
-            If the same color should be repeated, pass 0.
+            If the same color should be returned the next time, pass 0.
             To jump the next color, pass 2.
             Default: 1
         i: int, optional
@@ -964,11 +964,21 @@ class Plot(NotebookInteraction):
             x = np.arange(len(y1))
         self.element_count[row, col] += 1
 
+        fill_color = self.digest_color(
+            color,
+            opacity,
+            increment=0 if line_color is None else 1,
+        )
+        line_color = self.digest_color(
+            color if line_color is None else line_color,
+            line_opacity,
+        )
+
         # PLOTLY
         if self.interactive:
             if kwargs_pty is None:
                 kwargs_pty = dict()
-            legendgroup = "fill{}".format(self.element_count[row, col])
+            legendgroup = "fill_{}".format(self.element_count[row, col])
             row += 1
             col += 1
             self.fig.add_trace(
@@ -979,8 +989,7 @@ class Plot(NotebookInteraction):
                     **self._get_plotly_legend_args(
                         label, "fill border 1", show_legend=show_legend),
                     line=dict(width=line_width),
-                    marker_color=self.digest_color(
-                        line_color, line_opacity, increment=0),
+                    marker_color=line_color,
                     legendgroup=legendgroup,
                     **kwargs_pty,
                     **kwargs,
@@ -995,9 +1004,9 @@ class Plot(NotebookInteraction):
                     mode=mode,
                     **self._get_plotly_legend_args(label, "fill border 1"),
                     fill="tonexty",
-                    fillcolor=self.digest_color(color, opacity, increment=0),
+                    fillcolor=fill_color,
                     line=dict(width=line_width),
-                    marker_color=self.digest_color(line_color, line_opacity),
+                    marker_color=line_color,
                     legendgroup=legendgroup,
                     **kwargs_pty,
                     **kwargs,
