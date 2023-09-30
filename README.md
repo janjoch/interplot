@@ -65,19 +65,20 @@ datetime.datetime(2023, 5, 8, 14, 30, 2)
 Tools to iterate python objects.
 
 ```python
->>> from toolbox.iter import zip_smart
+>>> from toolbox.iter import zip_smart, repeat
 
->>> for a, b, c, c in zip_smart(
+>>> for a, b, c, d, e in zip_smart(
 >>>     ("A", "B", "C", "D"),
 >>>     True,
 >>>     [1, 2, 3, 4],
 >>>     "always the same",
+>>>     repeat((1, 2)),
 >>> ):
->>>     print(a, b, c, c)
-A True 1 always the same
-B True 2 always the same
-C True 3 always the same
-D True 4 always the same
+>>>     print(a, b, c, d, e)
+A True 1 always the same (1, 2)
+B True 2 always the same (1, 2)
+C True 3 always the same (1, 2)
+D True 4 always the same (1, 2)
 ```
 
 ### plot

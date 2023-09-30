@@ -602,6 +602,7 @@ def iso_tight(
     time_str,
     regex_start=r"^",
     regex_end=r"$",
+    regex_t="T",
     tzinfo=None,
 ):
     r"""
@@ -622,6 +623,10 @@ def iso_tight(
         Default: ^
         (Only matches at the beginning of the string.)
         Provide None to override with wildcard regex.
+    regex_t: str, optional
+        Replace the ISO T date/time separator with something else.
+        Can be any regex pattern.
+        Default: T
     regex_end: str, optional
         Regex patterns that follows the timestamp.
         Default: $
@@ -650,7 +655,7 @@ def iso_tight(
         time_str=time_str,
         pattern=(
             r"{}([0-9]{{4}})([0-9]{{2}})([0-9]{{2}})"
-            r"T([0-9]{{2}})([0-9]{{2}})([0-9]{{2}})?Z?{}"
-        ).format(regex_start, regex_end),
+            r"{}([0-9]{{2}})([0-9]{{2}})([0-9]{{2}})?Z?{}"
+        ).format(regex_start, regex_t, regex_end),
         tzinfo=tzinfo,
     )

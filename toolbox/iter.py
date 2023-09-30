@@ -2,65 +2,46 @@
 
 from warnings import warn
 from datetime import datetime
+from types import GeneratorType
 
 from numpy import ndarray as np_ndarray
 from pandas.core.series import Series as pd_Series
 
 
-ITERABLE_TYPES = (tuple, list, dict, np_ndarray, pd_Series, range)
+ITERABLE_TYPES = (
+    tuple, list, dict, np_ndarray, pd_Series, range, GeneratorType,
+)
+NON_ITERABLE_TYPES = (str, )
 CUSTOM_DIGESTION = ((dict, (lambda dct: [elem for _, elem in dct.items()])),)
 
 MUTE_STRICT_ZIP_WARNING = False
 
 
-class NoZip:
-    """Avoid iteration in zip() and zip_smart()"""
-    def __init__(self, iterable):
-        """
-        Avoid iteration of an iterable data type in the zip function.
-
-        Class allows iteration and subscription.
-
-        Call the instance to release the original variable.
-
-        Parameters
-        ----------
-        iterable
-            Iterable variable which should be "hidden".
-        """
-        self.iterable = iterable
-
-    def __iter__(self):
-        return iter(self.iterable)
-
-    def __getitem__(self, item):
-        return self.iterable[item]
-
-    def __call__(self):
-        return self.release()
-
-    def __repr__(self):
-        return "NoZip({})".format(self.iterable.__repr__())
-
-    def release(self):
-        """Return the original iterable variable."""
-        return self.iterable
-
-
-def _repeat(arg, iterable_types, maxlen, unpack_nozip):
+def repeat(arg, unpack_nozip=True):
     """
-    If arg is not an instance of iterable_types, repeat maxlen times.
+    A generator that always returns arg.
 
-    Unpacks NoZip instances by default.
+    Parameters
+    ----------
+    arg
+        Any arbitraty object.
+    unpack_nozip: bool, optional
+        Deprecation: Instead of NoZip, use repeat().
+        Unpack objects protected by NoZip.
+        Default: True
+
+    Returns
+    -------
+    generator function
+        which always returns arg.
     """
-    if isinstance(arg, iterable_types):
-        return arg
     if unpack_nozip and isinstance(arg, NoZip):
         arg = arg()
-    return (arg,) * maxlen
+    while True:
+        yield arg
 
 
-def zip_smart(*iterables, iterable_types=None, unpack_nozip=True, strict=True):
+def zip_smart(*iterables, unpack_nozip=True, strict=False):
     """
     Iterate over several iterables in parallel,
     producing tuples with an item from each one.
@@ -68,14 +49,22 @@ def zip_smart(*iterables, iterable_types=None, unpack_nozip=True, strict=True):
     Like Python's builtin zip() function,
     but if an argument is not iterable, it will be repeated each iteration.
 
+    Exception: strings will be repeated by default.
+    Override the NON_ITERABLE_TYPES constant of the module
+    to change this behavior.
+
+    To be iterated, the item needs to have an __iter__ attribute.
+    Otherwise, it will be repeated.
+
+    Pay attention with the strict parameter:
+    - only working with Python <3.10
+    - always raises an error if an item is repeated, since the generator
+      is endless.
+
     Parameters
     ----------
     *iterables: misc
         Elements to iterate or repeat.
-    iterable_types: tuple of types, optional
-        If iterable is one of these types, hand to zip() directly without
-        repeating.
-        Default: (tuple, list, np.ndarray, pandas.Series)
     unpack_nozip: bool, optional
         Unpack a NoZip-wrapped iterable.
         Default: True
@@ -89,18 +78,12 @@ def zip_smart(*iterables, iterable_types=None, unpack_nozip=True, strict=True):
     zip object
         Use it as you would use zip()
     """
-    iterable_types = iterable_types or ITERABLE_TYPES
     iterables = list(iterables)
-    maxlen = 1
-    for arg in iterables:
-        if isinstance(arg, iterable_types):
-            if len(arg) > maxlen:
-                maxlen = len(arg)
-    iterables = [
-        _repeat(arg, iterable_types, maxlen, unpack_nozip=unpack_nozip)
-        for arg
-        in iterables
-    ]
+
+    for i, arg in enumerate(iterables):
+        if not hasattr(arg, "__iter__") or isinstance(arg, NON_ITERABLE_TYPES):
+            iterables[i] = repeat(arg, unpack_nozip=unpack_nozip)
+
     try:
         return zip(*iterables, strict=strict)
 
@@ -223,3 +206,121 @@ def filter_nozip(iterable, no_iter_types=None, recursive=False, length=2):
 
     # no hit
     return iterable
+
+
+class NoZip:
+    """
+    DEPRECATED: use repeat() instead.
+
+    Avoid iteration in zip() and zip_smart()"""
+    def __init__(self, iterable):
+        """
+        DEPRECATED: use repeat() instead.
+
+        Avoid iteration of an iterable data type in the zip function.
+
+        Class allows iteration and subscription.
+
+        Call the instance to release the original variable.
+
+        Parameters
+        ----------
+        iterable
+            Iterable variable which should be "hidden".
+        """
+        self.iterable = iterable
+
+    def __iter__(self):
+        return iter(self.iterable)
+
+    def __getitem__(self, item):
+        return self.iterable[item]
+
+    def __call__(self):
+        return self.release()
+
+    def __repr__(self):
+        return "NoZip({})".format(self.iterable.__repr__())
+
+    def release(self):
+        """Return the original iterable variable."""
+        return self.iterable
+
+
+def _repeat(arg, iterable_types, maxlen, unpack_nozip):
+    """
+    DEPRECATE: USE repeat INSTEAD.
+
+    If arg is not an instance of iterable_types, repeat maxlen times.
+
+    Unpacks NoZip instances by default.
+    """
+    if isinstance(arg, iterable_types):
+        return arg
+    if unpack_nozip and isinstance(arg, NoZip):
+        arg = arg()
+    return (arg,) * maxlen
+
+
+def zip_smart_deprecated(
+    *iterables, iterable_types=None, unpack_nozip=True, strict=True,
+):
+    """
+    Iterate over several iterables in parallel,
+    producing tuples with an item from each one.
+
+    Like Python's builtin zip() function,
+    but if an argument is not iterable, it will be repeated each iteration.
+    Generator functions will be parsed to tuples before iteration.
+
+    Parameters
+    ----------
+    *iterables: misc
+        Elements to iterate or repeat.
+    iterable_types: tuple of types, optional
+        If iterable is one of these types, hand to zip() directly without
+        repeating.
+        Default: toolbox.iter.ITERABLE_TYPES
+    unpack_nozip: bool, optional
+        Unpack a NoZip-wrapped iterable.
+        Default: True
+    strict: bool, optional
+        Fail if iterables are not the same length.
+        Not supported in Python < 3.10.
+        Default: True
+
+    Returns
+    -------
+    zip object
+        Use it as you would use zip()
+    """
+    iterable_types = iterable_types or ITERABLE_TYPES
+    iterables = list(iterables)
+    maxlen = 1
+    for i, arg in enumerate(iterables):
+        if isinstance(arg, iterable_types):
+            if isinstance(arg, GeneratorType):
+                iterables[i] = tuple(arg)
+                if len(iterables[i]) > maxlen:
+                    maxlen = len(iterables[i])
+            else:
+                if len(arg) > maxlen:
+                    maxlen = len(arg)
+
+    iterables = [
+        _repeat(arg, iterable_types, maxlen, unpack_nozip=unpack_nozip)
+        for arg
+        in iterables
+    ]
+    try:
+        return zip(*iterables, strict=strict)
+
+    # strict mode not implemented in Python<3.10
+    except TypeError:
+        if strict:
+            if not MUTE_STRICT_ZIP_WARNING:
+                warn(
+                    "zip's strict mode not supported in Python<3.10.\n\n"
+                    "Falling back to non-strict mode."
+                )
+        return zip(*iterables)

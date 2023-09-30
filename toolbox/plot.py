@@ -377,7 +377,7 @@ def _serialize_2d(core):
     """Decorator to catch 2D arrays and other data types to unpack."""
 
     @wraps(core)
-    def wrapper(self, x, y=None, **kwargs):
+    def wrapper(self, x, y=None, label=None, **kwargs):
         """
         Wrapper function for a method.
 
@@ -399,13 +399,13 @@ def _serialize_2d(core):
                 index = x.index
                 y = x
                 x = index
-                if kwargs.get("label", None) is None:
-                    kwargs["label"] = y.name
+                if label is None:
+                    label = y.name
 
             # pd.DataFrame: split columns to pd.Series and iterate
             elif isinstance(x, pd_DataFrame):
-                for _, series in x.items():
-                    self.add_line(series, **kwargs)
+                for (_, series), label_ in zip_smart(x.items(), label):
+                    self.add_line(series, label=label_, **kwargs)
                 return
 
             else:
@@ -417,12 +417,11 @@ def _serialize_2d(core):
 
         # 2D np.array
         if isinstance(y, np.ndarray) and len(y.shape) == 2:
-            labels = kwargs.pop("label", None)
-            for y_, label in zip_smart(y.T, labels):
-                self.add_line(x, y_, label=label, **kwargs)
+            for y_, label_ in zip_smart(y.T, label):
+                self.add_line(x, y_, label=label_, **kwargs)
             return
 
-        return core(self, x, y, **kwargs)
+        return core(self, x, y, label=label, **kwargs)
 
     return wrapper
 

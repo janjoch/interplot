@@ -5,7 +5,7 @@ with open("requirements.txt", "r", encoding="utf-8") as f:
 
 setup(
     name='toolbox',
-    version='0.2.2',
+    version='0.2.3',
     description=(
         "Janosch's small Python code snippets "
         "making life a bit easier."
