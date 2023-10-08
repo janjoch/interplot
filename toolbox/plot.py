@@ -1270,7 +1270,9 @@ class Plot(NotebookInteraction):
         label=None,
         show_legend=None,
         color=None,
+        color_median="black",
         opacity=None,
+        notch=True,
         row=0,
         col=0,
         kwargs_pty=None,
@@ -1290,11 +1292,15 @@ class Plot(NotebookInteraction):
         label: tuple of strs, optional
             Trace labels for legend.
         color: tuple of strs, optional
-            Trace colors.
+            Fill colors.
             Can be hex, rgb(a) or any named color that is understood
             by matplotlib.
             Default: None
             In the default case, Plot will cycle through COLOR_CYCLE.
+        color_median: color, optional
+            MPL only.
+            Color of the median line.
+            Default: black
         opacity: float, optional
             Opacity (=alpha) of the fill.
             Default: None
@@ -1372,6 +1378,8 @@ class Plot(NotebookInteraction):
                 vert=not horizontal,
                 labels=None if show_legend is False else label,
                 patch_artist=True,
+                notch=notch,
+                medianprops=dict(color=color_median),
                 **kwargs_mpl,
                 **kwargs,
             )
