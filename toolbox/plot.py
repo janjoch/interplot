@@ -390,9 +390,12 @@ def _serialize_2d(core):
             * Instead of setting a string, a callable may be provided to
               reformat the column name. It must accept the column name
               and return a string. E.g.:
+
+              > tb.plot.line(df, label=lambda n: n.strip())
+
               > def capitalize(prefix="", suffix=""):
               >     return lambda name: prefix + name.upper() + suffix
-              > fig.add_line(df, label=capitalize("Cat. A: "))
+              > tb.plot.line(df, label=capitalize("Cat. A: "))
         xarray DataArrays will be convered to pandas and then handled
         accordingly.
         """
