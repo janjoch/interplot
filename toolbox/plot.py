@@ -383,8 +383,16 @@ def _serialize_2d(core):
 
         If a pandas object is provided, the index will be used as x
         if no x is provided.
-        In a pandas object, the name or column name is used as label
-        if none is provided.
+        Pandas column naming:
+            * If no label is set, the column name will be used by default.
+            * Manually set label string has priority.
+            * Label strings may contain a {} to insert the column name.
+            * Instead of setting a string, a callable may be provided to
+              reformat the column name. It must accept the column name
+              and return a string. E.g.:
+              > def capitalize(prefix="", suffix=""):
+              >     return lambda name: prefix + name.upper() + suffix
+              > fig.add_line(df, label=capitalize("Cat. A: "))
         xarray DataArrays will be convered to pandas and then handled
         accordingly.
         """
@@ -401,6 +409,10 @@ def _serialize_2d(core):
                 x = index
                 if label is None:
                     label = y.name
+                elif isinstance(label, str) and "{}" in label:
+                    label = label.format(y.name)
+                elif callable(label):
+                    label = label(y.name)
 
             # pd.DataFrame: split columns to pd.Series and iterate
             elif isinstance(x, pd_DataFrame):
