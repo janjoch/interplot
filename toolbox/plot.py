@@ -1,36 +1,36 @@
 """
-Create matplotlib/plotly hybrid plots with a few lines of code.
+Create `matplotlib/plotly` hybrid plots with a few lines of code.
 
-It combines the best of the matplotlib and the plotly worlds.
+It combines the best of the `matplotlib` and the `plotly` worlds through
+a unified, flat API.
 All the necessary boilerplate code is contained in this module.
 
 Currently supported:
-* line plots (scatter)
-* line fills
-* histograms
-* heatmaps
-* boxplot
-* linear regression
 
-* text annotations
-* 2D subplots
-* color cycling
+- line plots (scatter)
+- line fills
+- histograms
+- heatmaps
+- boxplot
+- linear regression
+- text annotations
+- 2D subplots
+- color cycling
 
-Example:
-```
+Examples:
+
 >>> toolbox.plot.line([0,4,6,7], [1,2,4,8])
 [plotly figure]
 
 >>> toolbox.plot.line(
->>>     [0,4,6,7],
->>>     [1,2,4,8],
->>>     interactive=False,
->>>     title="matploblib static figure",
->>>     xlabel="X",
->>>     ylabel="Y",
->>> )
+...     [0,4,6,7],
+...     [1,2,4,8],
+...     interactive=False,
+...     title="matploblib static figure",
+...     xlabel="X",
+...     ylabel="Y",
+... )
 [matplotlib figure "matploblib static figure"]
-```
 """
 
 
@@ -105,91 +105,96 @@ PTY_CONFIG = dict(
 REWRITE_DOCSTRING = True
 
 DOCSTRING_DECORATOR = """
-    interactive: bool, optional
+    interactive: bool, default: True
         Display an interactive plotly line plot
         instead of the default matplotlib figure.
-        Default: True
-    rows, cols: int, optional
+    rows, cols: int, default: 1
         Create a grid with x rows and y columns.
-        Default: 1
-    title: str, optional
+    title: str, default: None
         Plot title.
-        Default: None
-    xlabel, ylabel: str or str tuple, optional
+    xlabel, ylabel: str or str tuple, default: None
         Axis labels.
+
         Either one title for the entire axis or one for each row/column.
-        Default: None
-    xlim, ylim: tuple of 2 numbers or nested, optional
+    xlim, ylim: tuple of 2 numbers or nested, default: None
         Axis range limits.
-        In case of multiple rows/cols:
-        Provide either:
-        - a tuple
-        - a tuple for each row
-        - a tuple for each row containing tuple for each column.
-    shared_xaxes, shared_yaxes: str, optional
+
+        In case of multiple rows/cols provide either:
+            - a tuple
+            - a tuple for each row
+            - a tuple for each row containing tuple for each column.
+    shared_xaxes, shared_yaxes: str, default: None
         Define how multiple subplots share there axes.
+
         Options:
-            "all"
-            "rows"
-            "columns" or "cols"
-            None or False
-        Default: None
-    column_widths, row_heights: tuple/list, optional
+            - "all" or True
+            - "rows"
+            - "columns" or "cols"
+            - None or False
+    column_widths, row_heights: tuple/list, default: None
         Ratios of the width/height dimensions in each column/row.
         Will be normalised to a sum of 1.
-        Default: None
     fig_size: tuple of 2x float, optional
         Figure size in pixels.
-        Default: None
-    dpi: int, optional
+
+        Default behavior:
+            - MPL: Default figure size.
+            - PLT: Responsive sizing.
+    dpi: int, default: 100
         Plot resolution.
-        Default 100.
     legend_loc: str, optional
         MATPLOTLIB ONLY.
+
         Default:
-            In case of 1 line: None
-            In case of >1 line: "best" (auto-detect)
-    legend_title: str, optional
-        Default: None
-    save_fig: str or pathlib.Path, optional
+            - In case of 1 line: None
+            - In case of >1 line: "best" (auto-detect)
+    legend_title: str, default: None
+        MPL: Each subplot has its own legend, so a 2d list in the shape of
+        the subplots may be provided.
+
+        PTY: Just provide a `str`.
+    save_fig: str or pathlib.Path, default: None
         Provide a path to export the plot.
+
         Possible formats: png, jpg, svg, html, ...
-        The figure will only be saved on calling the instance's .post_process()
+
+        The figure will only be saved on calling the instance's
+        `.post_process()`.
+
         If a directory (or True for local directory) is provided,
         the filename will be automatically generated based on the title.
-    save_format: str, optional
+    save_format: str, default: None
         Provide a format for the exported plot.
-    pty_update_layout: dict, optional
+    pty_update_layout: dict, default: None
         PLOTLY ONLY.
         Pass keyword arguments to plotly's
-        fig.update_layout(**pty_update_layout)
+        `fig.update_layout(**pty_update_layout)`
         Thus, take full control over
-        Default: None
-    pty_custom_func: function, optional
+    pty_custom_func: function, default: None
         PLOTLY ONLY.
         Pass a function reference to further style the plotly graphs.
-        Function must accept fig and return fig.
-        Example:
+        Function must accept `fig` and return `fig`.
+
         >>> def pty_custom_func(fig):
-        >>>     fig.do_stuff()
-        >>>     return fig
-        Default: None
-    mpl_custom_func: function, optional
+        ...     fig.do_stuff()
+        ...     return fig
+    mpl_custom_func: function, default: None
         MATPLOTLIB ONLY.
         Pass a function reference to further style the matplotlib graphs.
-        Function must accept fig, ax and return fig, ax.
-        Note: ax always has row and col coordinates, even if the plot is
+        Function must accept `fig, ax` and return `fig, ax`.
+
+        Note: `ax` always has `row` and `col` coordinates, even if the plot is
         just 1x1.
-        Example:
+
         >>> def mpl_custom_func(fig, ax):
-        >>>     fig.do_stuff()
-        >>>     ax[0, 0].do_more()
-        >>>     return fig, ax
-        Default: None
+        ...     fig.do_stuff()
+        ...     ax[0, 0].do_more()
+        ...     return fig, ax
 
     Returns
     -------
-    toolbox.plot.Plot() instance"""
+    `toolbox.plot.Plot` instance
+"""
 
 
 def _rewrite_docstring(doc_core, doc_decorator=None, kwargs_remove=()):
@@ -443,8 +448,10 @@ def _serialize_2d(core):
 
 class NotebookInteraction:
     """
-    Calls the child's show()._repr_html_()
-    for automatic display in Jupyter Notebooks
+    Parent class for automatic display in Jupyter Notebook.
+
+    Calls the child's `show()._repr_html_()` for automatic display
+    in Jupyter Notebooks.
     """
     JS_RENDER_WARNING = '''
         <div class="alert alert-block alert-warning"
@@ -469,6 +476,7 @@ class NotebookInteraction:
     ''' if CALLED_FROM_NOTEBOOK else ""
 
     def __call__(self, *args, **kwargs):
+        """Calls the `self.show()` or `self.plot()` method."""
         # look for show() method
         try:
             return self.show(*args, **kwargs)
@@ -478,6 +486,7 @@ class NotebookInteraction:
             return self.plot(*args, **kwargs)
 
     def _repr_html_(self):
+        """Calls `self._repr_html_()`."""
         init_notebook_mode()
 
         # look for show() method
@@ -491,19 +500,23 @@ class NotebookInteraction:
 
 class Plot(NotebookInteraction):
     """
-    Create matplotlib/plotly hybrid plots with a flat API in few lines of code.
+    Create `matplotlib/plotly` hybrid plots with a few lines of code.
 
-    It combines the best of the matplotlib and the plotly worlds.
-    All the necessary boilerplate code is contained in this class.
-
-    See also the magic_plot decorator function, which wraps the Plot class
-    around a user-written function.
+    It combines the best of the `matplotlib` and the `plotly` worlds through
+    a unified, flat API.
+    All the necessary boilerplate code is contained in this module.
 
     Currently supported:
-    * line plots (scatter)
-    * histograms
-    * heatmaps
-    * subplot grid
+
+    - line plots (scatter)
+    - line fills
+    - histograms
+    - heatmaps
+    - boxplot
+    - linear regression
+    - text annotations
+    - 2D subplots
+    - color cycling
 
     Parameters
     ----------
@@ -668,25 +681,25 @@ class Plot(NotebookInteraction):
                         continue
 
                     # set shared x axes
-                    if shared_xaxes == "all":
-                        self.ax[i_row, i_col].sharex(self.ax[0, 0])
-                    elif (
-                        shared_xaxes == "columns"
+                    if (
+                        shared_xaxes == "all"
                         or type(shared_xaxes) is bool and shared_xaxes is True
                     ):
+                        self.ax[i_row, i_col].sharex(self.ax[0, 0])
+                    elif shared_xaxes == "columns":
                         self.ax[i_row, i_col].sharex(self.ax[0, i_col])
                     elif shared_xaxes == "rows":
                         self.ax[i_row, i_col].sharex(self.ax[i_row, 0])
 
                     # set shared y axes
-                    if shared_yaxes == "all":
+                    if (
+                        shared_yaxes == "all"
+                        or type(shared_yaxes) is bool and shared_yaxes is True
+                    ):
                         self.ax[i_row, i_col].sharey(self.ax[0, 0])
                     elif shared_yaxes == "columns":
                         self.ax[i_row, i_col].sharey(self.ax[0, i_col])
-                    elif (
-                        shared_yaxes == "rows"
-                        or type(shared_yaxes) is bool and shared_yaxes is True
-                    ):
+                    elif shared_yaxes == "rows":
                         self.ax[i_row, i_col].sharey(self.ax[i_row, 0])
 
             # axis labels
@@ -848,39 +861,42 @@ class Plot(NotebookInteraction):
         **kwargs,
     ):
         """
-        Add a line to the plot.
+        Draw a line plot.
 
         Parameters
         ----------
         x: array-like
         y: array-like, optional
-            If only x is defined, it will be assumed as y.
-            If a pandas Series is provided, the index will
-            be taken as x.
-            Else if a pandas DataFrame is provided, the method call
+            If only `x` is defined, it will be assumed as y.
+            If a pandas `Series` is provided, the index will
+            be taken as `x`.
+            Else if a pandas `DataFrame` is provided, the method call
             is looped for each column.
-            Else x will be an increment, starting from 0.
-            If a 2D numpy array is provided, the method call
+            Else `x` will be an increment, starting from `0`.
+            If a 2D numpy `array` is provided, the method call
             is looped for each column.
         label: str, optional
             Trace label for legend.
         show_legend: bool, optional
             Whether to show the label in the legend.
-            In case of None, it will be shown if a label is defined.
-            Default: None
+
+            By default, it will be shown if a label is defined.
         color: str, optional
             Trace color.
+
             Can be hex, rgb(a) or any named color that is understood
             by matplotlib.
-            Default: None
-            In the default case, Plot will cycle through COLOR_CYCLE.
+
+            Default: color is retrieved from `Plot.digest_color`,
+            which cycles through `COLOR_CYCLE`.
         opacity: float, optional
             Opacity (=alpha) of the fill.
-            Default: None
+
             By default, fallback to alpha value provided with color argument,
             or 1.
         row, col: int, optional
             If the plot contains a grid, provide the coordinates.
+
             Attention: Indexing starts with 0!
         kwargs_pty, kwargs_mpl, **kwargs: optional
             Pass specific keyword arguments to the line core method.
@@ -924,260 +940,6 @@ class Plot(NotebookInteraction):
                 **kwargs,
             )
 
-    def add_fill(
-        self,
-        x,
-        y1,
-        y2=None,
-        label=None,
-        show_legend=False,
-        mode="lines",
-        color=None,
-        opacity=0.5,
-        line_width=0.,
-        line_opacity=1.,
-        line_color=None,
-        row=0,
-        col=0,
-        kwargs_pty=None,
-        kwargs_mpl=None,
-        **kwargs,
-    ):
-        """
-        Add a fill between two y lines.
-
-        Parameters
-        ----------
-        x: array-like
-        y1, y2: array-like, optional
-            If only x and y1 is defined, it will be assumed as y1 and y2,
-            and x will be the index, starting from 0.
-        label: str, optional
-            Trace label for legend.
-        color, line_color: str, optional
-            Trace color.
-            Can be hex, rgb(a) or any named color that is understood
-            by matplotlib.
-            Default: None
-            In the default case, Plot will cycle through COLOR_CYCLE.
-        opacity, line_opacity: float, optional
-            Opacity (=alpha) of the fill.
-            Default: 0.5
-            Set to None to use a value provided with the color argument.
-        line_width: float, optional
-            Boundary line width.
-        row, col: int, optional
-            If the plot contains a grid, provide the coordinates.
-            Attention: Indexing starts with 0!
-        kwargs_pty, kwargs_mpl, **kwargs: optional
-            Pass specific keyword arguments to the fill core method.
-        """
-        # input verification
-        if y2 is None:
-            y1, y2 = x, y1
-            x = np.arange(len(y1))
-        self.element_count[row, col] += 1
-
-        fill_color = self.digest_color(
-            color,
-            opacity,
-            increment=0 if line_color is None else 1,
-        )
-        line_color = self.digest_color(
-            color if line_color is None else line_color,
-            line_opacity,
-        )
-
-        # PLOTLY
-        if self.interactive:
-            if kwargs_pty is None:
-                kwargs_pty = dict()
-            legendgroup = "fill_{}".format(self.element_count[row, col])
-            row += 1
-            col += 1
-            self.fig.add_trace(
-                go.Scatter(
-                    x=x,
-                    y=y1,
-                    mode=mode,
-                    **self._get_plotly_legend_args(
-                        label, "fill border 1", show_legend=show_legend),
-                    line=dict(width=line_width),
-                    marker_color=line_color,
-                    legendgroup=legendgroup,
-                    **kwargs_pty,
-                    **kwargs,
-                ),
-                row=row,
-                col=col,
-            )
-            self.fig.add_trace(
-                go.Scatter(
-                    x=x,
-                    y=y2,
-                    mode=mode,
-                    **self._get_plotly_legend_args(label, "fill border 1"),
-                    fill="tonexty",
-                    fillcolor=fill_color,
-                    line=dict(width=line_width),
-                    marker_color=line_color,
-                    legendgroup=legendgroup,
-                    **kwargs_pty,
-                    **kwargs,
-                ),
-                row=row,
-                col=col,
-            )
-
-        # MATPLOTLIB
-        else:
-            if kwargs_mpl is None:
-                kwargs_mpl = dict()
-            self.ax[row, col].fill_between(
-                x,
-                y1,
-                y2,
-                label=None if show_legend is False else label,
-                linewidth=line_width,
-                edgecolor=self.digest_color(
-                    line_color, line_opacity, increment=0),
-                facecolor=self.digest_color(color, opacity),
-                **kwargs_mpl,
-                **kwargs,
-            )
-
-    def add_text(
-        self,
-        x,
-        y,
-        text,
-        horizontal_alignment="center",
-        vertical_alignment="center",
-        text_alignment=None,
-        data_coords=None,
-        x_data_coords=True,
-        y_data_coords=True,
-        color="black",
-        opacity=None,
-        row=0,
-        col=0,
-        kwargs_pty=None,
-        kwargs_mpl=None,
-        **kwargs,
-    ):
-        """
-        Add text to the plot.
-
-        Parameters
-        ----------
-        x, y: float
-            Coordinates of the text.
-        text: str
-            Text to add.
-        horizontal_alignment, vertical_alignment: str, optional
-            Where the coordinates of the text box anchor.
-            Horizontal: ("left", "center", "right")
-            Vertical: ("top", "center", "bottom")
-            Default: "center"
-        text_alignment: str, optional
-            Set how text is aligned inside its box.
-            If left undefined, horizontal_alignment will be used.
-            Default: None
-        data_coords: bool, optional
-            Whether the x, y coordinates are provided in data coordinates
-            or in relation to the axes.
-            If set to False, x, y should be in the range (0, 1).
-            If data_coords is set, it will override
-            x_data_coords and y_data_coords.
-            Default: True
-        x_data_coords, y_data_coords: bool, optional
-            Specify the anchor for each axis separate.
-            Works with interactive plotly plots only.
-            Default: True
-        color: str, optional
-            Trace color.
-            Can be hex, rgb(a) or any named color that is understood
-            by matplotlib.
-            Default: "black"
-        opacity: float, optional
-            Opacity (=alpha) of the fill.
-            Default: None
-            By default, fallback to alpha value provided with color argument,
-            or 1.
-        row, col: int, optional
-            If the plot contains a grid, provide the coordinates.
-            Attention: Indexing starts with 0!
-        kwargs_pty, kwargs_mpl, **kwargs: optional
-            Pass specific keyword arguments to the line core method.
-        """
-        # input verification
-        if data_coords is not None:
-            x_data_coords = data_coords
-            y_data_coords = data_coords
-        text_alignment = (
-            horizontal_alignment
-            if text_alignment is None
-            else text_alignment
-        )
-
-        # PLOTLY
-        if self.interactive:
-            if kwargs_pty is None:
-                kwargs_pty = dict()
-            if vertical_alignment == "center":
-                vertical_alignment = "middle"
-            row += 1
-            col += 1
-            x_domain = "" if x_data_coords else " domain"
-            y_domain = "" if y_data_coords else " domain"
-            self.fig.add_annotation(
-                x=x,
-                y=y,
-                text=self._encode_html(text),
-                align=text_alignment,
-                xanchor=horizontal_alignment,
-                yanchor=vertical_alignment,
-                xref=self._get_plotly_anchor(
-                    "x", self.cols, row, col
-                ) + x_domain,
-                yref=self._get_plotly_anchor(
-                    "y", self.cols, row, col
-                ) + y_domain,
-                font=dict(color=self.digest_color(color, opacity)),
-                row=row,
-                col=col,
-                showarrow=False,
-                **kwargs_pty,
-            )
-
-        # MATPLOTLIB
-        else:
-            # input validation
-            if kwargs_mpl is None:
-                kwargs_mpl = dict()
-            if not x_data_coords == y_data_coords:
-                warn(
-                    "x_data_coords and y_data_coords must correspond "
-                    "for static matplotlib plot. x_data_coords was used."
-                )
-            transform = (
-                dict()
-                if x_data_coords
-                else dict(transform=self.ax[row, col].transAxes)
-            )
-            self.ax[row, col].text(
-                x,
-                y,
-                s=text,
-                color=self.digest_color(color, opacity),
-                horizontalalignment=horizontal_alignment,
-                verticalalignment=vertical_alignment,
-                multialignment=text_alignment,
-                **transform,
-                **kwargs_mpl,
-                **kwargs,
-            )
-
     def add_hist(
         self,
         x=None,
@@ -1195,7 +957,7 @@ class Plot(NotebookInteraction):
         **kwargs,
     ):
         """
-        Add a histogram to the plot.
+        Draw a histogram.
 
         Parameters
         ----------
@@ -1211,15 +973,17 @@ class Plot(NotebookInteraction):
             Trace color.
             Can be hex, rgb(a) or any named color that is understood
             by matplotlib.
-            Default: None
-            In the default case, Plot will cycle through COLOR_CYCLE.
+
+            Default: color is retrieved from `Plot.digest_color`,
+            which cycles through `COLOR_CYCLE`.
         opacity: float, optional
             Opacity (=alpha) of the fill.
-            Default: None
+
             By default, fallback to alpha value provided with color argument,
             or 1.
-        row, col: int, optional
+        row, col: int, default: 0
             If the plot contains a grid, provide the coordinates.
+
             Attention: Indexing starts with 0!
         kwargs_pty, kwargs_mpl, **kwargs: optional
             Pass specific keyword arguments to the hist core method.
@@ -1295,34 +1059,35 @@ class Plot(NotebookInteraction):
         **kwargs,
     ):
         """
-        Add a boxplot to the plot.
+        Draw a boxplot.
 
         Parameters
         ----------
         x: array or sequence of vectors
             Data to build boxplot from.
-        horizontal: bool, optional
+        horizontal: bool, default: False
             Show boxplot horizontally.
-            Default: False
         label: tuple of strs, optional
             Trace labels for legend.
         color: tuple of strs, optional
             Fill colors.
+
             Can be hex, rgb(a) or any named color that is understood
             by matplotlib.
-            Default: None
-            In the default case, Plot will cycle through COLOR_CYCLE.
-        color_median: color, optional
+
+            Default: color is retrieved from `Plot.digest_color`,
+            which cycles through `COLOR_CYCLE`.
+        color_median: color, default: "black"
             MPL only.
             Color of the median line.
-            Default: black
         opacity: float, optional
             Opacity (=alpha) of the fill.
-            Default: None
+
             By default, fallback to alpha value provided with color argument,
             or 1.
         row, col: int, optional
             If the plot contains a grid, provide the coordinates.
+
             Attention: Indexing starts with 0!
         kwargs_pty, kwargs_mpl, **kwargs: optional
             Pass specific keyword arguments to the boxplot core method.
@@ -1419,7 +1184,7 @@ class Plot(NotebookInteraction):
         **kwargs,
     ):
         """
-        Add a heatmap to the plot.
+        Draw a heatmap.
 
         Parameters
         ----------
@@ -1427,24 +1192,23 @@ class Plot(NotebookInteraction):
             2D data to show heatmap.
         lim: list/tuple of 2x float, optional
             Lower and upper limits of the color map.
-        aspect: float, optional
+        aspect: float, default: 1
             Aspect ratio of the axes.
-            Default: 1
         invert_x, invert_y: bool, optional
             Invert the axes directions.
             Default: False
-        cmap: str, optional
+        cmap: str, default: "rainbow"
             Color map to use.
             https://matplotlib.org/stable/gallery/color/colormap_reference.html
             Note: Not all cmaps are available for both libraries,
             and may differ slightly.
-            Default: "rainbow"
         cmap_under, cmap_over, cmap_bad: str, optional
             Colors to display if under/over range or a pixel is invalid,
-            e.g. in case of np.nan.
-            cmap_bad is not available for interactive plotly plots.
+            e.g. in case of `np.nan`.
+            `cmap_bad` is not available for interactive plotly plots.
         row, col: int, optional
             If the plot contains a grid, provide the coordinates.
+
             Attention: Indexing starts with 0!
         kwargs_pty, kwargs_mpl, **kwargs: optional
             Pass specific keyword arguments to the heatmap core method.
@@ -1543,25 +1307,23 @@ class Plot(NotebookInteraction):
         **kwargs,
     ):
         """
-        Generate a linear regression plot.
+        Draw a linear regression plot.
 
         Parameters
         ----------
-        x: array-like or toolbox.arraytools.LinearRegression instance
+        x: array-like or `toolbox.arraytools.LinearRegression` instance
             X axis data, or pre-existing LinearRegression instance.
         y: array-like, optional
             Y axis data.
             If a LinearRegression instance is provided for x,
             y can be omitted and will be ignored.
-        p: float, optional
+        p: float, default: 0.05
             p-value.
-            Default: 0.05
-        linspace: int, optional
+        linspace: int, default: 101
             Number of data points for linear regression model
             and conficence and prediction intervals.
-            Default: 101
         kwargs:
-            Keyword arguments for toolbox.arraytools.LinearRegression.plot.
+            Keyword arguments for `toolbox.arraytools.LinearRegression.plot`.
         """
         if (
             isinstance(x, arraytools.LinearRegression)
@@ -1575,6 +1337,271 @@ class Plot(NotebookInteraction):
                 p=p,
                 linspace=linspace,
             ).plot(fig=self, **kwargs)
+
+    def add_fill(
+        self,
+        x,
+        y1,
+        y2=None,
+        label=None,
+        show_legend=False,
+        mode="lines",
+        color=None,
+        opacity=0.5,
+        line_width=0.,
+        line_opacity=1.,
+        line_color=None,
+        row=0,
+        col=0,
+        kwargs_pty=None,
+        kwargs_mpl=None,
+        **kwargs,
+    ):
+        """
+        Draw a fill between two y lines.
+
+        Parameters
+        ----------
+        x: array-like
+        y1, y2: array-like, optional
+            If only `x` and `y1` is defined,
+            it will be assumed as `y1` and `y2`,
+            and `x` will be the index, starting from 0.
+        label: str, optional
+            Trace label for legend.
+        color, line_color: str, optional
+            Fill and line color.
+
+            Can be hex, rgb(a) or any named color that is understood
+            by matplotlib.
+            If line_color is undefined, the the fill color will be used.
+
+            Default: color is retrieved from `Plot.digest_color`,
+            which cycles through `COLOR_CYCLE`.
+        opacity, line_opacity: float, default: 0.5
+            Opacity (=alpha) of the fill.
+
+            Set to None to use a value provided with the color argument.
+        line_width: float, default: 0.
+            Boundary line width.
+        row, col: int, default: 0
+            If the plot contains a grid, provide the coordinates.
+
+            Attention: Indexing starts with 0!
+        kwargs_pty, kwargs_mpl, **kwargs: optional
+            Pass specific keyword arguments to the fill core method.
+        """
+        # input verification
+        if y2 is None:
+            y1, y2 = x, y1
+            x = np.arange(len(y1))
+        self.element_count[row, col] += 1
+
+        fill_color = self.digest_color(
+            color,
+            opacity,
+            increment=0 if line_color is None else 1,
+        )
+        line_color = self.digest_color(
+            color if line_color is None else line_color,
+            line_opacity,
+        )
+
+        # PLOTLY
+        if self.interactive:
+            if kwargs_pty is None:
+                kwargs_pty = dict()
+            legendgroup = "fill_{}".format(self.element_count[row, col])
+            row += 1
+            col += 1
+            self.fig.add_trace(
+                go.Scatter(
+                    x=x,
+                    y=y1,
+                    mode=mode,
+                    **self._get_plotly_legend_args(
+                        label, "fill border 1", show_legend=show_legend),
+                    line=dict(width=line_width),
+                    marker_color=line_color,
+                    legendgroup=legendgroup,
+                    **kwargs_pty,
+                    **kwargs,
+                ),
+                row=row,
+                col=col,
+            )
+            self.fig.add_trace(
+                go.Scatter(
+                    x=x,
+                    y=y2,
+                    mode=mode,
+                    **self._get_plotly_legend_args(label, "fill border 1"),
+                    fill="tonexty",
+                    fillcolor=fill_color,
+                    line=dict(width=line_width),
+                    marker_color=line_color,
+                    legendgroup=legendgroup,
+                    **kwargs_pty,
+                    **kwargs,
+                ),
+                row=row,
+                col=col,
+            )
+
+        # MATPLOTLIB
+        else:
+            if kwargs_mpl is None:
+                kwargs_mpl = dict()
+            self.ax[row, col].fill_between(
+                x,
+                y1,
+                y2,
+                label=None if show_legend is False else label,
+                linewidth=line_width,
+                edgecolor=self.digest_color(
+                    line_color, line_opacity, increment=0),
+                facecolor=self.digest_color(color, opacity),
+                **kwargs_mpl,
+                **kwargs,
+            )
+
+    def add_text(
+        self,
+        x,
+        y,
+        text,
+        horizontal_alignment="center",
+        vertical_alignment="center",
+        text_alignment=None,
+        data_coords=None,
+        x_data_coords=True,
+        y_data_coords=True,
+        color="black",
+        opacity=None,
+        row=0,
+        col=0,
+        kwargs_pty=None,
+        kwargs_mpl=None,
+        **kwargs,
+    ):
+        """
+        Draw text.
+
+        Parameters
+        ----------
+        x, y: float
+            Coordinates of the text.
+        text: str
+            Text to add.
+        horizontal_alignment, vertical_alignment: str, default: "center"
+            Where the coordinates of the text box anchor.
+
+            Options for `horizontal_alignment`:
+                - "left"
+                - "center"
+                - "right"
+
+            Options for `vertical_alignment`:
+                - "top"
+                - "center"
+                - "bottom"
+        text_alignment: str, optional
+            Set how text is aligned inside its box.
+
+            If left undefined, horizontal_alignment will be used.
+        data_coords: bool, default: True
+            Whether the `x`, `y` coordinates are provided in data coordinates
+            or in relation to the axes.
+
+            If set to `False`, `x`, `y` should be in the range (0, 1).
+            If `data_coords` is set, it will override
+            `x_data_coords` and `y_data_coords`.
+        x_data_coords, y_data_coords: bool, default: True
+            PTY only.
+            Specify the anchor for each axis separate.
+        color: str, default: "black"
+            Trace color.
+            Can be hex, rgb(a) or any named color that is understood
+            by matplotlib.
+        opacity: float, optional
+            Opacity (=alpha) of the fill.
+
+            By default, fallback to alpha value provided with color argument,
+            or 1.
+        row, col: int, optional
+            If the plot contains a grid, provide the coordinates.
+
+            Attention: Indexing starts with 0!
+        kwargs_pty, kwargs_mpl, **kwargs: optional
+            Pass specific keyword arguments to the line core method.
+        """
+        # input verification
+        if data_coords is not None:
+            x_data_coords = data_coords
+            y_data_coords = data_coords
+        text_alignment = (
+            horizontal_alignment
+            if text_alignment is None
+            else text_alignment
+        )
+
+        # PLOTLY
+        if self.interactive:
+            if kwargs_pty is None:
+                kwargs_pty = dict()
+            if vertical_alignment == "center":
+                vertical_alignment = "middle"
+            row += 1
+            col += 1
+            x_domain = "" if x_data_coords else " domain"
+            y_domain = "" if y_data_coords else " domain"
+            self.fig.add_annotation(
+                x=x,
+                y=y,
+                text=self._encode_html(text),
+                align=text_alignment,
+                xanchor=horizontal_alignment,
+                yanchor=vertical_alignment,
+                xref=self._get_plotly_anchor(
+                    "x", self.cols, row, col
+                ) + x_domain,
+                yref=self._get_plotly_anchor(
+                    "y", self.cols, row, col
+                ) + y_domain,
+                font=dict(color=self.digest_color(color, opacity)),
+                row=row,
+                col=col,
+                showarrow=False,
+                **kwargs_pty,
+            )
+
+        # MATPLOTLIB
+        else:
+            # input validation
+            if kwargs_mpl is None:
+                kwargs_mpl = dict()
+            if not x_data_coords == y_data_coords:
+                warn(
+                    "x_data_coords and y_data_coords must correspond "
+                    "for static matplotlib plot. x_data_coords was used."
+                )
+            transform = (
+                dict()
+                if x_data_coords
+                else dict(transform=self.ax[row, col].transAxes)
+            )
+            self.ax[row, col].text(
+                x,
+                y,
+                s=text,
+                color=self.digest_color(color, opacity),
+                horizontalalignment=horizontal_alignment,
+                verticalalignment=vertical_alignment,
+                multialignment=text_alignment,
+                **transform,
+                **kwargs_mpl,
+                **kwargs,
+            )
 
     def post_process(
         self,
@@ -1691,7 +1718,27 @@ class Plot(NotebookInteraction):
         if self.save_fig is not None:
             self.save(self.save_fig, self.save_format)
 
-    def save(self, path, export_format=None, **kwargs):
+    def save(self, path, export_format=None, print_confirm=True, **kwargs):
+        """
+        Save the plot.
+
+        Parameters
+        ----------
+        path: str, pathlib.Path, bool
+            May point to a directory or a filename.
+            If only a directory is provided (or True for local directory),
+            the filename will automatically be generated from the plot title.
+        export_format: str, optional
+            If the format is not indicated in the file name, specify a format.
+        print_confirm: bool, optional
+            Print a confirmation message where the file has been saved.
+            Default: True
+
+        Returns
+        -------
+        pathlib.Path
+            Path to the exported file.
+        """
         # input verification
         if isinstance(path, bool):
             if path:
@@ -1744,9 +1791,13 @@ class Plot(NotebookInteraction):
                 **kwargs,
             )
 
-        print("saved figure at {}".format(str(path)))
+        if print_confirm:
+            print("saved figure at {}".format(str(path)))
+
+        return path
 
     def show(self):
+        """Show the plot."""
         if self.interactive:
             init_notebook_mode()
             display_html(self.JS_RENDER_WARNING, raw=True)
@@ -1766,7 +1817,30 @@ class Plot(NotebookInteraction):
 
 def magic_plot(core, doc_decorator=None):
     """
-    Boilerplate code to advance Python plots.
+    Plot generator wrapper.
+
+    Your function feeds the data, the wrapper gives control over the plot
+    to the user.
+
+    Examples
+    --------
+    >>> @magic_plot
+    ... def line(
+    ...     data,
+    ...     fig,
+    ...     **kwargs,
+    ... ):
+    ...     fig.add_line(data)
+    ...
+    ... line([0,4,6,7], title="Plot title", interactive=False)
+    [matplotlib figure, "Plot title"]
+
+    Parameters
+    ----------
+    doc_decorator: str, optional
+        Append the docstring with the decorated parameters.
+
+        By default, the global variable `DOCSTRING_DECORATOR` will be used.
     """
     doc_decorator = (
         DOCSTRING_DECORATOR
@@ -1843,13 +1917,46 @@ def magic_plot(core, doc_decorator=None):
     wrapper.__doc__ = _rewrite_docstring(
         core.__doc__,
         doc_decorator,
-    )
+    ) + "\n"
 
     return wrapper
 
 
 def magic_plot_preset(doc_decorator=None, **kwargs_preset):
-    """Pre-configure the magic_plot decorator"""
+    """
+    Plot generator wrapper, preconfigured.
+
+    Your function feeds the data, the wrapper gives control over the plot
+    to the user.
+
+    Examples
+    --------
+    >>> @magic_plot_preset(
+    ...     title="Data view",
+    ...     interactive=False,
+    ...     strict_preset=False,
+    ... )
+    ... def line(
+    ...     data,
+    ...     fig,
+    ...     **kwargs,
+    ... ):
+    ...     fig.add_line(data)
+    ...
+    ... line([0,4,6,7], xlabel="X axis")
+    [matplotlib figure, "Data view"]
+
+    Parameters
+    ----------
+    doc_decorator: str, optional
+        Append the docstring with the decorated parameters.
+
+        By default, the global variable `DOCSTRING_DECORATOR` will be used.
+    **kwargs_preset: dict
+        Define presets for any keyword arguments accepted by `Plot`.
+
+        Setting `strict_preset=True` prevents overriding the preset.
+    """
     strict_preset = kwargs_preset.get("strict_preset", False)
     if "strict_preset" in kwargs_preset:
         del kwargs_preset["strict_preset"]
@@ -1902,296 +2009,89 @@ def line(
 
 
 @magic_plot
+@wraps(Plot.add_fill)
 def fill(
     *args,
     fig,
     **kwargs,
 ):
-    """
-    Draw a filled area plot.
-
-    Parameters
-    ----------
-    x: array-like
-    y1, y2: array-like, optional
-        If only x and y1 is defined, it will be assumed as y1 and y2,
-        and x will be the index, starting from 0.
-    label: str, optional
-        Trace label for legend.
-    color, line_color: str, optional
-        Trace color.
-        Can be hex, rgb(a) or any named color that is understood
-        by matplotlib.
-        Default: None
-        In the default case, Plot will cycle through COLOR_CYCLE.
-    opacity, line_opacity: float, optional
-        Opacity (=alpha) of the fill.
-        Default: 0.5
-        Set to None to use a value provided with the color argument.
-    line_width: float, optional
-        Boundary line width.
-    row, col: int, optional
-        If the plot contains a grid, provide the coordinates.
-        Attention: Indexing starts with 0!
-    kwargs_pty, kwargs_mpl, **kwargs: optional
-        Pass specific keyword arguments to the fill core method.
-    [decorator parameters added automatically]
-
-    Returns
-    -------
-    Plot() instance
-    """
     fig.add_fill(*args, **kwargs)
 
 
 @magic_plot
+@wraps(Plot.add_text)
 def text(
     *args,
     fig,
     **kwargs,
 ):
-    """
-    Annotate a plot.
-
-    Parameters
-    ----------
-    x, y: float
-        Coordinates of the text.
-    text: str
-        Text to add.
-    horizontal_alignment, vertical_alignment: str, optional
-        Where the coordinates of the text box anchor.
-        Horizontal: ("left", "center", "right")
-        Vertical: ("top", "center", "bottom")
-        Default: "center"
-    text_alignment: str, optional
-        Set how text is aligned inside its box.
-        If left undefined, horizontal_alignment will be used.
-        Default: None
-    data_coords: bool, optional
-        Whether the x, y coordinates are provided in data coordinates
-        or in relation to the axes.
-        If set to False, x, y should be in the range (0, 1).
-        If data_coords is set, it will override
-        x_data_coords and y_data_coords.
-        Default: True
-    x_data_coords, y_data_coords: bool, optional
-        Specify the anchor for each axis separate.
-        Works with interactive plotly plots only.
-        Default: True
-    color: str, optional
-        Trace color.
-        Can be hex, rgb(a) or any named color that is understood
-        by matplotlib.
-        Default: "black"
-    opacity: float, optional
-        Opacity (=alpha) of the fill.
-        Default: None
-        By default, fallback to alpha value provided with color argument,
-        or 1.
-    row, col: int, optional
-        If the plot contains a grid, provide the coordinates.
-        Attention: Indexing starts with 0!
-    kwargs_pty, kwargs_mpl, **kwargs: optional
-        Pass specific keyword arguments to the line core method.
-    [decorator parameters added automatically]
-
-    Returns
-    -------
-    Plot() instance
-    """
     fig.add_text(*args, **kwargs)
 
 
 @magic_plot
+@wraps(Plot.add_hist)
 def hist(
     *args,
     fig,
     **kwargs,
 ):
-    """
-    Draw a histogram plot.
-
-    Parameters
-    ----------
-    x: array-like
-        Histogram data.
-    bins: int, optional
-        Number of bins.
-        If undefined, plotly/matplotlib will detect automatically.
-        Default: None
-    label: str, optional
-        Trace label for legend.
-    color: str, optional
-        Trace color.
-        Can be hex, rgb(a) or any named color that is understood
-        by matplotlib.
-        Default: None
-        In the default case, Plot will cycle through COLOR_CYCLE.
-    opacity: float, optional
-        Opacity (=alpha) of the fill.
-        Default: None
-        By default, fallback to alpha value provided with color argument,
-        or 1.
-    row, col: int, optional
-        If the plot contains a grid, provide the coordinates.
-        Attention: Indexing starts with 0!
-    kwargs_pty, kwargs_mpl, **kwargs: optional
-        Pass specific keyword arguments to the hist core method.
-    [decorator parameters added automatically]
-
-    Returns
-    -------
-    Plot() instance
-    """
     fig.add_hist(*args, **kwargs)
 
 
 @magic_plot
+@wraps(Plot.add_boxplot)
 def boxplot(
     *args,
     fig,
     **kwargs,
 ):
-    """
-    Draw a boxplot plot.
-
-    Parameters
-    ----------
-    x: array or sequence of vectors
-        Data to build boxplot from.
-    horizontal: bool, optional
-        Show boxplot horizontally.
-        Default: False
-    labels: tuple of strs, optional
-        Trace labels for legend.
-    colors: tuple of strs, optional
-        Trace colors.
-        Can be hex, rgb(a) or any named color that is understood
-        by matplotlib.
-        Default: None
-        In the default case, Plot will cycle through COLOR_CYCLE.
-    opacity: float, optional
-        Opacity (=alpha) of the fill.
-        Default: None
-        By default, fallback to alpha value provided with color argument,
-        or 1.
-    row, col: int, optional
-        If the plot contains a grid, provide the coordinates.
-        Attention: Indexing starts with 0!
-    kwargs_pty, kwargs_mpl, **kwargs: optional
-        Pass specific keyword arguments to the boxplot core method.
-    [decorator parameters added automatically]
-
-    Returns
-    -------
-    Plot() instance
-    """
     fig.add_boxplot(*args, **kwargs)
 
 
 @magic_plot
+@wraps(Plot.add_heatmap)
 def heatmap(
     *args,
     fig,
     **kwargs,
 ):
-    """
-    Draw a heatmap plot.
-
-    Parameters
-    ----------
-    data: 2D array-like
-        2D data to show heatmap.
-    lim: list/tuple of 2x float, optional
-        Lower and upper limits of the color map.
-    aspect: float, optional
-        Aspect ratio of the axes.
-        Default: 1
-    invert_x, invert_y: bool, optional
-        Invert the axes directions.
-        Default: False
-    cmap: str, optional
-        Color map to use.
-        https://matplotlib.org/stable/gallery/color/colormap_reference.html
-        Note: Not all cmaps are available for both libraries,
-        and may differ slightly.
-        Default: "rainbow"
-    cmap_under, cmap_over, cmap_bad: str, optional
-        Colors to display if under/over range or a pixel is invalid,
-        e.g. in case of np.nan.
-        cmap_bad is not available for interactive plotly plots.
-    row, col: int, optional
-        If the plot contains a grid, provide the coordinates.
-        Attention: Indexing starts with 0!
-    kwargs_pty, kwargs_mpl, **kwargs: optional
-        Pass specific keyword arguments to the heatmap core method.
-    [decorator parameters added automatically]
-
-    Returns
-    -------
-    Plot() instance
-    """
     fig.add_heatmap(*args, **kwargs)
 
 
 @magic_plot
+@wraps(Plot.add_regression)
 def regression(
     *args,
     fig,
     **kwargs,
 ):
-    """
-    Generate a linear regression plot.
-
-    Parameters
-    ----------
-    x: array-like or toolbox.arraytools.LinearRegression instance
-        X axis data, or pre-existing LinearRegression instance.
-    y: array-like, optional
-        Y axis data.
-        If a LinearRegression instance is provided for x,
-        y can be omitted and will be ignored.
-    p: float, optional
-        p-value.
-        Default: 0.05
-    linspace: int, optional
-        Number of data points for linear regression model
-        and conficence and prediction intervals.
-        Default: 101
-    kwargs:
-        Keyword arguments for toolbox.arraytools.LinearRegression.plot.
-
-    Returns
-    -------
-    Plot() instance
-    """
     fig.add_regression(*args, **kwargs)
 
 
 class ShowDataArray(NotebookInteraction):
+    """
+    Automatically display a `xarray.DataArray` in a Jupyter notebook.
+
+    If the DataArray has more than two dimensions, provide default
+    sel or isel selectors to reduce to two dimensions.
+
+    Parameters
+    ----------
+    data: xarray.DataArray
+    default_sel: dict, optional
+        Select a subset of a the DataArray by label.
+        Can be a slice or the type of the dimension.
+    default_isel: dict, optional
+        Select a subset of a the DataArray by integer count.
+        Can be a integer slice or an integer.
+    """
+
     def __init__(
         self,
         data,
         default_sel=None,
         default_isel=None,
     ):
-        """
-        Automatically display a xarray.DataArray in a Jupyter notebook.
-
-        If the DataArray has more than two dimensions, provide default
-        sel or isel selectors to reduce to two dimensions.
-
-        Parameters
-        ----------
-        data: xarray.DataArray
-        default_sel: dict, optional
-            Select a subset of a the DataArray by label.
-            Can be a slice or the type of the dimension.
-        default_isel: dict, optional
-            Select a subset of a the DataArray by integer count.
-            Can be a integer slice or an integer.
-        """
         self.data = data
         self.default_sel = default_sel
         self.default_isel = default_isel
@@ -2240,6 +2140,27 @@ class ShowDataArray(NotebookInteraction):
 
 
 class ShowDataset(ShowDataArray):
+    """
+    Automatically display a `xarray.Dataset` in a Jupyter notebook.
+
+    Provide a default variable to display from the Dataset for
+    automatic display.
+    If the Dataset has more than two dimensions, provide default
+    sel or isel selectors to reduce to two dimensions.
+
+    Parameters
+    ----------
+    data: xarray.DataArray
+    default_var: str, optional
+        Select the variable of the Dataset to display by label.
+    default_sel: dict, optional
+        Select a subset of a the Dataset by label.
+        Can be a slice or the type of the dimension.
+    default_isel: dict, optional
+        Select a subset of a the Dataset by integer count.
+        Can be a integer slice or an integer.
+    """
+
     def __init__(
         self,
         data,
@@ -2247,26 +2168,6 @@ class ShowDataset(ShowDataArray):
         default_sel=None,
         default_isel=None,
     ):
-        """
-        Automatically display a xarray.Dataset in a Jupyter notebook.
-
-        Provide a default variable to display from the Dataset for
-        automatic display.
-        If the Dataset has more than two dimensions, provide default
-        sel or isel selectors to reduce to two dimensions.
-
-        Parameters
-        ----------
-        data: xarray.DataArray
-        default_var: str, optional
-            Select the variable of the Dataset to display by label.
-        default_sel: dict, optional
-            Select a subset of a the Dataset by label.
-            Can be a slice or the type of the dimension.
-        default_isel: dict, optional
-            Select a subset of a the Dataset by integer count.
-            Can be a integer slice or an integer.
-        """
         self.data = data
         self.default_var = default_var
         self.default_sel = default_sel
