@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>toolbox.iter Documentation and API reference &#8212; toolbox  documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="_static/classic.css?v=d534aad8" />
+    
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=b3ba4146"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=4825356b"></script>
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="toolbox.plot Documentation and API reference" href="api_plot.html" />
+    <link rel="prev" title="Welcome to toolbox’s documentation!" href="index.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="api_plot.html" title="toolbox.plot Documentation and API reference"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to toolbox’s documentation!"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">toolbox  documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href=""><cite>toolbox.iter</cite> Documentation and API reference</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="toolbox-iter-documentation-and-api-reference">
+<h1><cite>toolbox.iter</cite> Documentation and API reference<a class="headerlink" href="#toolbox-iter-documentation-and-api-reference" title="Permalink to this heading">¶</a></h1>
+<p>Full API documentation of the <cite>toolbox.iter</cite> Python module.</p>
+<span class="target" id="module-toolbox.iter"></span><p>Tools to iterate Python objects.</p>
+<section id="zip-smart">
+<h2><cite>zip_smart</cite><a class="headerlink" href="#zip-smart" title="Permalink to this heading">¶</a></h2>
+<dl class="py method">
+<dt class="sig sig-object py" id="toolbox.iter.zip_smart">
+<span class="sig-prename descclassname"><span class="pre">iter.</span></span><span class="sig-name descname"><span class="pre">zip_smart</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unpack_nozip</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strict</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#toolbox.iter.zip_smart" title="Permalink to this definition">¶</a></dt>
+<dd><p>Iterate over several iterables in parallel,
+producing tuples with an item from each one.</p>
+<p>Like Python’s builtin <cite>zip</cite> function,
+but if an argument is not iterable, it will be repeated each iteration.</p>
+<p>Exception: strings will be repeated by default.
+Override the <cite>NON_ITERABLE_TYPES</cite> constant of the module
+to change this behavior.</p>
+<p>To be iterated, the item needs to have an <cite>__iter__</cite> attribute.
+Otherwise, it will be repeated.</p>
+<dl class="simple">
+<dt>Pay attention with the <cite>strict</cite> parameter:</dt><dd><ul class="simple">
+<li><p>only working with Python &lt;3.10</p></li>
+<li><p>always raises an error if an item is repeated, since the generator         is endless.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>*iterables: misc</strong></dt><dd><p>Elements to iterate or repeat.</p>
+</dd>
+<dt><strong>unpack_nozip: bool, default: True</strong></dt><dd><p>Unpack a <cite>NoZip</cite>-wrapped iterable.</p>
+</dd>
+<dt><strong>strict: bool, default: True</strong></dt><dd><p>Fail if iterables are not the same length.
+Warning: Not supported in Python &lt; 3.10.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>zip object</dt><dd><p>Use it as you would use <cite>zip</cite></p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">zip_smart</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="p">(</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">),</span>
+<span class="gp">... </span>    <span class="kc">True</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="s2">&quot;always the same&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">repeat</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)),</span>
+<span class="gp">... </span><span class="p">):</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+<span class="go">A True 1 always the same (1, 2)</span>
+<span class="go">B True 2 always the same (1, 2)</span>
+<span class="go">C True 3 always the same (1, 2)</span>
+<span class="go">D True 4 always the same (1, 2)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</section>
+<section id="repeat">
+<h2><cite>repeat</cite><a class="headerlink" href="#repeat" title="Permalink to this heading">¶</a></h2>
+<dl class="py method">
+<dt class="sig sig-object py" id="toolbox.iter.repeat">
+<span class="sig-prename descclassname"><span class="pre">iter.</span></span><span class="sig-name descname"><span class="pre">repeat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">unpack_nozip</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#toolbox.iter.repeat" title="Permalink to this definition">¶</a></dt>
+<dd><p>A generator that always returns <cite>arg</cite>.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>arg</strong></dt><dd><p>Any arbitraty object.</p>
+</dd>
+<dt><strong>unpack_nozip: bool, default: True</strong></dt><dd><p>Deprecation: Instead of <cite>NoZip</cite>, use <cite>repeat</cite>.</p>
+<p>Unpack objects protected by <cite>NoZip</cite>.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>generator function</dt><dd><p>which always returns arg.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">zip_smart</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="p">(</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">),</span>
+<span class="gp">... </span>    <span class="kc">True</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="s2">&quot;always the same&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">repeat</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)),</span>
+<span class="gp">... </span><span class="p">):</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+<span class="go">A True 1 always the same (1, 2)</span>
+<span class="go">B True 2 always the same (1, 2)</span>
+<span class="go">C True 3 always the same (1, 2)</span>
+<span class="go">D True 4 always the same (1, 2)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</section>
+<section id="sum-nested">
+<h2><cite>sum_nested</cite><a class="headerlink" href="#sum-nested" title="Permalink to this heading">¶</a></h2>
+<dl class="py method">
+<dt class="sig sig-object py" id="toolbox.iter.sum_nested">
+<span class="sig-prename descclassname"><span class="pre">iter.</span></span><span class="sig-name descname"><span class="pre">sum_nested</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iterable_types</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">custom_digestion</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#toolbox.iter.sum_nested" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add up all values in iterable objects.</p>
+<p>Nested structures are added up recursively.
+In dictionaries, only the values are used.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>inp: iterable</strong></dt><dd><p>Object to iterate over.
+If it is not a iterable type, the object itself is returned.</p>
+</dd>
+<dt><strong>iterable_types: tuple of types, optional</strong></dt><dd><p>If iterable is one of these types, hand to zip() directly without
+repeating.
+Default: (tuple, list, np.ndarray, pandas.Series)</p>
+</dd>
+<dt><strong>depth: int, optional</strong></dt><dd><p>Maximum depth to recurse.
+Set to -1 to recurse infinitely.
+Default -1.</p>
+</dd>
+<dt><strong>custom_digestion: tuple of tuples, optional</strong></dt><dd><dl>
+<dt>Each element of the tuple must be a tuple of the following structure:</dt><dd><dl class="simple">
+<dt>(</dt><dd><p>type or tuple of types,
+lambda function to digest the elements,</p>
+</dd>
+</dl>
+<p>)</p>
+</dd>
+</dl>
+<p>The result of the lambda function will then be treated
+like the new type.
+By default, toolbox.iter.CUSTOM_DIGESTION will be used:</p>
+<blockquote>
+<div><p>Dicts will be digested to a list of their values.</p>
+</div></blockquote>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>sum</dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="deprecated-legacy-methods">
+<h2>Deprecated legacy methods<a class="headerlink" href="#deprecated-legacy-methods" title="Permalink to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="toolbox.iter.NoZip">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">toolbox.iter.</span></span><span class="sig-name descname"><span class="pre">NoZip</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iterable</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#toolbox.iter.NoZip" title="Permalink to this definition">¶</a></dt>
+<dd><p>DEPRECATED: use <cite>repeat</cite> instead.</p>
+<p>Avoid iteration in <cite>zip</cite> and <cite>zip_smart</cite></p>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">__call__</span></code>()</p></td>
+<td><p>Call self as a function.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#toolbox.iter.NoZip.release" title="toolbox.iter.NoZip.release"><code class="xref py py-obj docutils literal notranslate"><span class="pre">release</span></code></a>()</p></td>
+<td><p>Return the original iterable variable.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="toolbox.iter.NoZip.release">
+<span class="sig-name descname"><span class="pre">release</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#toolbox.iter.NoZip.release" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the original iterable variable.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="toolbox.iter.filter_nozip">
+<span class="sig-prename descclassname"><span class="pre">iter.</span></span><span class="sig-name descname"><span class="pre">filter_nozip</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">no_iter_types</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recursive</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#toolbox.iter.filter_nozip" title="Permalink to this definition">¶</a></dt>
+<dd><p>DEPRECATED.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id0">
+<span class="sig-prename descclassname"><span class="pre">iter.</span></span><span class="sig-name descname"><span class="pre">repeat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">unpack_nozip</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#id0" title="Permalink to this definition">¶</a></dt>
+<dd><p>A generator that always returns <cite>arg</cite>.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>arg</strong></dt><dd><p>Any arbitraty object.</p>
+</dd>
+<dt><strong>unpack_nozip: bool, default: True</strong></dt><dd><p>Deprecation: Instead of <cite>NoZip</cite>, use <cite>repeat</cite>.</p>
+<p>Unpack objects protected by <cite>NoZip</cite>.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>generator function</dt><dd><p>which always returns arg.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">zip_smart</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="p">(</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">),</span>
+<span class="gp">... </span>    <span class="kc">True</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="s2">&quot;always the same&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">repeat</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)),</span>
+<span class="gp">... </span><span class="p">):</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+<span class="go">A True 1 always the same (1, 2)</span>
+<span class="go">B True 2 always the same (1, 2)</span>
+<span class="go">C True 3 always the same (1, 2)</span>
+<span class="go">D True 4 always the same (1, 2)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#"><cite>toolbox.iter</cite> Documentation and API reference</a><ul>
+<li><a class="reference internal" href="#zip-smart"><cite>zip_smart</cite></a><ul>
+<li><a class="reference internal" href="#toolbox.iter.zip_smart"><code class="docutils literal notranslate"><span class="pre">iter.zip_smart()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#repeat"><cite>repeat</cite></a><ul>
+<li><a class="reference internal" href="#toolbox.iter.repeat"><code class="docutils literal notranslate"><span class="pre">iter.repeat()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#sum-nested"><cite>sum_nested</cite></a><ul>
+<li><a class="reference internal" href="#toolbox.iter.sum_nested"><code class="docutils literal notranslate"><span class="pre">iter.sum_nested()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#deprecated-legacy-methods">Deprecated legacy methods</a><ul>
+<li><a class="reference internal" href="#toolbox.iter.NoZip"><code class="docutils literal notranslate"><span class="pre">NoZip</span></code></a><ul>
+<li><a class="reference internal" href="#toolbox.iter.NoZip.release"><code class="docutils literal notranslate"><span class="pre">NoZip.release()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#toolbox.iter.filter_nozip"><code class="docutils literal notranslate"><span class="pre">iter.filter_nozip()</span></code></a></li>
+<li><a class="reference internal" href="#id0"><code class="docutils literal notranslate"><span class="pre">iter.repeat()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="index.html"
+                          title="previous chapter">Welcome to toolbox’s documentation!</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="api_plot.html"
+                          title="next chapter"><cite>toolbox.plot</cite> Documentation and API reference</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/api_iter.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="api_plot.html" title="toolbox.plot Documentation and API reference"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to toolbox’s documentation!"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">toolbox  documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href=""><cite>toolbox.iter</cite> Documentation and API reference</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2023, Janosch Jörg.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.2.
+    </div>
+  </body>
+</html>
