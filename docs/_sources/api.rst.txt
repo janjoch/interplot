@@ -1,0 +1,17 @@
+=====================
+toolbox documentation
+=====================
+
+Full API documentation of the `toolbox` Python module.
+
+.. automodule:: toolbox.plot
+
+----
+Plot
+----
+
+.. autoclass: toolbox.plot.Plot
+    :members:
+    :undoc-members:
+    :inherited-members:
+    :show-inheritance:
