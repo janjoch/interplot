@@ -12,9 +12,17 @@ Welcome to toolbox's documentation!
 
 .. toctree::
     :maxdepth: 2
+    :caption: toolbox.iter
+
+    api_iter
+
+.. toctree::
+    :maxdepth: 2
     :caption: toolbox.plot
 
     api_plot
+
+Documentation of the other modules will follow.
 
 
 Indices and tables
