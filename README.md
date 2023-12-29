@@ -68,13 +68,13 @@ Tools to iterate python objects.
 >>> from toolbox.iter import zip_smart, repeat
 
 >>> for a, b, c, d, e in zip_smart(
->>>     ("A", "B", "C", "D"),
->>>     True,
->>>     [1, 2, 3, 4],
->>>     "always the same",
->>>     repeat((1, 2)),
->>> ):
->>>     print(a, b, c, d, e)
+...     ("A", "B", "C", "D"),
+...     True,
+...     [1, 2, 3, 4],
+...     "always the same",
+...     repeat((1, 2)),
+... ):
+...     print(a, b, c, d, e)
 A True 1 always the same (1, 2)
 B True 2 always the same (1, 2)
 C True 3 always the same (1, 2)
@@ -107,28 +107,28 @@ Currently supported:
 [matplotlib figure]
 
 >>> toolbox.plot.line(
->>>     [0,4,6,7],
->>>     [1,2,4,8],
->>>     interactive=False,
->>>     xlim=(0, 10),
->>>     title="Matploblib Static Figure",
->>>     xlabel="X",
->>>     ylabel="Y",
->>>     save_fig="export/path/export.png",
->>>     dpi=300,
->>> )
+...     [0,4,6,7],
+...     [1,2,4,8],
+...     interactive=False,
+...     xlim=(0, 10),
+...     title="Matploblib Static Figure",
+...     xlabel="X",
+...     ylabel="Y",
+...     save_fig="export/path/export.png",
+...     dpi=300,
+... )
 [matplotlib figure, custom formatted]
 
 >>> # toolbox.plot.NotebookInteraction searches the .show() or .plot() methods for Notebook representation
 >>> class ReadTrace(toolbox.plot.NotebookInteraction):
->>> 
->>>     def __init__(self, file):
->>>         self.data = pd.read_csv(file)
->>>     
->>>     @toolbox.plot.magic_plot_preset(title="Automatic callback of show() in a Jupyter notebook")
->>>     def show(self, col="signal", fig=None):
->>>         fig.add_line(self.data[col])
-
->>> ReadTrace("path/to/data.csv")
+... 
+...     def __init__(self, file):
+...         self.data = pd.read_csv(file)
+...     
+...     @toolbox.plot.magic_plot_preset(title="Automatic callback of show() in a Jupyter notebook")
+...     def show(self, col="signal", fig=None):
+...         fig.add_line(self.data[col])
+...
+... ReadTrace("path/to/data.csv")
 [plotly figure is shown automatically]
 ```

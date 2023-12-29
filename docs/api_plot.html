@@ -1,0 +1,1944 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>toolbox.plot Documentation and API reference &#8212; toolbox  documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="_static/classic.css?v=d534aad8" />
+    
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=b3ba4146"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=4825356b"></script>
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Welcome to toolbox’s documentation!" href="index.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to toolbox’s documentation!"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">toolbox  documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href=""><cite>toolbox.plot</cite> Documentation and API reference</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="toolbox-plot-documentation-and-api-reference">
+<h1><cite>toolbox.plot</cite> Documentation and API reference<a class="headerlink" href="#toolbox-plot-documentation-and-api-reference" title="Permalink to this heading">¶</a></h1>
+<p>Full API documentation of the <cite>toolbox.plot</cite> Python module.</p>
+<span class="target" id="module-toolbox.plot"></span><p>Create <cite>matplotlib/plotly</cite> hybrid plots with a few lines of code.</p>
+<p>It combines the best of the <cite>matplotlib</cite> and the <cite>plotly</cite> worlds through
+a unified, flat API.
+All the necessary boilerplate code is contained in this module.</p>
+<p>Currently supported:</p>
+<ul class="simple">
+<li><p>line plots (scatter)</p></li>
+<li><p>line fills</p></li>
+<li><p>histograms</p></li>
+<li><p>heatmaps</p></li>
+<li><p>boxplot</p></li>
+<li><p>linear regression</p></li>
+<li><p>text annotations</p></li>
+<li><p>2D subplots</p></li>
+<li><p>color cycling</p></li>
+</ul>
+<p>Examples:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">toolbox</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">line</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span><span class="mi">7</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">8</span><span class="p">])</span>
+<span class="go">[plotly figure]</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">toolbox</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">line</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span><span class="mi">7</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">8</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="n">interactive</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">title</span><span class="o">=</span><span class="s2">&quot;matploblib static figure&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">xlabel</span><span class="o">=</span><span class="s2">&quot;X&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">ylabel</span><span class="o">=</span><span class="s2">&quot;Y&quot;</span><span class="p">,</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="go">[matplotlib figure &quot;matploblib static figure&quot;]</span>
+</pre></div>
+</div>
+<section id="the-core-plot-class">
+<h2>The core <cite>Plot</cite> class<a class="headerlink" href="#the-core-plot-class" title="Permalink to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="toolbox.plot.Plot">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">toolbox.plot.</span></span><span class="sig-name descname"><span class="pre">Plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">interactive</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rows</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cols</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xlabel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ylabel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xlim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ylim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shared_xaxes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shared_yaxes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">column_widths</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row_heights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fig_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dpi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legend_loc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legend_title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_fig</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pty_update_layout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pty_custom_func</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mpl_custom_func</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#toolbox.plot.Plot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#toolbox.plot.NotebookInteraction" title="toolbox.plot.NotebookInteraction"><code class="xref py py-class docutils literal notranslate"><span class="pre">NotebookInteraction</span></code></a></p>
+<p>Create <cite>matplotlib/plotly</cite> hybrid plots with a few lines of code.</p>
+<p>It combines the best of the <cite>matplotlib</cite> and the <cite>plotly</cite> worlds through
+a unified, flat API.
+All the necessary boilerplate code is contained in this module.</p>
+<p>Currently supported:</p>
+<ul class="simple">
+<li><p>line plots (scatter)</p></li>
+<li><p>line fills</p></li>
+<li><p>histograms</p></li>
+<li><p>heatmaps</p></li>
+<li><p>boxplot</p></li>
+<li><p>linear regression</p></li>
+<li><p>text annotations</p></li>
+<li><p>2D subplots</p></li>
+<li><p>color cycling</p></li>
+</ul>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>interactive: bool, default: True</strong></dt><dd><p>Display an interactive plotly line plot
+instead of the default matplotlib figure.</p>
+</dd>
+<dt><strong>rows, cols: int, default: 1</strong></dt><dd><p>Create a grid with x rows and y columns.</p>
+</dd>
+<dt><strong>title: str, default: None</strong></dt><dd><p>Plot title.</p>
+</dd>
+<dt><strong>xlabel, ylabel: str or str tuple, default: None</strong></dt><dd><p>Axis labels.</p>
+<p>Either one title for the entire axis or one for each row/column.</p>
+</dd>
+<dt><strong>xlim, ylim: tuple of 2 numbers or nested, default: None</strong></dt><dd><p>Axis range limits.</p>
+<dl class="simple">
+<dt>In case of multiple rows/cols provide either:</dt><dd><ul class="simple">
+<li><p>a tuple</p></li>
+<li><p>a tuple for each row</p></li>
+<li><p>a tuple for each row containing tuple for each column.</p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+<dt><strong>shared_xaxes, shared_yaxes: str, default: None</strong></dt><dd><p>Define how multiple subplots share there axes.</p>
+<dl class="simple">
+<dt>Options:</dt><dd><ul class="simple">
+<li><p>“all” or True</p></li>
+<li><p>“rows”</p></li>
+<li><p>“columns” or “cols”</p></li>
+<li><p>None or False</p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+<dt><strong>column_widths, row_heights: tuple/list, default: None</strong></dt><dd><p>Ratios of the width/height dimensions in each column/row.
+Will be normalised to a sum of 1.</p>
+</dd>
+<dt><strong>fig_size: tuple of 2x float, optional</strong></dt><dd><p>Figure size in pixels.</p>
+<dl class="simple">
+<dt>Default behavior:</dt><dd><ul class="simple">
+<li><p>MPL: Default figure size.</p></li>
+<li><p>PLT: Responsive sizing.</p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+<dt><strong>dpi: int, default: 100</strong></dt><dd><p>Plot resolution.</p>
+</dd>
+<dt><strong>legend_loc: str, optional</strong></dt><dd><p>MATPLOTLIB ONLY.</p>
+<dl class="simple">
+<dt>Default:</dt><dd><ul class="simple">
+<li><p>In case of 1 line: None</p></li>
+<li><p>In case of &gt;1 line: “best” (auto-detect)</p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+<dt><strong>legend_title: str, default: None</strong></dt><dd><p>MPL: Each subplot has its own legend, so a 2d list in the shape of
+the subplots may be provided.</p>
+<p>PTY: Just provide a <cite>str</cite>.</p>
+</dd>
+<dt><strong>save_fig: str or pathlib.Path, default: None</strong></dt><dd><p>Provide a path to export the plot.</p>
+<p>Possible formats: png, jpg, svg, html, …</p>
+<p>The figure will only be saved on calling the instance’s
+<cite>.post_process()</cite>.</p>
+<p>If a directory (or True for local directory) is provided,
+the filename will be automatically generated based on the title.</p>
+</dd>
+<dt><strong>save_format: str, default: None</strong></dt><dd><p>Provide a format for the exported plot.</p>
+</dd>
+<dt><strong>pty_update_layout: dict, default: None</strong></dt><dd><p>PLOTLY ONLY.
+Pass keyword arguments to plotly’s
+<cite>fig.update_layout(**pty_update_layout)</cite>
+Thus, take full control over</p>
+</dd>
+<dt><strong>pty_custom_func: function, default: None</strong></dt><dd><p>PLOTLY ONLY.
+Pass a function reference to further style the plotly graphs.
+Function must accept <cite>fig</cite> and return <cite>fig</cite>.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">pty_custom_func</span><span class="p">(</span><span class="n">fig</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="n">fig</span><span class="o">.</span><span class="n">do_stuff</span><span class="p">()</span>
+<span class="gp">... </span>    <span class="k">return</span> <span class="n">fig</span>
+</pre></div>
+</div>
+</dd>
+<dt><strong>mpl_custom_func: function, default: None</strong></dt><dd><p>MATPLOTLIB ONLY.
+Pass a function reference to further style the matplotlib graphs.
+Function must accept <cite>fig, ax</cite> and return <cite>fig, ax</cite>.</p>
+<p>Note: <cite>ax</cite> always has <cite>row</cite> and <cite>col</cite> coordinates, even if the plot is
+just 1x1.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">mpl_custom_func</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="n">fig</span><span class="o">.</span><span class="n">do_stuff</span><span class="p">()</span>
+<span class="gp">... </span>    <span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">do_more</span><span class="p">()</span>
+<span class="gp">... </span>    <span class="k">return</span> <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><cite>toolbox.plot.Plot</cite> instance</dt><dd></dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">__call__</span></code>(*args, **kwargs)</p></td>
+<td><p>Calls the <cite>self.show()</cite> or <cite>self.plot()</cite> method.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#toolbox.plot.Plot.add_boxplot" title="toolbox.plot.Plot.add_boxplot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_boxplot</span></code></a>(x[, horizontal, label, ...])</p></td>
+<td><p>Draw a boxplot.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#toolbox.plot.Plot.add_fill" title="toolbox.plot.Plot.add_fill"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_fill</span></code></a>(x, y1[, y2, label, show_legend, ...])</p></td>
+<td><p>Draw a fill between two y lines.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#toolbox.plot.Plot.add_heatmap" title="toolbox.plot.Plot.add_heatmap"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_heatmap</span></code></a>(data[, lim, aspect, invert_x, ...])</p></td>
+<td><p>Draw a heatmap.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#toolbox.plot.Plot.add_hist" title="toolbox.plot.Plot.add_hist"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_hist</span></code></a>([x, y, bins, density, label, ...])</p></td>
+<td><p>Draw a histogram.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#toolbox.plot.Plot.add_line" title="toolbox.plot.Plot.add_line"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_line</span></code></a>(x[, y, label, show_legend, color, ...])</p></td>
+<td><p>Draw a line plot.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#toolbox.plot.Plot.add_regression" title="toolbox.plot.Plot.add_regression"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_regression</span></code></a>(x[, y, p, linspace])</p></td>
+<td><p>Draw a linear regression plot.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#toolbox.plot.Plot.add_text" title="toolbox.plot.Plot.add_text"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_text</span></code></a>(x, y, text[, horizontal_alignment, ...])</p></td>
+<td><p>Draw text.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#toolbox.plot.Plot.digest_color" title="toolbox.plot.Plot.digest_color"><code class="xref py py-obj docutils literal notranslate"><span class="pre">digest_color</span></code></a>([color, alpha, increment])</p></td>
+<td><p>Parse color with matplotlib.colors to a rgba array.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#toolbox.plot.Plot.get_cycle_color" title="toolbox.plot.Plot.get_cycle_color"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_cycle_color</span></code></a>([increment, i])</p></td>
+<td><p>Retrieves the next color in the color cycle.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#toolbox.plot.Plot.post_process" title="toolbox.plot.Plot.post_process"><code class="xref py py-obj docutils literal notranslate"><span class="pre">post_process</span></code></a>([pty_update_layout, ...])</p></td>
+<td><p>Finish the plot.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#toolbox.plot.Plot.save" title="toolbox.plot.Plot.save"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save</span></code></a>(path[, export_format, print_confirm])</p></td>
+<td><p>Save the plot.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#toolbox.plot.Plot.show" title="toolbox.plot.Plot.show"><code class="xref py py-obj docutils literal notranslate"><span class="pre">show</span></code></a>()</p></td>
+<td><p>Show the plot.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="toolbox.plot.Plot.JS_RENDER_WARNING">
+<span class="sig-name descname"><span class="pre">JS_RENDER_WARNING</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></em><a class="headerlink" href="#toolbox.plot.Plot.JS_RENDER_WARNING" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="toolbox.plot.Plot.add_boxplot">
+<span class="sig-name descname"><span class="pre">add_boxplot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">horizontal</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_legend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color_median</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'black'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">opacity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">notch</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">col</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwargs_pty</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwargs_mpl</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#toolbox.plot.Plot.add_boxplot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draw a boxplot.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>x: array or sequence of vectors</strong></dt><dd><p>Data to build boxplot from.</p>
+</dd>
+<dt><strong>horizontal: bool, default: False</strong></dt><dd><p>Show boxplot horizontally.</p>
+</dd>
+<dt><strong>label: tuple of strs, optional</strong></dt><dd><p>Trace labels for legend.</p>
+</dd>
+<dt><strong>color: tuple of strs, optional</strong></dt><dd><p>Fill colors.</p>
+<p>Can be hex, rgb(a) or any named color that is understood
+by matplotlib.</p>
+<p>Default: color is retrieved from <cite>Plot.digest_color</cite>,
+which cycles through <cite>COLOR_CYCLE</cite>.</p>
+</dd>
+<dt><strong>color_median: color, default: “black”</strong></dt><dd><p>MPL only.
+Color of the median line.</p>
+</dd>
+<dt><strong>opacity: float, optional</strong></dt><dd><p>Opacity (=alpha) of the fill.</p>
+<p>By default, fallback to alpha value provided with color argument,
+or 1.</p>
+</dd>
+<dt><strong>row, col: int, optional</strong></dt><dd><p>If the plot contains a grid, provide the coordinates.</p>
+<p>Attention: Indexing starts with 0!</p>
+</dd>
+<dt><strong>kwargs_pty, kwargs_mpl, **kwargs: optional</strong></dt><dd><p>Pass specific keyword arguments to the boxplot core method.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="toolbox.plot.Plot.add_fill">
+<span class="sig-name descname"><span class="pre">add_fill</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_legend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'lines'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">opacity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">line_width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">line_opacity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">line_color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">col</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwargs_pty</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwargs_mpl</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#toolbox.plot.Plot.add_fill" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draw a fill between two y lines.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>x: array-like</strong></dt><dd></dd>
+<dt><strong>y1, y2: array-like, optional</strong></dt><dd><p>If only <cite>x</cite> and <cite>y1</cite> is defined,
+it will be assumed as <cite>y1</cite> and <cite>y2</cite>,
+and <cite>x</cite> will be the index, starting from 0.</p>
+</dd>
+<dt><strong>label: str, optional</strong></dt><dd><p>Trace label for legend.</p>
+</dd>
+<dt><strong>color, line_color: str, optional</strong></dt><dd><p>Fill and line color.</p>
+<p>Can be hex, rgb(a) or any named color that is understood
+by matplotlib.
+If line_color is undefined, the the fill color will be used.</p>
+<p>Default: color is retrieved from <cite>Plot.digest_color</cite>,
+which cycles through <cite>COLOR_CYCLE</cite>.</p>
+</dd>
+<dt><strong>opacity, line_opacity: float, default: 0.5</strong></dt><dd><p>Opacity (=alpha) of the fill.</p>
+<p>Set to None to use a value provided with the color argument.</p>
+</dd>
+<dt><strong>line_width: float, default: 0.</strong></dt><dd><p>Boundary line width.</p>
+</dd>
+<dt><strong>row, col: int, default: 0</strong></dt><dd><p>If the plot contains a grid, provide the coordinates.</p>
+<p>Attention: Indexing starts with 0!</p>
+</dd>
+<dt><strong>kwargs_pty, kwargs_mpl, **kwargs: optional</strong></dt><dd><p>Pass specific keyword arguments to the fill core method.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="toolbox.plot.Plot.add_heatmap">
+<span class="sig-name descname"><span class="pre">add_heatmap</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(None,</span> <span class="pre">None)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aspect</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">invert_x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">invert_y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'rainbow'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmap_under</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmap_over</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmap_bad</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">col</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwargs_pty</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwargs_mpl</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#toolbox.plot.Plot.add_heatmap" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draw a heatmap.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>data: 2D array-like</strong></dt><dd><p>2D data to show heatmap.</p>
+</dd>
+<dt><strong>lim: list/tuple of 2x float, optional</strong></dt><dd><p>Lower and upper limits of the color map.</p>
+</dd>
+<dt><strong>aspect: float, default: 1</strong></dt><dd><p>Aspect ratio of the axes.</p>
+</dd>
+<dt><strong>invert_x, invert_y: bool, optional</strong></dt><dd><p>Invert the axes directions.
+Default: False</p>
+</dd>
+<dt><strong>cmap: str, default: “rainbow”</strong></dt><dd><p>Color map to use.
+<a class="reference external" href="https://matplotlib.org/stable/gallery/color/colormap_reference.html">https://matplotlib.org/stable/gallery/color/colormap_reference.html</a>
+Note: Not all cmaps are available for both libraries,
+and may differ slightly.</p>
+</dd>
+<dt><strong>cmap_under, cmap_over, cmap_bad: str, optional</strong></dt><dd><p>Colors to display if under/over range or a pixel is invalid,
+e.g. in case of <cite>np.nan</cite>.
+<cite>cmap_bad</cite> is not available for interactive plotly plots.</p>
+</dd>
+<dt><strong>row, col: int, optional</strong></dt><dd><p>If the plot contains a grid, provide the coordinates.</p>
+<p>Attention: Indexing starts with 0!</p>
+</dd>
+<dt><strong>kwargs_pty, kwargs_mpl, **kwargs: optional</strong></dt><dd><p>Pass specific keyword arguments to the heatmap core method.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="toolbox.plot.Plot.add_hist">
+<span class="sig-name descname"><span class="pre">add_hist</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bins</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">density</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_legend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">opacity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">col</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwargs_pty</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwargs_mpl</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#toolbox.plot.Plot.add_hist" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draw a histogram.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>x: array-like</strong></dt><dd><p>Histogram data.</p>
+</dd>
+<dt><strong>bins: int, optional</strong></dt><dd><p>Number of bins.
+If undefined, plotly/matplotlib will detect automatically.
+Default: None</p>
+</dd>
+<dt><strong>label: str, optional</strong></dt><dd><p>Trace label for legend.</p>
+</dd>
+<dt><strong>color: str, optional</strong></dt><dd><p>Trace color.
+Can be hex, rgb(a) or any named color that is understood
+by matplotlib.</p>
+<p>Default: color is retrieved from <cite>Plot.digest_color</cite>,
+which cycles through <cite>COLOR_CYCLE</cite>.</p>
+</dd>
+<dt><strong>opacity: float, optional</strong></dt><dd><p>Opacity (=alpha) of the fill.</p>
+<p>By default, fallback to alpha value provided with color argument,
+or 1.</p>
+</dd>
+<dt><strong>row, col: int, default: 0</strong></dt><dd><p>If the plot contains a grid, provide the coordinates.</p>
+<p>Attention: Indexing starts with 0!</p>
+</dd>
+<dt><strong>kwargs_pty, kwargs_mpl, **kwargs: optional</strong></dt><dd><p>Pass specific keyword arguments to the hist core method.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="toolbox.plot.Plot.add_line">
+<span class="sig-name descname"><span class="pre">add_line</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_legend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">opacity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linewidth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">col</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwargs_pty</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwargs_mpl</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#toolbox.plot.Plot.add_line" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draw a line plot.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>x: array-like</strong></dt><dd></dd>
+<dt><strong>y: array-like, optional</strong></dt><dd><p>If only <cite>x</cite> is defined, it will be assumed as y.
+If a pandas <cite>Series</cite> is provided, the index will
+be taken as <cite>x</cite>.
+Else if a pandas <cite>DataFrame</cite> is provided, the method call
+is looped for each column.
+Else <cite>x</cite> will be an increment, starting from <cite>0</cite>.
+If a 2D numpy <cite>array</cite> is provided, the method call
+is looped for each column.</p>
+</dd>
+<dt><strong>label: str, optional</strong></dt><dd><p>Trace label for legend.</p>
+</dd>
+<dt><strong>show_legend: bool, optional</strong></dt><dd><p>Whether to show the label in the legend.</p>
+<p>By default, it will be shown if a label is defined.</p>
+</dd>
+<dt><strong>color: str, optional</strong></dt><dd><p>Trace color.</p>
+<p>Can be hex, rgb(a) or any named color that is understood
+by matplotlib.</p>
+<p>Default: color is retrieved from <cite>Plot.digest_color</cite>,
+which cycles through <cite>COLOR_CYCLE</cite>.</p>
+</dd>
+<dt><strong>opacity: float, optional</strong></dt><dd><p>Opacity (=alpha) of the fill.</p>
+<p>By default, fallback to alpha value provided with color argument,
+or 1.</p>
+</dd>
+<dt><strong>row, col: int, optional</strong></dt><dd><p>If the plot contains a grid, provide the coordinates.</p>
+<p>Attention: Indexing starts with 0!</p>
+</dd>
+<dt><strong>kwargs_pty, kwargs_mpl, **kwargs: optional</strong></dt><dd><p>Pass specific keyword arguments to the line core method.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="toolbox.plot.Plot.add_regression">
+<span class="sig-name descname"><span class="pre">add_regression</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linspace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">101</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#toolbox.plot.Plot.add_regression" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draw a linear regression plot.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>x: array-like or `toolbox.arraytools.LinearRegression` instance</strong></dt><dd><p>X axis data, or pre-existing LinearRegression instance.</p>
+</dd>
+<dt><strong>y: array-like, optional</strong></dt><dd><p>Y axis data.
+If a LinearRegression instance is provided for x,
+y can be omitted and will be ignored.</p>
+</dd>
+<dt><strong>p: float, default: 0.05</strong></dt><dd><p>p-value.</p>
+</dd>
+<dt><strong>linspace: int, default: 101</strong></dt><dd><p>Number of data points for linear regression model
+and conficence and prediction intervals.</p>
+</dd>
+<dt><strong>kwargs:</strong></dt><dd><p>Keyword arguments for <cite>toolbox.arraytools.LinearRegression.plot</cite>.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="toolbox.plot.Plot.add_text">
+<span class="sig-name descname"><span class="pre">add_text</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">text</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">horizontal_alignment</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'center'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vertical_alignment</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'center'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">text_alignment</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_coords</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_data_coords</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_data_coords</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'black'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">opacity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">col</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwargs_pty</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwargs_mpl</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#toolbox.plot.Plot.add_text" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draw text.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>x, y: float</strong></dt><dd><p>Coordinates of the text.</p>
+</dd>
+<dt><strong>text: str</strong></dt><dd><p>Text to add.</p>
+</dd>
+<dt><strong>horizontal_alignment, vertical_alignment: str, default: “center”</strong></dt><dd><p>Where the coordinates of the text box anchor.</p>
+<dl class="simple">
+<dt>Options for <cite>horizontal_alignment</cite>:</dt><dd><ul class="simple">
+<li><p>“left”</p></li>
+<li><p>“center”</p></li>
+<li><p>“right”</p></li>
+</ul>
+</dd>
+<dt>Options for <cite>vertical_alignment</cite>:</dt><dd><ul class="simple">
+<li><p>“top”</p></li>
+<li><p>“center”</p></li>
+<li><p>“bottom”</p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+<dt><strong>text_alignment: str, optional</strong></dt><dd><p>Set how text is aligned inside its box.</p>
+<p>If left undefined, horizontal_alignment will be used.</p>
+</dd>
+<dt><strong>data_coords: bool, default: True</strong></dt><dd><p>Whether the <cite>x</cite>, <cite>y</cite> coordinates are provided in data coordinates
+or in relation to the axes.</p>
+<p>If set to <cite>False</cite>, <cite>x</cite>, <cite>y</cite> should be in the range (0, 1).
+If <cite>data_coords</cite> is set, it will override
+<cite>x_data_coords</cite> and <cite>y_data_coords</cite>.</p>
+</dd>
+<dt><strong>x_data_coords, y_data_coords: bool, default: True</strong></dt><dd><p>PTY only.
+Specify the anchor for each axis separate.</p>
+</dd>
+<dt><strong>color: str, default: “black”</strong></dt><dd><p>Trace color.
+Can be hex, rgb(a) or any named color that is understood
+by matplotlib.</p>
+</dd>
+<dt><strong>opacity: float, optional</strong></dt><dd><p>Opacity (=alpha) of the fill.</p>
+<p>By default, fallback to alpha value provided with color argument,
+or 1.</p>
+</dd>
+<dt><strong>row, col: int, optional</strong></dt><dd><p>If the plot contains a grid, provide the coordinates.</p>
+<p>Attention: Indexing starts with 0!</p>
+</dd>
+<dt><strong>kwargs_pty, kwargs_mpl, **kwargs: optional</strong></dt><dd><p>Pass specific keyword arguments to the line core method.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="toolbox.plot.Plot.digest_color">
+<span class="sig-name descname"><span class="pre">digest_color</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">increment</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#toolbox.plot.Plot.digest_color" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse color with matplotlib.colors to a rgba array.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>color: any color format matplotlib accepts, optional</strong></dt><dd><p>E.g. “blue”, “#0000ff”
+If None is provided, the next one from COLOR_CYCLE will be picked.</p>
+</dd>
+<dt><strong>alpha: float, optional</strong></dt><dd><p>Set alpha / opacity.
+Overrides alpha contained in color input.
+Default: None (use the value contained in color or default to 1)</p>
+</dd>
+<dt><strong>increment: int, optional</strong></dt><dd><p>If a color from the cycler is picked, increase the cycler by
+this increment.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="toolbox.plot.Plot.get_cycle_color">
+<span class="sig-name descname"><span class="pre">get_cycle_color</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">increment</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">i</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#toolbox.plot.Plot.get_cycle_color" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieves the next color in the color cycle.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>increment: int, optional</strong></dt><dd><p>If the same color should be returned the next time, pass 0.
+To jump the next color, pass 2.
+Default: 1</p>
+</dd>
+<dt><strong>i: int, optional</strong></dt><dd><p>Get a fixed index of the color cycle instead of the next one.
+This will not modify the regular color cycle iteration.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>color: str</dt><dd><p>HEX color, with leading hashtag</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="toolbox.plot.Plot.post_process">
+<span class="sig-name descname"><span class="pre">post_process</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pty_update_layout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pty_custom_func</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mpl_custom_func</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#toolbox.plot.Plot.post_process" title="Permalink to this definition">¶</a></dt>
+<dd><p>Finish the plot.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>Note: If not provided, the parameters given on init will be used.</strong></dt><dd></dd>
+<dt><strong>pty_update_layout: dict, optional</strong></dt><dd><p>PLOTLY ONLY.
+Pass keyword arguments to plotly’s
+fig.update_layout(<a href="#id1"><span class="problematic" id="id2">**</span></a>pty_update_layout)
+Thus, take full control over
+Default: None</p>
+</dd>
+<dt><strong>pty_custom_func: function, optional</strong></dt><dd><p>PLOTLY ONLY.
+Pass a function reference to further style the plotly graphs.
+Function must accept fig and return fig.
+Example:
+&gt;&gt;&gt; def pty_custom_func(fig):
+&gt;&gt;&gt;     fig.do_stuff()
+&gt;&gt;&gt;     return fig
+Default: None</p>
+</dd>
+<dt><strong>mpl_custom_func: function, optional</strong></dt><dd><p>MATPLOTLIB ONLY.
+Pass a function reference to further style the matplotlib graphs.
+Function must accept fig, ax and return fig, ax.
+Example:
+&gt;&gt;&gt; def mpl_custom_func(fig, ax):
+&gt;&gt;&gt;     fig.do_stuff()
+&gt;&gt;&gt;     ax.do_more()
+&gt;&gt;&gt;     return fig, ax
+Default: None</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="toolbox.plot.Plot.save">
+<span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">export_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_confirm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#toolbox.plot.Plot.save" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save the plot.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>path: str, pathlib.Path, bool</strong></dt><dd><p>May point to a directory or a filename.
+If only a directory is provided (or True for local directory),
+the filename will automatically be generated from the plot title.</p>
+</dd>
+<dt><strong>export_format: str, optional</strong></dt><dd><p>If the format is not indicated in the file name, specify a format.</p>
+</dd>
+<dt><strong>print_confirm: bool, optional</strong></dt><dd><p>Print a confirmation message where the file has been saved.
+Default: True</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>pathlib.Path</dt><dd><p>Path to the exported file.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="toolbox.plot.Plot.show">
+<span class="sig-name descname"><span class="pre">show</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#toolbox.plot.Plot.show" title="Permalink to this definition">¶</a></dt>
+<dd><p>Show the plot.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="one-line-plotting">
+<h2>One-line Plotting<a class="headerlink" href="#one-line-plotting" title="Permalink to this heading">¶</a></h2>
+<dl class="py method">
+<dt class="sig sig-object py" id="toolbox.plot.line">
+<span class="sig-prename descclassname"><span class="pre">plot.</span></span><span class="sig-name descname"><span class="pre">line</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interactive</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rows</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cols</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fig</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip_post_process</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xlabel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ylabel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xlim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ylim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shared_xaxes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shared_yaxes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">column_widths</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row_heights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fig_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dpi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legend_loc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legend_title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_fig</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pty_update_layout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pty_custom_func</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mpl_custom_func</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#toolbox.plot.line" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draw a line plot.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>x: array-like</strong></dt><dd></dd>
+<dt><strong>y: array-like, optional</strong></dt><dd><p>If only <cite>x</cite> is defined, it will be assumed as y.
+If a pandas <cite>Series</cite> is provided, the index will
+be taken as <cite>x</cite>.
+Else if a pandas <cite>DataFrame</cite> is provided, the method call
+is looped for each column.
+Else <cite>x</cite> will be an increment, starting from <cite>0</cite>.
+If a 2D numpy <cite>array</cite> is provided, the method call
+is looped for each column.</p>
+</dd>
+<dt><strong>label: str, optional</strong></dt><dd><p>Trace label for legend.</p>
+</dd>
+<dt><strong>show_legend: bool, optional</strong></dt><dd><p>Whether to show the label in the legend.</p>
+</dd>
+<dt><strong>interactive: bool, default: True</strong></dt><dd><p>Display an interactive plotly line plot
+instead of the default matplotlib figure.</p>
+</dd>
+<dt><strong>rows, cols: int, default: 1</strong></dt><dd><p>Create a grid with x rows and y columns.</p>
+</dd>
+<dt><strong>title: str, default: None</strong></dt><dd><p>Plot title.</p>
+</dd>
+<dt><strong>xlabel, ylabel: str or str tuple, default: None</strong></dt><dd><p>Axis labels.</p>
+<p>Either one title for the entire axis or one for each row/column.</p>
+</dd>
+<dt><strong>xlim, ylim: tuple of 2 numbers or nested, default: None</strong></dt><dd><p>Axis range limits.</p>
+<dl class="simple">
+<dt>In case of multiple rows/cols provide either:</dt><dd><ul class="simple">
+<li><p>a tuple</p></li>
+<li><p>a tuple for each row</p></li>
+<li><p>a tuple for each row containing tuple for each column.</p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+<dt><strong>shared_xaxes, shared_yaxes: str, default: None</strong></dt><dd><p>Define how multiple subplots share there axes.</p>
+<dl class="simple">
+<dt>Options:</dt><dd><ul class="simple">
+<li><p>“all” or True</p></li>
+<li><p>“rows”</p></li>
+<li><p>“columns” or “cols”</p></li>
+<li><p>None or False</p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+<dt><strong>column_widths, row_heights: tuple/list, default: None</strong></dt><dd><p>Ratios of the width/height dimensions in each column/row.
+Will be normalised to a sum of 1.</p>
+</dd>
+<dt><strong>fig_size: tuple of 2x float, optional</strong></dt><dd><p>Figure size in pixels.</p>
+<dl class="simple">
+<dt>Default behavior:</dt><dd><ul class="simple">
+<li><p>MPL: Default figure size.</p></li>
+<li><p>PLT: Responsive sizing.</p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+<dt><strong>dpi: int, default: 100</strong></dt><dd><p>Plot resolution.</p>
+</dd>
+<dt><strong>legend_loc: str, optional</strong></dt><dd><p>MATPLOTLIB ONLY.</p>
+<dl class="simple">
+<dt>Default:</dt><dd><ul class="simple">
+<li><p>In case of 1 line: None</p></li>
+<li><p>In case of &gt;1 line: “best” (auto-detect)</p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+<dt><strong>legend_title: str, default: None</strong></dt><dd><p>MPL: Each subplot has its own legend, so a 2d list in the shape of
+the subplots may be provided.</p>
+<p>PTY: Just provide a <cite>str</cite>.</p>
+</dd>
+<dt><strong>save_fig: str or pathlib.Path, default: None</strong></dt><dd><p>Provide a path to export the plot.</p>
+<p>Possible formats: png, jpg, svg, html, …</p>
+<p>The figure will only be saved on calling the instance’s
+<cite>.post_process()</cite>.</p>
+<p>If a directory (or True for local directory) is provided,
+the filename will be automatically generated based on the title.</p>
+</dd>
+<dt><strong>save_format: str, default: None</strong></dt><dd><p>Provide a format for the exported plot.</p>
+</dd>
+<dt><strong>pty_update_layout: dict, default: None</strong></dt><dd><p>PLOTLY ONLY.
+Pass keyword arguments to plotly’s
+<cite>fig.update_layout(**pty_update_layout)</cite>
+Thus, take full control over</p>
+</dd>
+<dt><strong>pty_custom_func: function, default: None</strong></dt><dd><p>PLOTLY ONLY.
+Pass a function reference to further style the plotly graphs.
+Function must accept <cite>fig</cite> and return <cite>fig</cite>.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">pty_custom_func</span><span class="p">(</span><span class="n">fig</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="n">fig</span><span class="o">.</span><span class="n">do_stuff</span><span class="p">()</span>
+<span class="gp">... </span>    <span class="k">return</span> <span class="n">fig</span>
+</pre></div>
+</div>
+</dd>
+<dt><strong>mpl_custom_func: function, default: None</strong></dt><dd><p>MATPLOTLIB ONLY.
+Pass a function reference to further style the matplotlib graphs.
+Function must accept <cite>fig, ax</cite> and return <cite>fig, ax</cite>.</p>
+<p>Note: <cite>ax</cite> always has <cite>row</cite> and <cite>col</cite> coordinates, even if the plot is
+just 1x1.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">mpl_custom_func</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="n">fig</span><span class="o">.</span><span class="n">do_stuff</span><span class="p">()</span>
+<span class="gp">... </span>    <span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">do_more</span><span class="p">()</span>
+<span class="gp">... </span>    <span class="k">return</span> <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl>
+<dt><cite>toolbox.plot.Plot</cite> instance</dt><dd><p>By default, it will be shown if a label is defined.</p>
+</dd>
+<dt>color: str, optional</dt><dd><p>Trace color.</p>
+<p>Can be hex, rgb(a) or any named color that is understood
+by matplotlib.</p>
+<p>Default: color is retrieved from <cite>Plot.digest_color</cite>,
+which cycles through <cite>COLOR_CYCLE</cite>.</p>
+</dd>
+<dt>opacity: float, optional</dt><dd><p>Opacity (=alpha) of the fill.</p>
+<p>By default, fallback to alpha value provided with color argument,
+or 1.</p>
+</dd>
+<dt>row, col: int, optional</dt><dd><p>If the plot contains a grid, provide the coordinates.</p>
+<p>Attention: Indexing starts with 0!</p>
+</dd>
+<dt>kwargs_pty, kwargs_mpl, <a href="#id3"><span class="problematic" id="id4">**</span></a>kwargs: optional</dt><dd><p>Pass specific keyword arguments to the line core method.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="toolbox.plot.hist">
+<span class="sig-prename descclassname"><span class="pre">plot.</span></span><span class="sig-name descname"><span class="pre">hist</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interactive</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rows</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cols</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fig</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip_post_process</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xlabel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ylabel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xlim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ylim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shared_xaxes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shared_yaxes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">column_widths</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row_heights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fig_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dpi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legend_loc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legend_title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_fig</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pty_update_layout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pty_custom_func</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mpl_custom_func</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#toolbox.plot.hist" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draw a histogram.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>x: array-like</strong></dt><dd><p>Histogram data.</p>
+</dd>
+<dt><strong>bins: int, optional</strong></dt><dd><p>Number of bins.
+If undefined, plotly/matplotlib will detect automatically.
+Default: None</p>
+</dd>
+<dt><strong>label: str, optional</strong></dt><dd><p>Trace label for legend.</p>
+</dd>
+<dt><strong>color: str, optional</strong></dt><dd><p>Trace color.
+Can be hex, rgb(a) or any named color that is understood
+by matplotlib.</p>
+</dd>
+<dt><strong>interactive: bool, default: True</strong></dt><dd><p>Display an interactive plotly line plot
+instead of the default matplotlib figure.</p>
+</dd>
+<dt><strong>rows, cols: int, default: 1</strong></dt><dd><p>Create a grid with x rows and y columns.</p>
+</dd>
+<dt><strong>title: str, default: None</strong></dt><dd><p>Plot title.</p>
+</dd>
+<dt><strong>xlabel, ylabel: str or str tuple, default: None</strong></dt><dd><p>Axis labels.</p>
+<p>Either one title for the entire axis or one for each row/column.</p>
+</dd>
+<dt><strong>xlim, ylim: tuple of 2 numbers or nested, default: None</strong></dt><dd><p>Axis range limits.</p>
+<dl class="simple">
+<dt>In case of multiple rows/cols provide either:</dt><dd><ul class="simple">
+<li><p>a tuple</p></li>
+<li><p>a tuple for each row</p></li>
+<li><p>a tuple for each row containing tuple for each column.</p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+<dt><strong>shared_xaxes, shared_yaxes: str, default: None</strong></dt><dd><p>Define how multiple subplots share there axes.</p>
+<dl class="simple">
+<dt>Options:</dt><dd><ul class="simple">
+<li><p>“all” or True</p></li>
+<li><p>“rows”</p></li>
+<li><p>“columns” or “cols”</p></li>
+<li><p>None or False</p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+<dt><strong>column_widths, row_heights: tuple/list, default: None</strong></dt><dd><p>Ratios of the width/height dimensions in each column/row.
+Will be normalised to a sum of 1.</p>
+</dd>
+<dt><strong>fig_size: tuple of 2x float, optional</strong></dt><dd><p>Figure size in pixels.</p>
+<dl class="simple">
+<dt>Default behavior:</dt><dd><ul class="simple">
+<li><p>MPL: Default figure size.</p></li>
+<li><p>PLT: Responsive sizing.</p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+<dt><strong>dpi: int, default: 100</strong></dt><dd><p>Plot resolution.</p>
+</dd>
+<dt><strong>legend_loc: str, optional</strong></dt><dd><p>MATPLOTLIB ONLY.</p>
+<dl class="simple">
+<dt>Default:</dt><dd><ul class="simple">
+<li><p>In case of 1 line: None</p></li>
+<li><p>In case of &gt;1 line: “best” (auto-detect)</p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+<dt><strong>legend_title: str, default: None</strong></dt><dd><p>MPL: Each subplot has its own legend, so a 2d list in the shape of
+the subplots may be provided.</p>
+<p>PTY: Just provide a <cite>str</cite>.</p>
+</dd>
+<dt><strong>save_fig: str or pathlib.Path, default: None</strong></dt><dd><p>Provide a path to export the plot.</p>
+<p>Possible formats: png, jpg, svg, html, …</p>
+<p>The figure will only be saved on calling the instance’s
+<cite>.post_process()</cite>.</p>
+<p>If a directory (or True for local directory) is provided,
+the filename will be automatically generated based on the title.</p>
+</dd>
+<dt><strong>save_format: str, default: None</strong></dt><dd><p>Provide a format for the exported plot.</p>
+</dd>
+<dt><strong>pty_update_layout: dict, default: None</strong></dt><dd><p>PLOTLY ONLY.
+Pass keyword arguments to plotly’s
+<cite>fig.update_layout(**pty_update_layout)</cite>
+Thus, take full control over</p>
+</dd>
+<dt><strong>pty_custom_func: function, default: None</strong></dt><dd><p>PLOTLY ONLY.
+Pass a function reference to further style the plotly graphs.
+Function must accept <cite>fig</cite> and return <cite>fig</cite>.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">pty_custom_func</span><span class="p">(</span><span class="n">fig</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="n">fig</span><span class="o">.</span><span class="n">do_stuff</span><span class="p">()</span>
+<span class="gp">... </span>    <span class="k">return</span> <span class="n">fig</span>
+</pre></div>
+</div>
+</dd>
+<dt><strong>mpl_custom_func: function, default: None</strong></dt><dd><p>MATPLOTLIB ONLY.
+Pass a function reference to further style the matplotlib graphs.
+Function must accept <cite>fig, ax</cite> and return <cite>fig, ax</cite>.</p>
+<p>Note: <cite>ax</cite> always has <cite>row</cite> and <cite>col</cite> coordinates, even if the plot is
+just 1x1.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">mpl_custom_func</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="n">fig</span><span class="o">.</span><span class="n">do_stuff</span><span class="p">()</span>
+<span class="gp">... </span>    <span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">do_more</span><span class="p">()</span>
+<span class="gp">... </span>    <span class="k">return</span> <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl>
+<dt><cite>toolbox.plot.Plot</cite> instance</dt><dd><p>Default: color is retrieved from <cite>Plot.digest_color</cite>,
+which cycles through <cite>COLOR_CYCLE</cite>.</p>
+</dd>
+<dt>opacity: float, optional</dt><dd><p>Opacity (=alpha) of the fill.</p>
+<p>By default, fallback to alpha value provided with color argument,
+or 1.</p>
+</dd>
+<dt>row, col: int, default: 0</dt><dd><p>If the plot contains a grid, provide the coordinates.</p>
+<p>Attention: Indexing starts with 0!</p>
+</dd>
+<dt>kwargs_pty, kwargs_mpl, <a href="#id5"><span class="problematic" id="id6">**</span></a>kwargs: optional</dt><dd><p>Pass specific keyword arguments to the hist core method.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="toolbox.plot.boxplot">
+<span class="sig-prename descclassname"><span class="pre">plot.</span></span><span class="sig-name descname"><span class="pre">boxplot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interactive</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rows</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cols</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fig</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip_post_process</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xlabel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ylabel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xlim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ylim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shared_xaxes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shared_yaxes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">column_widths</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row_heights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fig_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dpi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legend_loc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legend_title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_fig</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pty_update_layout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pty_custom_func</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mpl_custom_func</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#toolbox.plot.boxplot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draw a boxplot.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>x: array or sequence of vectors</strong></dt><dd><p>Data to build boxplot from.</p>
+</dd>
+<dt><strong>horizontal: bool, default: False</strong></dt><dd><p>Show boxplot horizontally.</p>
+</dd>
+<dt><strong>label: tuple of strs, optional</strong></dt><dd><p>Trace labels for legend.</p>
+</dd>
+<dt><strong>color: tuple of strs, optional</strong></dt><dd><p>Fill colors.</p>
+</dd>
+<dt><strong>interactive: bool, default: True</strong></dt><dd><p>Display an interactive plotly line plot
+instead of the default matplotlib figure.</p>
+</dd>
+<dt><strong>rows, cols: int, default: 1</strong></dt><dd><p>Create a grid with x rows and y columns.</p>
+</dd>
+<dt><strong>title: str, default: None</strong></dt><dd><p>Plot title.</p>
+</dd>
+<dt><strong>xlabel, ylabel: str or str tuple, default: None</strong></dt><dd><p>Axis labels.</p>
+<p>Either one title for the entire axis or one for each row/column.</p>
+</dd>
+<dt><strong>xlim, ylim: tuple of 2 numbers or nested, default: None</strong></dt><dd><p>Axis range limits.</p>
+<dl class="simple">
+<dt>In case of multiple rows/cols provide either:</dt><dd><ul class="simple">
+<li><p>a tuple</p></li>
+<li><p>a tuple for each row</p></li>
+<li><p>a tuple for each row containing tuple for each column.</p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+<dt><strong>shared_xaxes, shared_yaxes: str, default: None</strong></dt><dd><p>Define how multiple subplots share there axes.</p>
+<dl class="simple">
+<dt>Options:</dt><dd><ul class="simple">
+<li><p>“all” or True</p></li>
+<li><p>“rows”</p></li>
+<li><p>“columns” or “cols”</p></li>
+<li><p>None or False</p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+<dt><strong>column_widths, row_heights: tuple/list, default: None</strong></dt><dd><p>Ratios of the width/height dimensions in each column/row.
+Will be normalised to a sum of 1.</p>
+</dd>
+<dt><strong>fig_size: tuple of 2x float, optional</strong></dt><dd><p>Figure size in pixels.</p>
+<dl class="simple">
+<dt>Default behavior:</dt><dd><ul class="simple">
+<li><p>MPL: Default figure size.</p></li>
+<li><p>PLT: Responsive sizing.</p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+<dt><strong>dpi: int, default: 100</strong></dt><dd><p>Plot resolution.</p>
+</dd>
+<dt><strong>legend_loc: str, optional</strong></dt><dd><p>MATPLOTLIB ONLY.</p>
+<dl class="simple">
+<dt>Default:</dt><dd><ul class="simple">
+<li><p>In case of 1 line: None</p></li>
+<li><p>In case of &gt;1 line: “best” (auto-detect)</p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+<dt><strong>legend_title: str, default: None</strong></dt><dd><p>MPL: Each subplot has its own legend, so a 2d list in the shape of
+the subplots may be provided.</p>
+<p>PTY: Just provide a <cite>str</cite>.</p>
+</dd>
+<dt><strong>save_fig: str or pathlib.Path, default: None</strong></dt><dd><p>Provide a path to export the plot.</p>
+<p>Possible formats: png, jpg, svg, html, …</p>
+<p>The figure will only be saved on calling the instance’s
+<cite>.post_process()</cite>.</p>
+<p>If a directory (or True for local directory) is provided,
+the filename will be automatically generated based on the title.</p>
+</dd>
+<dt><strong>save_format: str, default: None</strong></dt><dd><p>Provide a format for the exported plot.</p>
+</dd>
+<dt><strong>pty_update_layout: dict, default: None</strong></dt><dd><p>PLOTLY ONLY.
+Pass keyword arguments to plotly’s
+<cite>fig.update_layout(**pty_update_layout)</cite>
+Thus, take full control over</p>
+</dd>
+<dt><strong>pty_custom_func: function, default: None</strong></dt><dd><p>PLOTLY ONLY.
+Pass a function reference to further style the plotly graphs.
+Function must accept <cite>fig</cite> and return <cite>fig</cite>.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">pty_custom_func</span><span class="p">(</span><span class="n">fig</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="n">fig</span><span class="o">.</span><span class="n">do_stuff</span><span class="p">()</span>
+<span class="gp">... </span>    <span class="k">return</span> <span class="n">fig</span>
+</pre></div>
+</div>
+</dd>
+<dt><strong>mpl_custom_func: function, default: None</strong></dt><dd><p>MATPLOTLIB ONLY.
+Pass a function reference to further style the matplotlib graphs.
+Function must accept <cite>fig, ax</cite> and return <cite>fig, ax</cite>.</p>
+<p>Note: <cite>ax</cite> always has <cite>row</cite> and <cite>col</cite> coordinates, even if the plot is
+just 1x1.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">mpl_custom_func</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="n">fig</span><span class="o">.</span><span class="n">do_stuff</span><span class="p">()</span>
+<span class="gp">... </span>    <span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">do_more</span><span class="p">()</span>
+<span class="gp">... </span>    <span class="k">return</span> <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl>
+<dt><cite>toolbox.plot.Plot</cite> instance</dt><dd><p>Can be hex, rgb(a) or any named color that is understood
+by matplotlib.</p>
+<p>Default: color is retrieved from <cite>Plot.digest_color</cite>,
+which cycles through <cite>COLOR_CYCLE</cite>.</p>
+</dd>
+<dt>color_median: color, default: “black”</dt><dd><p>MPL only.
+Color of the median line.</p>
+</dd>
+<dt>opacity: float, optional</dt><dd><p>Opacity (=alpha) of the fill.</p>
+<p>By default, fallback to alpha value provided with color argument,
+or 1.</p>
+</dd>
+<dt>row, col: int, optional</dt><dd><p>If the plot contains a grid, provide the coordinates.</p>
+<p>Attention: Indexing starts with 0!</p>
+</dd>
+<dt>kwargs_pty, kwargs_mpl, <a href="#id7"><span class="problematic" id="id8">**</span></a>kwargs: optional</dt><dd><p>Pass specific keyword arguments to the boxplot core method.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="toolbox.plot.heatmap">
+<span class="sig-prename descclassname"><span class="pre">plot.</span></span><span class="sig-name descname"><span class="pre">heatmap</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interactive</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rows</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cols</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fig</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip_post_process</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xlabel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ylabel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xlim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ylim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shared_xaxes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shared_yaxes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">column_widths</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row_heights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fig_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dpi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legend_loc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legend_title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_fig</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pty_update_layout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pty_custom_func</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mpl_custom_func</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#toolbox.plot.heatmap" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draw a heatmap.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>data: 2D array-like</strong></dt><dd><p>2D data to show heatmap.</p>
+</dd>
+<dt><strong>lim: list/tuple of 2x float, optional</strong></dt><dd><p>Lower and upper limits of the color map.</p>
+</dd>
+<dt><strong>aspect: float, default: 1</strong></dt><dd><p>Aspect ratio of the axes.</p>
+</dd>
+<dt><strong>invert_x, invert_y: bool, optional</strong></dt><dd><p>Invert the axes directions.
+Default: False</p>
+</dd>
+<dt><strong>cmap: str, default: “rainbow”</strong></dt><dd><p>Color map to use.
+<a class="reference external" href="https://matplotlib.org/stable/gallery/color/colormap_reference.html">https://matplotlib.org/stable/gallery/color/colormap_reference.html</a>
+Note: Not all cmaps are available for both libraries,
+and may differ slightly.</p>
+</dd>
+<dt><strong>cmap_under, cmap_over, cmap_bad: str, optional</strong></dt><dd><p>Colors to display if under/over range or a pixel is invalid,
+e.g. in case of <cite>np.nan</cite>.
+<cite>cmap_bad</cite> is not available for interactive plotly plots.</p>
+</dd>
+<dt><strong>row, col: int, optional</strong></dt><dd><p>If the plot contains a grid, provide the coordinates.</p>
+</dd>
+<dt><strong>interactive: bool, default: True</strong></dt><dd><p>Display an interactive plotly line plot
+instead of the default matplotlib figure.</p>
+</dd>
+<dt><strong>rows, cols: int, default: 1</strong></dt><dd><p>Create a grid with x rows and y columns.</p>
+</dd>
+<dt><strong>title: str, default: None</strong></dt><dd><p>Plot title.</p>
+</dd>
+<dt><strong>xlabel, ylabel: str or str tuple, default: None</strong></dt><dd><p>Axis labels.</p>
+<p>Either one title for the entire axis or one for each row/column.</p>
+</dd>
+<dt><strong>xlim, ylim: tuple of 2 numbers or nested, default: None</strong></dt><dd><p>Axis range limits.</p>
+<dl class="simple">
+<dt>In case of multiple rows/cols provide either:</dt><dd><ul class="simple">
+<li><p>a tuple</p></li>
+<li><p>a tuple for each row</p></li>
+<li><p>a tuple for each row containing tuple for each column.</p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+<dt><strong>shared_xaxes, shared_yaxes: str, default: None</strong></dt><dd><p>Define how multiple subplots share there axes.</p>
+<dl class="simple">
+<dt>Options:</dt><dd><ul class="simple">
+<li><p>“all” or True</p></li>
+<li><p>“rows”</p></li>
+<li><p>“columns” or “cols”</p></li>
+<li><p>None or False</p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+<dt><strong>column_widths, row_heights: tuple/list, default: None</strong></dt><dd><p>Ratios of the width/height dimensions in each column/row.
+Will be normalised to a sum of 1.</p>
+</dd>
+<dt><strong>fig_size: tuple of 2x float, optional</strong></dt><dd><p>Figure size in pixels.</p>
+<dl class="simple">
+<dt>Default behavior:</dt><dd><ul class="simple">
+<li><p>MPL: Default figure size.</p></li>
+<li><p>PLT: Responsive sizing.</p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+<dt><strong>dpi: int, default: 100</strong></dt><dd><p>Plot resolution.</p>
+</dd>
+<dt><strong>legend_loc: str, optional</strong></dt><dd><p>MATPLOTLIB ONLY.</p>
+<dl class="simple">
+<dt>Default:</dt><dd><ul class="simple">
+<li><p>In case of 1 line: None</p></li>
+<li><p>In case of &gt;1 line: “best” (auto-detect)</p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+<dt><strong>legend_title: str, default: None</strong></dt><dd><p>MPL: Each subplot has its own legend, so a 2d list in the shape of
+the subplots may be provided.</p>
+<p>PTY: Just provide a <cite>str</cite>.</p>
+</dd>
+<dt><strong>save_fig: str or pathlib.Path, default: None</strong></dt><dd><p>Provide a path to export the plot.</p>
+<p>Possible formats: png, jpg, svg, html, …</p>
+<p>The figure will only be saved on calling the instance’s
+<cite>.post_process()</cite>.</p>
+<p>If a directory (or True for local directory) is provided,
+the filename will be automatically generated based on the title.</p>
+</dd>
+<dt><strong>save_format: str, default: None</strong></dt><dd><p>Provide a format for the exported plot.</p>
+</dd>
+<dt><strong>pty_update_layout: dict, default: None</strong></dt><dd><p>PLOTLY ONLY.
+Pass keyword arguments to plotly’s
+<cite>fig.update_layout(**pty_update_layout)</cite>
+Thus, take full control over</p>
+</dd>
+<dt><strong>pty_custom_func: function, default: None</strong></dt><dd><p>PLOTLY ONLY.
+Pass a function reference to further style the plotly graphs.
+Function must accept <cite>fig</cite> and return <cite>fig</cite>.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">pty_custom_func</span><span class="p">(</span><span class="n">fig</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="n">fig</span><span class="o">.</span><span class="n">do_stuff</span><span class="p">()</span>
+<span class="gp">... </span>    <span class="k">return</span> <span class="n">fig</span>
+</pre></div>
+</div>
+</dd>
+<dt><strong>mpl_custom_func: function, default: None</strong></dt><dd><p>MATPLOTLIB ONLY.
+Pass a function reference to further style the matplotlib graphs.
+Function must accept <cite>fig, ax</cite> and return <cite>fig, ax</cite>.</p>
+<p>Note: <cite>ax</cite> always has <cite>row</cite> and <cite>col</cite> coordinates, even if the plot is
+just 1x1.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">mpl_custom_func</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="n">fig</span><span class="o">.</span><span class="n">do_stuff</span><span class="p">()</span>
+<span class="gp">... </span>    <span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">do_more</span><span class="p">()</span>
+<span class="gp">... </span>    <span class="k">return</span> <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><cite>toolbox.plot.Plot</cite> instance</dt><dd><p>Attention: Indexing starts with 0!</p>
+</dd>
+<dt>kwargs_pty, kwargs_mpl, <a href="#id9"><span class="problematic" id="id10">**</span></a>kwargs: optional</dt><dd><p>Pass specific keyword arguments to the heatmap core method.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="toolbox.plot.regression">
+<span class="sig-prename descclassname"><span class="pre">plot.</span></span><span class="sig-name descname"><span class="pre">regression</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interactive</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rows</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cols</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fig</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip_post_process</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xlabel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ylabel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xlim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ylim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shared_xaxes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shared_yaxes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">column_widths</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row_heights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fig_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dpi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legend_loc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legend_title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_fig</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pty_update_layout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pty_custom_func</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mpl_custom_func</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#toolbox.plot.regression" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draw a linear regression plot.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>x: array-like or `toolbox.arraytools.LinearRegression` instance</strong></dt><dd><p>X axis data, or pre-existing LinearRegression instance.</p>
+</dd>
+<dt><strong>y: array-like, optional</strong></dt><dd><p>Y axis data.
+If a LinearRegression instance is provided for x,
+y can be omitted and will be ignored.</p>
+</dd>
+<dt><strong>p: float, default: 0.05</strong></dt><dd><p>p-value.</p>
+</dd>
+<dt><strong>linspace: int, default: 101</strong></dt><dd><p>Number of data points for linear regression model
+and conficence and prediction intervals.</p>
+</dd>
+<dt><strong>kwargs:</strong></dt><dd><p>Keyword arguments for <cite>toolbox.arraytools.LinearRegression.plot</cite>.</p>
+</dd>
+<dt><strong>interactive: bool, default: True</strong></dt><dd><p>Display an interactive plotly line plot
+instead of the default matplotlib figure.</p>
+</dd>
+<dt><strong>rows, cols: int, default: 1</strong></dt><dd><p>Create a grid with x rows and y columns.</p>
+</dd>
+<dt><strong>title: str, default: None</strong></dt><dd><p>Plot title.</p>
+</dd>
+<dt><strong>xlabel, ylabel: str or str tuple, default: None</strong></dt><dd><p>Axis labels.</p>
+<p>Either one title for the entire axis or one for each row/column.</p>
+</dd>
+<dt><strong>xlim, ylim: tuple of 2 numbers or nested, default: None</strong></dt><dd><p>Axis range limits.</p>
+<dl class="simple">
+<dt>In case of multiple rows/cols provide either:</dt><dd><ul class="simple">
+<li><p>a tuple</p></li>
+<li><p>a tuple for each row</p></li>
+<li><p>a tuple for each row containing tuple for each column.</p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+<dt><strong>shared_xaxes, shared_yaxes: str, default: None</strong></dt><dd><p>Define how multiple subplots share there axes.</p>
+<dl class="simple">
+<dt>Options:</dt><dd><ul class="simple">
+<li><p>“all” or True</p></li>
+<li><p>“rows”</p></li>
+<li><p>“columns” or “cols”</p></li>
+<li><p>None or False</p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+<dt><strong>column_widths, row_heights: tuple/list, default: None</strong></dt><dd><p>Ratios of the width/height dimensions in each column/row.
+Will be normalised to a sum of 1.</p>
+</dd>
+<dt><strong>fig_size: tuple of 2x float, optional</strong></dt><dd><p>Figure size in pixels.</p>
+<dl class="simple">
+<dt>Default behavior:</dt><dd><ul class="simple">
+<li><p>MPL: Default figure size.</p></li>
+<li><p>PLT: Responsive sizing.</p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+<dt><strong>dpi: int, default: 100</strong></dt><dd><p>Plot resolution.</p>
+</dd>
+<dt><strong>legend_loc: str, optional</strong></dt><dd><p>MATPLOTLIB ONLY.</p>
+<dl class="simple">
+<dt>Default:</dt><dd><ul class="simple">
+<li><p>In case of 1 line: None</p></li>
+<li><p>In case of &gt;1 line: “best” (auto-detect)</p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+<dt><strong>legend_title: str, default: None</strong></dt><dd><p>MPL: Each subplot has its own legend, so a 2d list in the shape of
+the subplots may be provided.</p>
+<p>PTY: Just provide a <cite>str</cite>.</p>
+</dd>
+<dt><strong>save_fig: str or pathlib.Path, default: None</strong></dt><dd><p>Provide a path to export the plot.</p>
+<p>Possible formats: png, jpg, svg, html, …</p>
+<p>The figure will only be saved on calling the instance’s
+<cite>.post_process()</cite>.</p>
+<p>If a directory (or True for local directory) is provided,
+the filename will be automatically generated based on the title.</p>
+</dd>
+<dt><strong>save_format: str, default: None</strong></dt><dd><p>Provide a format for the exported plot.</p>
+</dd>
+<dt><strong>pty_update_layout: dict, default: None</strong></dt><dd><p>PLOTLY ONLY.
+Pass keyword arguments to plotly’s
+<cite>fig.update_layout(**pty_update_layout)</cite>
+Thus, take full control over</p>
+</dd>
+<dt><strong>pty_custom_func: function, default: None</strong></dt><dd><p>PLOTLY ONLY.
+Pass a function reference to further style the plotly graphs.
+Function must accept <cite>fig</cite> and return <cite>fig</cite>.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">pty_custom_func</span><span class="p">(</span><span class="n">fig</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="n">fig</span><span class="o">.</span><span class="n">do_stuff</span><span class="p">()</span>
+<span class="gp">... </span>    <span class="k">return</span> <span class="n">fig</span>
+</pre></div>
+</div>
+</dd>
+<dt><strong>mpl_custom_func: function, default: None</strong></dt><dd><p>MATPLOTLIB ONLY.
+Pass a function reference to further style the matplotlib graphs.
+Function must accept <cite>fig, ax</cite> and return <cite>fig, ax</cite>.</p>
+<p>Note: <cite>ax</cite> always has <cite>row</cite> and <cite>col</cite> coordinates, even if the plot is
+just 1x1.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">mpl_custom_func</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="n">fig</span><span class="o">.</span><span class="n">do_stuff</span><span class="p">()</span>
+<span class="gp">... </span>    <span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">do_more</span><span class="p">()</span>
+<span class="gp">... </span>    <span class="k">return</span> <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><cite>toolbox.plot.Plot</cite> instance</dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="toolbox.plot.fill">
+<span class="sig-prename descclassname"><span class="pre">plot.</span></span><span class="sig-name descname"><span class="pre">fill</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interactive</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rows</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cols</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fig</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip_post_process</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xlabel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ylabel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xlim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ylim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shared_xaxes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shared_yaxes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">column_widths</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row_heights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fig_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dpi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legend_loc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legend_title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_fig</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pty_update_layout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pty_custom_func</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mpl_custom_func</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#toolbox.plot.fill" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draw a fill between two y lines.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>x: array-like</strong></dt><dd></dd>
+<dt><strong>y1, y2: array-like, optional</strong></dt><dd><p>If only <cite>x</cite> and <cite>y1</cite> is defined,
+it will be assumed as <cite>y1</cite> and <cite>y2</cite>,
+and <cite>x</cite> will be the index, starting from 0.</p>
+</dd>
+<dt><strong>label: str, optional</strong></dt><dd><p>Trace label for legend.</p>
+</dd>
+<dt><strong>color, line_color: str, optional</strong></dt><dd><p>Fill and line color.</p>
+</dd>
+<dt><strong>interactive: bool, default: True</strong></dt><dd><p>Display an interactive plotly line plot
+instead of the default matplotlib figure.</p>
+</dd>
+<dt><strong>rows, cols: int, default: 1</strong></dt><dd><p>Create a grid with x rows and y columns.</p>
+</dd>
+<dt><strong>title: str, default: None</strong></dt><dd><p>Plot title.</p>
+</dd>
+<dt><strong>xlabel, ylabel: str or str tuple, default: None</strong></dt><dd><p>Axis labels.</p>
+<p>Either one title for the entire axis or one for each row/column.</p>
+</dd>
+<dt><strong>xlim, ylim: tuple of 2 numbers or nested, default: None</strong></dt><dd><p>Axis range limits.</p>
+<dl class="simple">
+<dt>In case of multiple rows/cols provide either:</dt><dd><ul class="simple">
+<li><p>a tuple</p></li>
+<li><p>a tuple for each row</p></li>
+<li><p>a tuple for each row containing tuple for each column.</p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+<dt><strong>shared_xaxes, shared_yaxes: str, default: None</strong></dt><dd><p>Define how multiple subplots share there axes.</p>
+<dl class="simple">
+<dt>Options:</dt><dd><ul class="simple">
+<li><p>“all” or True</p></li>
+<li><p>“rows”</p></li>
+<li><p>“columns” or “cols”</p></li>
+<li><p>None or False</p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+<dt><strong>column_widths, row_heights: tuple/list, default: None</strong></dt><dd><p>Ratios of the width/height dimensions in each column/row.
+Will be normalised to a sum of 1.</p>
+</dd>
+<dt><strong>fig_size: tuple of 2x float, optional</strong></dt><dd><p>Figure size in pixels.</p>
+<dl class="simple">
+<dt>Default behavior:</dt><dd><ul class="simple">
+<li><p>MPL: Default figure size.</p></li>
+<li><p>PLT: Responsive sizing.</p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+<dt><strong>dpi: int, default: 100</strong></dt><dd><p>Plot resolution.</p>
+</dd>
+<dt><strong>legend_loc: str, optional</strong></dt><dd><p>MATPLOTLIB ONLY.</p>
+<dl class="simple">
+<dt>Default:</dt><dd><ul class="simple">
+<li><p>In case of 1 line: None</p></li>
+<li><p>In case of &gt;1 line: “best” (auto-detect)</p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+<dt><strong>legend_title: str, default: None</strong></dt><dd><p>MPL: Each subplot has its own legend, so a 2d list in the shape of
+the subplots may be provided.</p>
+<p>PTY: Just provide a <cite>str</cite>.</p>
+</dd>
+<dt><strong>save_fig: str or pathlib.Path, default: None</strong></dt><dd><p>Provide a path to export the plot.</p>
+<p>Possible formats: png, jpg, svg, html, …</p>
+<p>The figure will only be saved on calling the instance’s
+<cite>.post_process()</cite>.</p>
+<p>If a directory (or True for local directory) is provided,
+the filename will be automatically generated based on the title.</p>
+</dd>
+<dt><strong>save_format: str, default: None</strong></dt><dd><p>Provide a format for the exported plot.</p>
+</dd>
+<dt><strong>pty_update_layout: dict, default: None</strong></dt><dd><p>PLOTLY ONLY.
+Pass keyword arguments to plotly’s
+<cite>fig.update_layout(**pty_update_layout)</cite>
+Thus, take full control over</p>
+</dd>
+<dt><strong>pty_custom_func: function, default: None</strong></dt><dd><p>PLOTLY ONLY.
+Pass a function reference to further style the plotly graphs.
+Function must accept <cite>fig</cite> and return <cite>fig</cite>.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">pty_custom_func</span><span class="p">(</span><span class="n">fig</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="n">fig</span><span class="o">.</span><span class="n">do_stuff</span><span class="p">()</span>
+<span class="gp">... </span>    <span class="k">return</span> <span class="n">fig</span>
+</pre></div>
+</div>
+</dd>
+<dt><strong>mpl_custom_func: function, default: None</strong></dt><dd><p>MATPLOTLIB ONLY.
+Pass a function reference to further style the matplotlib graphs.
+Function must accept <cite>fig, ax</cite> and return <cite>fig, ax</cite>.</p>
+<p>Note: <cite>ax</cite> always has <cite>row</cite> and <cite>col</cite> coordinates, even if the plot is
+just 1x1.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">mpl_custom_func</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="n">fig</span><span class="o">.</span><span class="n">do_stuff</span><span class="p">()</span>
+<span class="gp">... </span>    <span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">do_more</span><span class="p">()</span>
+<span class="gp">... </span>    <span class="k">return</span> <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl>
+<dt><cite>toolbox.plot.Plot</cite> instance</dt><dd><p>Can be hex, rgb(a) or any named color that is understood
+by matplotlib.
+If line_color is undefined, the the fill color will be used.</p>
+<p>Default: color is retrieved from <cite>Plot.digest_color</cite>,
+which cycles through <cite>COLOR_CYCLE</cite>.</p>
+</dd>
+<dt>opacity, line_opacity: float, default: 0.5</dt><dd><p>Opacity (=alpha) of the fill.</p>
+<p>Set to None to use a value provided with the color argument.</p>
+</dd>
+<dt>line_width: float, default: 0.</dt><dd><p>Boundary line width.</p>
+</dd>
+<dt>row, col: int, default: 0</dt><dd><p>If the plot contains a grid, provide the coordinates.</p>
+<p>Attention: Indexing starts with 0!</p>
+</dd>
+<dt>kwargs_pty, kwargs_mpl, <a href="#id11"><span class="problematic" id="id12">**</span></a>kwargs: optional</dt><dd><p>Pass specific keyword arguments to the fill core method.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="toolbox.plot.text">
+<span class="sig-prename descclassname"><span class="pre">plot.</span></span><span class="sig-name descname"><span class="pre">text</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interactive</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rows</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cols</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fig</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip_post_process</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xlabel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ylabel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xlim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ylim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shared_xaxes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shared_yaxes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">column_widths</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row_heights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fig_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dpi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legend_loc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legend_title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_fig</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pty_update_layout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pty_custom_func</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mpl_custom_func</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#toolbox.plot.text" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draw text.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>x, y: float</strong></dt><dd><p>Coordinates of the text.</p>
+</dd>
+<dt><strong>text: str</strong></dt><dd><p>Text to add.</p>
+</dd>
+<dt><strong>horizontal_alignment, vertical_alignment: str, default: “center”</strong></dt><dd><p>Where the coordinates of the text box anchor.</p>
+</dd>
+<dt><strong>interactive: bool, default: True</strong></dt><dd><p>Display an interactive plotly line plot
+instead of the default matplotlib figure.</p>
+</dd>
+<dt><strong>rows, cols: int, default: 1</strong></dt><dd><p>Create a grid with x rows and y columns.</p>
+</dd>
+<dt><strong>title: str, default: None</strong></dt><dd><p>Plot title.</p>
+</dd>
+<dt><strong>xlabel, ylabel: str or str tuple, default: None</strong></dt><dd><p>Axis labels.</p>
+<p>Either one title for the entire axis or one for each row/column.</p>
+</dd>
+<dt><strong>xlim, ylim: tuple of 2 numbers or nested, default: None</strong></dt><dd><p>Axis range limits.</p>
+<dl class="simple">
+<dt>In case of multiple rows/cols provide either:</dt><dd><ul class="simple">
+<li><p>a tuple</p></li>
+<li><p>a tuple for each row</p></li>
+<li><p>a tuple for each row containing tuple for each column.</p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+<dt><strong>shared_xaxes, shared_yaxes: str, default: None</strong></dt><dd><p>Define how multiple subplots share there axes.</p>
+<dl class="simple">
+<dt>Options:</dt><dd><ul class="simple">
+<li><p>“all” or True</p></li>
+<li><p>“rows”</p></li>
+<li><p>“columns” or “cols”</p></li>
+<li><p>None or False</p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+<dt><strong>column_widths, row_heights: tuple/list, default: None</strong></dt><dd><p>Ratios of the width/height dimensions in each column/row.
+Will be normalised to a sum of 1.</p>
+</dd>
+<dt><strong>fig_size: tuple of 2x float, optional</strong></dt><dd><p>Figure size in pixels.</p>
+<dl class="simple">
+<dt>Default behavior:</dt><dd><ul class="simple">
+<li><p>MPL: Default figure size.</p></li>
+<li><p>PLT: Responsive sizing.</p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+<dt><strong>dpi: int, default: 100</strong></dt><dd><p>Plot resolution.</p>
+</dd>
+<dt><strong>legend_loc: str, optional</strong></dt><dd><p>MATPLOTLIB ONLY.</p>
+<dl class="simple">
+<dt>Default:</dt><dd><ul class="simple">
+<li><p>In case of 1 line: None</p></li>
+<li><p>In case of &gt;1 line: “best” (auto-detect)</p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+<dt><strong>legend_title: str, default: None</strong></dt><dd><p>MPL: Each subplot has its own legend, so a 2d list in the shape of
+the subplots may be provided.</p>
+<p>PTY: Just provide a <cite>str</cite>.</p>
+</dd>
+<dt><strong>save_fig: str or pathlib.Path, default: None</strong></dt><dd><p>Provide a path to export the plot.</p>
+<p>Possible formats: png, jpg, svg, html, …</p>
+<p>The figure will only be saved on calling the instance’s
+<cite>.post_process()</cite>.</p>
+<p>If a directory (or True for local directory) is provided,
+the filename will be automatically generated based on the title.</p>
+</dd>
+<dt><strong>save_format: str, default: None</strong></dt><dd><p>Provide a format for the exported plot.</p>
+</dd>
+<dt><strong>pty_update_layout: dict, default: None</strong></dt><dd><p>PLOTLY ONLY.
+Pass keyword arguments to plotly’s
+<cite>fig.update_layout(**pty_update_layout)</cite>
+Thus, take full control over</p>
+</dd>
+<dt><strong>pty_custom_func: function, default: None</strong></dt><dd><p>PLOTLY ONLY.
+Pass a function reference to further style the plotly graphs.
+Function must accept <cite>fig</cite> and return <cite>fig</cite>.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">pty_custom_func</span><span class="p">(</span><span class="n">fig</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="n">fig</span><span class="o">.</span><span class="n">do_stuff</span><span class="p">()</span>
+<span class="gp">... </span>    <span class="k">return</span> <span class="n">fig</span>
+</pre></div>
+</div>
+</dd>
+<dt><strong>mpl_custom_func: function, default: None</strong></dt><dd><p>MATPLOTLIB ONLY.
+Pass a function reference to further style the matplotlib graphs.
+Function must accept <cite>fig, ax</cite> and return <cite>fig, ax</cite>.</p>
+<p>Note: <cite>ax</cite> always has <cite>row</cite> and <cite>col</cite> coordinates, even if the plot is
+just 1x1.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">mpl_custom_func</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="n">fig</span><span class="o">.</span><span class="n">do_stuff</span><span class="p">()</span>
+<span class="gp">... </span>    <span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">do_more</span><span class="p">()</span>
+<span class="gp">... </span>    <span class="k">return</span> <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl>
+<dt><cite>toolbox.plot.Plot</cite> instance</dt><dd><dl class="simple">
+<dt>Options for <cite>horizontal_alignment</cite>:</dt><dd><ul class="simple">
+<li><p>“left”</p></li>
+<li><p>“center”</p></li>
+<li><p>“right”</p></li>
+</ul>
+</dd>
+<dt>Options for <cite>vertical_alignment</cite>:</dt><dd><ul class="simple">
+<li><p>“top”</p></li>
+<li><p>“center”</p></li>
+<li><p>“bottom”</p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+<dt>text_alignment: str, optional</dt><dd><p>Set how text is aligned inside its box.</p>
+<p>If left undefined, horizontal_alignment will be used.</p>
+</dd>
+<dt>data_coords: bool, default: True</dt><dd><p>Whether the <cite>x</cite>, <cite>y</cite> coordinates are provided in data coordinates
+or in relation to the axes.</p>
+<p>If set to <cite>False</cite>, <cite>x</cite>, <cite>y</cite> should be in the range (0, 1).
+If <cite>data_coords</cite> is set, it will override
+<cite>x_data_coords</cite> and <cite>y_data_coords</cite>.</p>
+</dd>
+<dt>x_data_coords, y_data_coords: bool, default: True</dt><dd><p>PTY only.
+Specify the anchor for each axis separate.</p>
+</dd>
+<dt>color: str, default: “black”</dt><dd><p>Trace color.
+Can be hex, rgb(a) or any named color that is understood
+by matplotlib.</p>
+</dd>
+<dt>opacity: float, optional</dt><dd><p>Opacity (=alpha) of the fill.</p>
+<p>By default, fallback to alpha value provided with color argument,
+or 1.</p>
+</dd>
+<dt>row, col: int, optional</dt><dd><p>If the plot contains a grid, provide the coordinates.</p>
+<p>Attention: Indexing starts with 0!</p>
+</dd>
+<dt>kwargs_pty, kwargs_mpl, <a href="#id13"><span class="problematic" id="id14">**</span></a>kwargs: optional</dt><dd><p>Pass specific keyword arguments to the line core method.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="magic-plot-decorators">
+<h2><cite>magic_plot</cite> decorators<a class="headerlink" href="#magic-plot-decorators" title="Permalink to this heading">¶</a></h2>
+<dl class="py method">
+<dt class="sig sig-object py" id="toolbox.plot.magic_plot">
+<span class="sig-prename descclassname"><span class="pre">plot.</span></span><span class="sig-name descname"><span class="pre">magic_plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">doc_decorator</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#toolbox.plot.magic_plot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot generator wrapper.</p>
+<p>Your function feeds the data, the wrapper gives control over the plot
+to the user.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>doc_decorator: str, optional</strong></dt><dd><p>Append the docstring with the decorated parameters.</p>
+<p>By default, the global variable <cite>DOCSTRING_DECORATOR</cite> will be used.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nd">@magic_plot</span>
+<span class="gp">... </span><span class="k">def</span> <span class="nf">line</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">data</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">fig</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+<span class="gp">... </span><span class="p">):</span>
+<span class="gp">... </span>    <span class="n">fig</span><span class="o">.</span><span class="n">add_line</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="gp">...</span>
+<span class="gp">... </span><span class="n">line</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span><span class="mi">7</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Plot title&quot;</span><span class="p">,</span> <span class="n">interactive</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="go">[matplotlib figure, &quot;Plot title&quot;]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="toolbox.plot.magic_plot_preset">
+<span class="sig-prename descclassname"><span class="pre">plot.</span></span><span class="sig-name descname"><span class="pre">magic_plot_preset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs_preset</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#toolbox.plot.magic_plot_preset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot generator wrapper, preconfigured.</p>
+<p>Your function feeds the data, the wrapper gives control over the plot
+to the user.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>doc_decorator: str, optional</strong></dt><dd><p>Append the docstring with the decorated parameters.</p>
+<p>By default, the global variable <cite>DOCSTRING_DECORATOR</cite> will be used.</p>
+</dd>
+<dt><strong>**kwargs_preset: dict</strong></dt><dd><p>Define presets for any keyword arguments accepted by <cite>Plot</cite>.</p>
+<p>Setting <cite>strict_preset=True</cite> prevents overriding the preset.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nd">@magic_plot_preset</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Data view&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">interactive</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">strict_preset</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">... </span><span class="k">def</span> <span class="nf">line</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">data</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">fig</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+<span class="gp">... </span><span class="p">):</span>
+<span class="gp">... </span>    <span class="n">fig</span><span class="o">.</span><span class="n">add_line</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="gp">...</span>
+<span class="gp">... </span><span class="n">line</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span><span class="mi">7</span><span class="p">],</span> <span class="n">xlabel</span><span class="o">=</span><span class="s2">&quot;X axis&quot;</span><span class="p">)</span>
+<span class="go">[matplotlib figure, &quot;Data view&quot;]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</section>
+<section id="notebookinteraction-parent-class">
+<h2><cite>NotebookInteraction</cite> Parent Class<a class="headerlink" href="#notebookinteraction-parent-class" title="Permalink to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="toolbox.plot.NotebookInteraction">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">toolbox.plot.</span></span><span class="sig-name descname"><span class="pre">NotebookInteraction</span></span><a class="headerlink" href="#toolbox.plot.NotebookInteraction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Parent class for automatic display in Jupyter Notebook.</p>
+<p>Calls the child’s <cite>show()._repr_html_()</cite> for automatic display
+in Jupyter Notebooks.</p>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">__call__</span></code>(*args, **kwargs)</p></td>
+<td><p>Calls the <cite>self.show()</cite> or <cite>self.plot()</cite> method.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="toolbox.plot.NotebookInteraction.JS_RENDER_WARNING">
+<span class="sig-name descname"><span class="pre">JS_RENDER_WARNING</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></em><a class="headerlink" href="#toolbox.plot.NotebookInteraction.JS_RENDER_WARNING" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="showdataarray-showdataset">
+<h2><cite>ShowDataArray</cite>, <cite>ShowDataset</cite><a class="headerlink" href="#showdataarray-showdataset" title="Permalink to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="toolbox.plot.ShowDataArray">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">toolbox.plot.</span></span><span class="sig-name descname"><span class="pre">ShowDataArray</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default_sel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default_isel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#toolbox.plot.ShowDataArray" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#toolbox.plot.NotebookInteraction" title="toolbox.plot.NotebookInteraction"><code class="xref py py-class docutils literal notranslate"><span class="pre">NotebookInteraction</span></code></a></p>
+<p>Automatically display a <cite>xarray.DataArray</cite> in a Jupyter notebook.</p>
+<p>If the DataArray has more than two dimensions, provide default
+sel or isel selectors to reduce to two dimensions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>data: xarray.DataArray</strong></dt><dd></dd>
+<dt><strong>default_sel: dict, optional</strong></dt><dd><p>Select a subset of a the DataArray by label.
+Can be a slice or the type of the dimension.</p>
+</dd>
+<dt><strong>default_isel: dict, optional</strong></dt><dd><p>Select a subset of a the DataArray by integer count.
+Can be a integer slice or an integer.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">__call__</span></code>(*args, **kwargs)</p></td>
+<td><p>Calls the <cite>self.show()</cite> or <cite>self.plot()</cite> method.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#toolbox.plot.ShowDataArray.plot" title="toolbox.plot.ShowDataArray.plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a>(*args[, sel, isel])</p></td>
+<td><p>Show the DataArray.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="toolbox.plot.ShowDataArray.JS_RENDER_WARNING">
+<span class="sig-name descname"><span class="pre">JS_RENDER_WARNING</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></em><a class="headerlink" href="#toolbox.plot.ShowDataArray.JS_RENDER_WARNING" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="toolbox.plot.ShowDataArray.plot">
+<span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">isel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#toolbox.plot.ShowDataArray.plot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Show the DataArray.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>sel: dict, optional</strong></dt><dd><p>Select a subset of a the DataArray by label.
+Can be a slice or the type of the dimension.
+If None, default_sel will be used.</p>
+</dd>
+<dt><strong>isel: dict, optional</strong></dt><dd><p>Select a subset of a the DataArray by integer count.
+Can be a integer slice or an integer.
+If None, default_isel will be used.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>Plot.fig</dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="toolbox.plot.ShowDataset">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">toolbox.plot.</span></span><span class="sig-name descname"><span class="pre">ShowDataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default_var</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default_sel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default_isel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#toolbox.plot.ShowDataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#toolbox.plot.ShowDataArray" title="toolbox.plot.ShowDataArray"><code class="xref py py-class docutils literal notranslate"><span class="pre">ShowDataArray</span></code></a></p>
+<p>Automatically display a <cite>xarray.Dataset</cite> in a Jupyter notebook.</p>
+<p>Provide a default variable to display from the Dataset for
+automatic display.
+If the Dataset has more than two dimensions, provide default
+sel or isel selectors to reduce to two dimensions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>data: xarray.DataArray</strong></dt><dd></dd>
+<dt><strong>default_var: str, optional</strong></dt><dd><p>Select the variable of the Dataset to display by label.</p>
+</dd>
+<dt><strong>default_sel: dict, optional</strong></dt><dd><p>Select a subset of a the Dataset by label.
+Can be a slice or the type of the dimension.</p>
+</dd>
+<dt><strong>default_isel: dict, optional</strong></dt><dd><p>Select a subset of a the Dataset by integer count.
+Can be a integer slice or an integer.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">__call__</span></code>(*args, **kwargs)</p></td>
+<td><p>Calls the <cite>self.show()</cite> or <cite>self.plot()</cite> method.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#toolbox.plot.ShowDataset.plot" title="toolbox.plot.ShowDataset.plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a>(*args[, var, sel, isel])</p></td>
+<td><p>Show a variable of the Dataset.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="toolbox.plot.ShowDataset.JS_RENDER_WARNING">
+<span class="sig-name descname"><span class="pre">JS_RENDER_WARNING</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></em><a class="headerlink" href="#toolbox.plot.ShowDataset.JS_RENDER_WARNING" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="toolbox.plot.ShowDataset.plot">
+<span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">var</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">isel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#toolbox.plot.ShowDataset.plot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Show a variable of the Dataset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>var: str, optional</strong></dt><dd><p>Select the variable of the Dataset to display by label.
+If None, default_var will be used.</p>
+</dd>
+<dt><strong>sel: dict, optional</strong></dt><dd><p>Select a subset of a the DataArray by label.
+Can be a slice or the type of the dimension.
+If None, default_sel will be used.</p>
+</dd>
+<dt><strong>isel: dict, optional</strong></dt><dd><p>Select a subset of a the DataArray by integer count.
+Can be a integer slice or an integer.
+If None, default_isel will be used.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>Plot.fig</dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#"><cite>toolbox.plot</cite> Documentation and API reference</a><ul>
+<li><a class="reference internal" href="#the-core-plot-class">The core <cite>Plot</cite> class</a><ul>
+<li><a class="reference internal" href="#toolbox.plot.Plot"><code class="docutils literal notranslate"><span class="pre">Plot</span></code></a><ul>
+<li><a class="reference internal" href="#toolbox.plot.Plot.JS_RENDER_WARNING"><code class="docutils literal notranslate"><span class="pre">Plot.JS_RENDER_WARNING</span></code></a></li>
+<li><a class="reference internal" href="#toolbox.plot.Plot.add_boxplot"><code class="docutils literal notranslate"><span class="pre">Plot.add_boxplot()</span></code></a></li>
+<li><a class="reference internal" href="#toolbox.plot.Plot.add_fill"><code class="docutils literal notranslate"><span class="pre">Plot.add_fill()</span></code></a></li>
+<li><a class="reference internal" href="#toolbox.plot.Plot.add_heatmap"><code class="docutils literal notranslate"><span class="pre">Plot.add_heatmap()</span></code></a></li>
+<li><a class="reference internal" href="#toolbox.plot.Plot.add_hist"><code class="docutils literal notranslate"><span class="pre">Plot.add_hist()</span></code></a></li>
+<li><a class="reference internal" href="#toolbox.plot.Plot.add_line"><code class="docutils literal notranslate"><span class="pre">Plot.add_line()</span></code></a></li>
+<li><a class="reference internal" href="#toolbox.plot.Plot.add_regression"><code class="docutils literal notranslate"><span class="pre">Plot.add_regression()</span></code></a></li>
+<li><a class="reference internal" href="#toolbox.plot.Plot.add_text"><code class="docutils literal notranslate"><span class="pre">Plot.add_text()</span></code></a></li>
+<li><a class="reference internal" href="#toolbox.plot.Plot.digest_color"><code class="docutils literal notranslate"><span class="pre">Plot.digest_color()</span></code></a></li>
+<li><a class="reference internal" href="#toolbox.plot.Plot.get_cycle_color"><code class="docutils literal notranslate"><span class="pre">Plot.get_cycle_color()</span></code></a></li>
+<li><a class="reference internal" href="#toolbox.plot.Plot.post_process"><code class="docutils literal notranslate"><span class="pre">Plot.post_process()</span></code></a></li>
+<li><a class="reference internal" href="#toolbox.plot.Plot.save"><code class="docutils literal notranslate"><span class="pre">Plot.save()</span></code></a></li>
+<li><a class="reference internal" href="#toolbox.plot.Plot.show"><code class="docutils literal notranslate"><span class="pre">Plot.show()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#one-line-plotting">One-line Plotting</a><ul>
+<li><a class="reference internal" href="#toolbox.plot.line"><code class="docutils literal notranslate"><span class="pre">plot.line()</span></code></a></li>
+<li><a class="reference internal" href="#toolbox.plot.hist"><code class="docutils literal notranslate"><span class="pre">plot.hist()</span></code></a></li>
+<li><a class="reference internal" href="#toolbox.plot.boxplot"><code class="docutils literal notranslate"><span class="pre">plot.boxplot()</span></code></a></li>
+<li><a class="reference internal" href="#toolbox.plot.heatmap"><code class="docutils literal notranslate"><span class="pre">plot.heatmap()</span></code></a></li>
+<li><a class="reference internal" href="#toolbox.plot.regression"><code class="docutils literal notranslate"><span class="pre">plot.regression()</span></code></a></li>
+<li><a class="reference internal" href="#toolbox.plot.fill"><code class="docutils literal notranslate"><span class="pre">plot.fill()</span></code></a></li>
+<li><a class="reference internal" href="#toolbox.plot.text"><code class="docutils literal notranslate"><span class="pre">plot.text()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#magic-plot-decorators"><cite>magic_plot</cite> decorators</a><ul>
+<li><a class="reference internal" href="#toolbox.plot.magic_plot"><code class="docutils literal notranslate"><span class="pre">plot.magic_plot()</span></code></a></li>
+<li><a class="reference internal" href="#toolbox.plot.magic_plot_preset"><code class="docutils literal notranslate"><span class="pre">plot.magic_plot_preset()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#notebookinteraction-parent-class"><cite>NotebookInteraction</cite> Parent Class</a><ul>
+<li><a class="reference internal" href="#toolbox.plot.NotebookInteraction"><code class="docutils literal notranslate"><span class="pre">NotebookInteraction</span></code></a><ul>
+<li><a class="reference internal" href="#toolbox.plot.NotebookInteraction.JS_RENDER_WARNING"><code class="docutils literal notranslate"><span class="pre">NotebookInteraction.JS_RENDER_WARNING</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#showdataarray-showdataset"><cite>ShowDataArray</cite>, <cite>ShowDataset</cite></a><ul>
+<li><a class="reference internal" href="#toolbox.plot.ShowDataArray"><code class="docutils literal notranslate"><span class="pre">ShowDataArray</span></code></a><ul>
+<li><a class="reference internal" href="#toolbox.plot.ShowDataArray.JS_RENDER_WARNING"><code class="docutils literal notranslate"><span class="pre">ShowDataArray.JS_RENDER_WARNING</span></code></a></li>
+<li><a class="reference internal" href="#toolbox.plot.ShowDataArray.plot"><code class="docutils literal notranslate"><span class="pre">ShowDataArray.plot()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#toolbox.plot.ShowDataset"><code class="docutils literal notranslate"><span class="pre">ShowDataset</span></code></a><ul>
+<li><a class="reference internal" href="#toolbox.plot.ShowDataset.JS_RENDER_WARNING"><code class="docutils literal notranslate"><span class="pre">ShowDataset.JS_RENDER_WARNING</span></code></a></li>
+<li><a class="reference internal" href="#toolbox.plot.ShowDataset.plot"><code class="docutils literal notranslate"><span class="pre">ShowDataset.plot()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="index.html"
+                          title="previous chapter">Welcome to toolbox’s documentation!</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/api_plot.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to toolbox’s documentation!"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">toolbox  documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href=""><cite>toolbox.plot</cite> Documentation and API reference</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2023, Janosch Jörg.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.2.
+    </div>
+  </body>
+</html>

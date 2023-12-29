@@ -1,0 +1,17 @@
+-r requirements.txt
+
+# developping
+jupyter
+
+# documentation
+sphinx
+numpydoc
+
+# flake8 checks
+flake8
+
+# testing
+pytest
+
+# editable
+-e .
