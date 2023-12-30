@@ -13,6 +13,9 @@ toolbox documentation and API reference
 
 Check out the `GitHub project page <https://github.com/janjoch/toolbox>`_ for further information.
 
+Documentation and API reference
+===============================
+
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
