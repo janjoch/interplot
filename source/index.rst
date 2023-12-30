@@ -3,8 +3,15 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to toolbox's documentation!
-===================================
+toolbox documentation and API reference
+=======================================
+
+|GitHub license|
+
+.. |GitHub license| image:: https://img.shields.io/badge/License-GPLv3-blue.svg
+   :target: https://www.gnu.org/licenses/gpl-3.0
+
+Check out the `GitHub project page <https://github.com/janjoch/toolbox>`_ for further information.
 
 .. toctree::
    :maxdepth: 2
