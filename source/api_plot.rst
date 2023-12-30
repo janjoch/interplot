@@ -6,9 +6,6 @@ Full API documentation of the `toolbox.plot` Python module.
 
 .. automodule:: toolbox.plot
 
-.. raw:: html
-   :file: gauss_plot_pty.html
-
 
 ---------------------
 The core `Plot` class
