@@ -159,7 +159,7 @@ def sum_nested(
             )
         The result of the lambda function will then be treated
         like the new type.
-        By default, toolbox.iter.CUSTOM_DIGESTION will be used:
+        By default, interplot.CUSTOM_DIGESTION will be used:
             Dicts will be digested to a list of their values.
 
     Returns

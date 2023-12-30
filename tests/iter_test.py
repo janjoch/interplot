@@ -1,4 +1,4 @@
-from toolbox import iter
+import interplot
 
 import pytest
 
@@ -12,7 +12,7 @@ from pandas import DataFrame, Series
     (1, 3.1415, (1, 2, 3), [4, 5, 6], {1: 3, 5: 3.1415}),
 )
 def test_repeat(input):
-    gen = iter.repeat(input).__iter__()
+    gen = interplot.repeat(input).__iter__()
     _ = next(gen)
     assert next(gen) == input
 

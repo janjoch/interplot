@@ -17,7 +17,7 @@
 
 # -- Project information -----------------------------------------------------
 
-project = 'toolbox'
+project = 'interplot'
 copyright = '2023, Janosch Jörg'
 author = 'Janosch Jörg'
 
