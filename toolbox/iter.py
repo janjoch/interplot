@@ -207,7 +207,21 @@ def sum_nested(
 
 
 def filter_nozip(iterable, no_iter_types=None, recursive=False, length=2):
-    """DEPRECATED."""
+    """
+    Filter patterns which should not be unpacked in zip.
+
+    Parameters
+    ----------
+    iterable
+    no_iter_types, tuple, optional
+        Types which, if found, indicate this iterable should not be unpacked.
+
+        Default: (`float`, `int`, `datetime`)
+
+    Returns
+    -------
+    either `iterable` or `repeat(iterable)`
+    """
     # input validation
     no_iter_types = (
         (float, int, datetime)
@@ -227,11 +241,15 @@ def filter_nozip(iterable, no_iter_types=None, recursive=False, length=2):
                 all_allowed = False
                 break
         if all_allowed:
-            return NoZip(iterable)
+            return repeat(iterable)
 
     # otherwise recursively
     if recursive:
-        return [filter_nozip(i, no_iter_types, length) for i in iterable]
+        return [
+            filter_nozip(i, no_iter_types, length=length)
+            for i
+            in iterable
+        ]
 
     # no hit
     return iterable
