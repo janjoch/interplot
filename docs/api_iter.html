@@ -146,6 +146,30 @@ Warning: Not supported in Python &lt; 3.10.</p>
 </dd></dl>
 
 </section>
+<section id="filter-nozip">
+<h2><cite>filter_nozip</cite><a class="headerlink" href="#filter-nozip" title="Permalink to this heading">¶</a></h2>
+<dl class="py method">
+<dt class="sig sig-object py" id="toolbox.iter.filter_nozip">
+<span class="sig-prename descclassname"><span class="pre">iter.</span></span><span class="sig-name descname"><span class="pre">filter_nozip</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">no_iter_types</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recursive</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#toolbox.iter.filter_nozip" title="Permalink to this definition">¶</a></dt>
+<dd><p>Filter patterns which should not be unpacked in zip.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>iterable</strong></dt><dd></dd>
+<dt><strong>no_iter_types, tuple, optional</strong></dt><dd><p>Types which, if found, indicate this iterable should not be unpacked.</p>
+<p>Default: (<cite>float</cite>, <cite>int</cite>, <cite>datetime</cite>)</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>either <cite>iterable</cite> or <cite>repeat(iterable)</cite></dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
 <section id="sum-nested">
 <h2><cite>sum_nested</cite><a class="headerlink" href="#sum-nested" title="Permalink to this heading">¶</a></h2>
 <dl class="py method">
@@ -195,8 +219,8 @@ By default, toolbox.iter.CUSTOM_DIGESTION will be used:</p>
 </dd></dl>
 
 </section>
-<section id="deprecated-legacy-methods">
-<h2>Deprecated legacy methods<a class="headerlink" href="#deprecated-legacy-methods" title="Permalink to this heading">¶</a></h2>
+<section id="deprecated">
+<h2>Deprecated<a class="headerlink" href="#deprecated" title="Permalink to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="toolbox.iter.NoZip">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">toolbox.iter.</span></span><span class="sig-name descname"><span class="pre">NoZip</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iterable</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#toolbox.iter.NoZip" title="Permalink to this definition">¶</a></dt>
@@ -219,12 +243,6 @@ By default, toolbox.iter.CUSTOM_DIGESTION will be used:</p>
 <dd><p>Return the original iterable variable.</p>
 </dd></dl>
 
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="toolbox.iter.filter_nozip">
-<span class="sig-prename descclassname"><span class="pre">iter.</span></span><span class="sig-name descname"><span class="pre">filter_nozip</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">no_iter_types</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recursive</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#toolbox.iter.filter_nozip" title="Permalink to this definition">¶</a></dt>
-<dd><p>DEPRECATED.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -287,16 +305,19 @@ By default, toolbox.iter.CUSTOM_DIGESTION will be used:</p>
 <li><a class="reference internal" href="#toolbox.iter.repeat"><code class="docutils literal notranslate"><span class="pre">iter.repeat()</span></code></a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#filter-nozip"><cite>filter_nozip</cite></a><ul>
+<li><a class="reference internal" href="#toolbox.iter.filter_nozip"><code class="docutils literal notranslate"><span class="pre">iter.filter_nozip()</span></code></a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#sum-nested"><cite>sum_nested</cite></a><ul>
 <li><a class="reference internal" href="#toolbox.iter.sum_nested"><code class="docutils literal notranslate"><span class="pre">iter.sum_nested()</span></code></a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#deprecated-legacy-methods">Deprecated legacy methods</a><ul>
+<li><a class="reference internal" href="#deprecated">Deprecated</a><ul>
 <li><a class="reference internal" href="#toolbox.iter.NoZip"><code class="docutils literal notranslate"><span class="pre">NoZip</span></code></a><ul>
 <li><a class="reference internal" href="#toolbox.iter.NoZip.release"><code class="docutils literal notranslate"><span class="pre">NoZip.release()</span></code></a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#toolbox.iter.filter_nozip"><code class="docutils literal notranslate"><span class="pre">iter.filter_nozip()</span></code></a></li>
 <li><a class="reference internal" href="#id0"><code class="docutils literal notranslate"><span class="pre">iter.repeat()</span></code></a></li>
 </ul>
 </li>

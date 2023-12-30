@@ -18,20 +18,24 @@ Full API documentation of the `toolbox.iter` Python module.
 
 .. automethod:: toolbox.iter.repeat
 
+--------------
+`filter_nozip`
+--------------
+
+.. automethod:: toolbox.iter.filter_nozip
+
 ------------
 `sum_nested`
 ------------
 
 .. automethod:: toolbox.iter.sum_nested
 
--------------------------
-Deprecated legacy methods
--------------------------
+----------
+Deprecated
+----------
 
 .. autoclass:: toolbox.iter.NoZip
     :members:
     :undoc-members:
-
-.. automethod:: toolbox.iter.filter_nozip
 
 .. automethod:: toolbox.iter.repeat

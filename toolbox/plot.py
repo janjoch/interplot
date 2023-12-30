@@ -20,7 +20,9 @@ Currently supported:
 Examples:
 
 >>> toolbox.plot.line([0,4,6,7], [1,2,4,8])
-[plotly figure]
+
+.. raw:: html
+     :file: ../source/plot_examples/basic_plot_pty.html
 
 >>> toolbox.plot.line(
 ...     [0,4,6,7],
@@ -30,7 +32,41 @@ Examples:
 ...     xlabel="X",
 ...     ylabel="Y",
 ... )
-[matplotlib figure "matploblib static figure"]
+
+.. image:: plot_examples/basic_plot_mpl.png
+    :alt: [matplotlib plot "Normally distributed Noise]
+
+>>> @tb.plot.magic_plot
+... def plot_lines(samples=100, n=10, label="sigma={0}, mu={1}", fig=None):
+...     \"\"\"
+...     Plot a line!
+...
+...     Parameters
+...     ----------
+...     samples: int, optional
+...         Default 100
+...     n: int, optional
+...         Number of traces.
+...         Default: 10
+...     label: str, optional
+...         Trace label. May contain {0} for sigma and {1} for mu values.
+...         Default: "sigma={0}, mu={1}"
+...     [decorator parameters will be added automatically]
+...     \"\"\"
+...     for i in range(1, n+1):
+...         fig.add_line(
+...             np.random.normal(i*10,i,samples), label=label.format(i, i*10))
+
+>>> plot_lines(samples=200, title="Normally distributed Noise")
+
+.. raw:: html
+     :file: ../source/plot_examples/gauss_plot_pty.html
+
+>>> plot_lines(
+...     samples=200, interactive=False, title="Normally distributed Noise")
+
+.. image:: plot_examples/gauss_plot_mpl.png
+    :alt: [matplotlib plot "Normally distributed Noise]
 """
 
 
@@ -495,7 +531,26 @@ class NotebookInteraction:
 
         # fall back to plot() method
         except AttributeError:
-            return self.JS_RENDER_WARNING + self.plot()._repr_html_()
+            try:
+                return self.JS_RENDER_WARNING + self.plot()._repr_html_()
+
+            # not implemented
+            except AttributeError:
+                raise NotImplementedError
+
+    def _repr_mimebundle_(self, *args, **kwargs):
+        # look for show() method
+        try:
+            return self.show()._repr_mimebundle_(*args, **kwargs)
+
+        # fall back to plot() method
+        except AttributeError:
+            try:
+                return self.plot()._repr_mimebundle_(*args, **kwargs)
+
+            # not implemented
+            except AttributeError:
+                raise NotImplementedError
 
 
 class Plot(NotebookInteraction):
@@ -1807,6 +1862,10 @@ class Plot(NotebookInteraction):
                 else self.save_config
             )
         return self.fig.show()
+
+    def _repr_mimebundle_(self, *args, **kwargs):
+        if self.interactive:
+            return self.fig._repr_mimebundle_(*args, **kwargs)
 
     def _repr_html_(self):
         if self.interactive:
