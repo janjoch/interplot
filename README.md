@@ -4,6 +4,9 @@ Janosch's small Python code snippets making life a bit easier.
 ## Licence
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
+## Docs
+See [toolbox.janjo.ch](https://toolbox.janjo.ch) for the documentation.
+
 ## Demo
 View on NBViewer: [![NBViewer](https://raw.githubusercontent.com/jupyter/design/master/logos/Badges/nbviewer_badge.svg)](https://nbviewer.org/github/janjoch/toolbox/tree/main/demo/)
 
