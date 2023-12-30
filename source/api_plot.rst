@@ -1,75 +1,83 @@
-==============================================
-`toolbox.plot` Documentation and API reference
-==============================================
+===========================================
+`interplot` Documentation and API reference
+===========================================
 
-Full API documentation of the `toolbox.plot` Python module.
+Full API documentation of the `interplot` Python module.
 
-.. automodule:: toolbox.plot
+.. automodule:: interplot.plot
 
 
 ---------------------
 The core `Plot` class
 ---------------------
 
-.. autoclass:: toolbox.plot.Plot
+.. autoclass:: interplot.Plot
     :members:
     :undoc-members:
     :inherited-members:
     :show-inheritance:
+    :private-members: _repr_html_, _repr_mimebundle_
+    :member-order: bysource
 
 
 -----------------
 One-line Plotting
 -----------------
 
-.. automethod:: toolbox.plot.line
+.. autofunction:: interplot.line
 
-.. automethod:: toolbox.plot.hist
+.. autofunction:: interplot.hist
 
-.. automethod:: toolbox.plot.boxplot
+.. autofunction:: interplot.boxplot
 
-.. automethod:: toolbox.plot.heatmap
+.. autofunction:: interplot.heatmap
 
-.. automethod:: toolbox.plot.regression
+.. autofunction:: interplot.regression
 
-.. automethod:: toolbox.plot.fill
+.. autofunction:: interplot.fill
 
-.. automethod:: toolbox.plot.text
+.. autofunction:: interplot.text
 
 
 -----------------------
 `magic_plot` decorators
 -----------------------
 
-.. automethod:: toolbox.plot.magic_plot
+.. autofunction:: interplot.magic_plot
 
-.. automethod:: toolbox.plot.magic_plot_preset
+.. autofunction:: interplot.magic_plot_preset
 
 
 ----------------------------------
 `NotebookInteraction` Parent Class
 ----------------------------------
 
-.. autoclass:: toolbox.plot.NotebookInteraction
+.. autoclass:: interplot.NotebookInteraction
     :members:
     :undoc-members:
     :inherited-members:
     :show-inheritance:
+    :private-members: _repr_html_, _repr_mimebundle_
+    :member-order: bysource
 
 
 ------------------------------
 `ShowDataArray`, `ShowDataset`
 ------------------------------
 
-.. autoclass:: toolbox.plot.ShowDataArray
+.. autoclass:: interplot.ShowDataArray
     :members:
     :undoc-members:
     :inherited-members:
     :show-inheritance:
+    :private-members: _repr_html_, _repr_mimebundle_
+    :member-order: bysource
 
-.. autoclass:: toolbox.plot.ShowDataset
+.. autoclass:: interplot.ShowDataset
     :members:
     :undoc-members:
     :inherited-members:
     :show-inheritance:
+    :private-members: _repr_html_, _repr_mimebundle_
+    :member-order: bysource
 

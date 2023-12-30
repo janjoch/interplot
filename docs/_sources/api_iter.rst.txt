@@ -1,41 +1,39 @@
-==============================================
-`toolbox.iter` Documentation and API reference
-==============================================
+=====================================================
+`interplot` zip tools Documentation and API reference
+=====================================================
 
-Full API documentation of the `toolbox.iter` Python module.
-
-.. automodule:: toolbox.iter
+.. automodule:: interplot.iter
 
 -----------
 `zip_smart`
 -----------
 
-.. automethod:: toolbox.iter.zip_smart
+.. autofunction:: interplot.zip_smart
 
 --------
 `repeat`
 --------
 
-.. automethod:: toolbox.iter.repeat
+.. autofunction:: interplot.repeat
 
 --------------
 `filter_nozip`
 --------------
 
-.. automethod:: toolbox.iter.filter_nozip
+.. autofunction:: interplot.filter_nozip
 
 ------------
 `sum_nested`
 ------------
 
-.. automethod:: toolbox.iter.sum_nested
+.. autofunction:: interplot.sum_nested
 
 ----------
 Deprecated
 ----------
 
-.. autoclass:: toolbox.iter.NoZip
+.. autoclass:: interplot.NoZip
     :members:
     :undoc-members:
 
-.. automethod:: toolbox.iter.repeat
+.. autofunction:: interplot.repeat

@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>toolbox.iter Documentation and API reference &#8212; toolbox  documentation</title>
+    <title>interplot zip tools Documentation and API reference &#8212; toolbox  documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
     <link rel="stylesheet" type="text/css" href="_static/classic.css?v=d534aad8" />
     
@@ -15,8 +15,7 @@
     
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="toolbox.plot Documentation and API reference" href="api_plot.html" />
-    <link rel="prev" title="Welcome to toolbox’s documentation!" href="index.html" /> 
+    <link rel="prev" title="interplot Documentation and API reference" href="api_plot.html" /> 
   </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
@@ -28,13 +27,10 @@
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="api_plot.html" title="toolbox.plot Documentation and API reference"
-             accesskey="N">next</a> |</li>
-        <li class="right" >
-          <a href="index.html" title="Welcome to toolbox’s documentation!"
+          <a href="api_plot.html" title="interplot Documentation and API reference"
              accesskey="P">previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="index.html">toolbox  documentation</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href=""><cite>toolbox.iter</cite> Documentation and API reference</a></li> 
+        <li class="nav-item nav-item-this"><a href=""><cite>interplot</cite> zip tools Documentation and API reference</a></li> 
       </ul>
     </div>  
 
@@ -43,15 +39,14 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <section id="toolbox-iter-documentation-and-api-reference">
-<h1><cite>toolbox.iter</cite> Documentation and API reference<a class="headerlink" href="#toolbox-iter-documentation-and-api-reference" title="Permalink to this heading">¶</a></h1>
-<p>Full API documentation of the <cite>toolbox.iter</cite> Python module.</p>
-<span class="target" id="module-toolbox.iter"></span><p>Tools to iterate Python objects.</p>
+  <section id="module-interplot.iter">
+<span id="interplot-zip-tools-documentation-and-api-reference"></span><h1><cite>interplot</cite> zip tools Documentation and API reference<a class="headerlink" href="#module-interplot.iter" title="Permalink to this heading">¶</a></h1>
+<p>Tools to iterate Python objects.</p>
 <section id="zip-smart">
 <h2><cite>zip_smart</cite><a class="headerlink" href="#zip-smart" title="Permalink to this heading">¶</a></h2>
-<dl class="py method">
-<dt class="sig sig-object py" id="toolbox.iter.zip_smart">
-<span class="sig-prename descclassname"><span class="pre">iter.</span></span><span class="sig-name descname"><span class="pre">zip_smart</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unpack_nozip</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strict</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#toolbox.iter.zip_smart" title="Permalink to this definition">¶</a></dt>
+<dl class="py function">
+<dt class="sig sig-object py" id="interplot.zip_smart">
+<span class="sig-prename descclassname"><span class="pre">interplot.</span></span><span class="sig-name descname"><span class="pre">zip_smart</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">iterables</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unpack_nozip</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strict</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#interplot.zip_smart" title="Permalink to this definition">¶</a></dt>
 <dd><p>Iterate over several iterables in parallel,
 producing tuples with an item from each one.</p>
 <p>Like Python’s builtin <cite>zip</cite> function,
@@ -107,9 +102,9 @@ Warning: Not supported in Python &lt; 3.10.</p>
 </section>
 <section id="repeat">
 <h2><cite>repeat</cite><a class="headerlink" href="#repeat" title="Permalink to this heading">¶</a></h2>
-<dl class="py method">
-<dt class="sig sig-object py" id="toolbox.iter.repeat">
-<span class="sig-prename descclassname"><span class="pre">iter.</span></span><span class="sig-name descname"><span class="pre">repeat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">unpack_nozip</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#toolbox.iter.repeat" title="Permalink to this definition">¶</a></dt>
+<dl class="py function">
+<dt class="sig sig-object py" id="interplot.repeat">
+<span class="sig-prename descclassname"><span class="pre">interplot.</span></span><span class="sig-name descname"><span class="pre">repeat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arg</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unpack_nozip</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#interplot.repeat" title="Permalink to this definition">¶</a></dt>
 <dd><p>A generator that always returns <cite>arg</cite>.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -148,9 +143,9 @@ Warning: Not supported in Python &lt; 3.10.</p>
 </section>
 <section id="filter-nozip">
 <h2><cite>filter_nozip</cite><a class="headerlink" href="#filter-nozip" title="Permalink to this heading">¶</a></h2>
-<dl class="py method">
-<dt class="sig sig-object py" id="toolbox.iter.filter_nozip">
-<span class="sig-prename descclassname"><span class="pre">iter.</span></span><span class="sig-name descname"><span class="pre">filter_nozip</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">no_iter_types</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recursive</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#toolbox.iter.filter_nozip" title="Permalink to this definition">¶</a></dt>
+<dl class="py function">
+<dt class="sig sig-object py" id="interplot.filter_nozip">
+<span class="sig-prename descclassname"><span class="pre">interplot.</span></span><span class="sig-name descname"><span class="pre">filter_nozip</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iterable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">no_iter_types</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recursive</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#interplot.filter_nozip" title="Permalink to this definition">¶</a></dt>
 <dd><p>Filter patterns which should not be unpacked in zip.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -172,9 +167,9 @@ Warning: Not supported in Python &lt; 3.10.</p>
 </section>
 <section id="sum-nested">
 <h2><cite>sum_nested</cite><a class="headerlink" href="#sum-nested" title="Permalink to this heading">¶</a></h2>
-<dl class="py method">
-<dt class="sig sig-object py" id="toolbox.iter.sum_nested">
-<span class="sig-prename descclassname"><span class="pre">iter.</span></span><span class="sig-name descname"><span class="pre">sum_nested</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iterable_types</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">custom_digestion</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#toolbox.iter.sum_nested" title="Permalink to this definition">¶</a></dt>
+<dl class="py function">
+<dt class="sig sig-object py" id="interplot.sum_nested">
+<span class="sig-prename descclassname"><span class="pre">interplot.</span></span><span class="sig-name descname"><span class="pre">sum_nested</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iterable_types</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">custom_digestion</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#interplot.sum_nested" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add up all values in iterable objects.</p>
 <p>Nested structures are added up recursively.
 In dictionaries, only the values are used.</p>
@@ -222,8 +217,8 @@ By default, toolbox.iter.CUSTOM_DIGESTION will be used:</p>
 <section id="deprecated">
 <h2>Deprecated<a class="headerlink" href="#deprecated" title="Permalink to this heading">¶</a></h2>
 <dl class="py class">
-<dt class="sig sig-object py" id="toolbox.iter.NoZip">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">toolbox.iter.</span></span><span class="sig-name descname"><span class="pre">NoZip</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iterable</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#toolbox.iter.NoZip" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="interplot.NoZip">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">interplot.</span></span><span class="sig-name descname"><span class="pre">NoZip</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iterable</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#interplot.NoZip" title="Permalink to this definition">¶</a></dt>
 <dd><p>DEPRECATED: use <cite>repeat</cite> instead.</p>
 <p>Avoid iteration in <cite>zip</cite> and <cite>zip_smart</cite></p>
 <p class="rubric">Methods</p>
@@ -232,22 +227,22 @@ By default, toolbox.iter.CUSTOM_DIGESTION will be used:</p>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">__call__</span></code>()</p></td>
 <td><p>Call self as a function.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#toolbox.iter.NoZip.release" title="toolbox.iter.NoZip.release"><code class="xref py py-obj docutils literal notranslate"><span class="pre">release</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#interplot.NoZip.release" title="interplot.NoZip.release"><code class="xref py py-obj docutils literal notranslate"><span class="pre">release</span></code></a>()</p></td>
 <td><p>Return the original iterable variable.</p></td>
 </tr>
 </tbody>
 </table>
 <dl class="py method">
-<dt class="sig sig-object py" id="toolbox.iter.NoZip.release">
-<span class="sig-name descname"><span class="pre">release</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#toolbox.iter.NoZip.release" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="interplot.NoZip.release">
+<span class="sig-name descname"><span class="pre">release</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#interplot.NoZip.release" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the original iterable variable.</p>
 </dd></dl>
 
 </dd></dl>
 
-<dl class="py method">
+<dl class="py function">
 <dt class="sig sig-object py" id="id0">
-<span class="sig-prename descclassname"><span class="pre">iter.</span></span><span class="sig-name descname"><span class="pre">repeat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">unpack_nozip</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#id0" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">interplot.</span></span><span class="sig-name descname"><span class="pre">repeat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arg</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unpack_nozip</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#id0" title="Permalink to this definition">¶</a></dt>
 <dd><p>A generator that always returns <cite>arg</cite>.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -296,29 +291,29 @@ By default, toolbox.iter.CUSTOM_DIGESTION will be used:</p>
   <div>
     <h3><a href="index.html">Table of Contents</a></h3>
     <ul>
-<li><a class="reference internal" href="#"><cite>toolbox.iter</cite> Documentation and API reference</a><ul>
+<li><a class="reference internal" href="#"><cite>interplot</cite> zip tools Documentation and API reference</a><ul>
 <li><a class="reference internal" href="#zip-smart"><cite>zip_smart</cite></a><ul>
-<li><a class="reference internal" href="#toolbox.iter.zip_smart"><code class="docutils literal notranslate"><span class="pre">iter.zip_smart()</span></code></a></li>
+<li><a class="reference internal" href="#interplot.zip_smart"><code class="docutils literal notranslate"><span class="pre">zip_smart()</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#repeat"><cite>repeat</cite></a><ul>
-<li><a class="reference internal" href="#toolbox.iter.repeat"><code class="docutils literal notranslate"><span class="pre">iter.repeat()</span></code></a></li>
+<li><a class="reference internal" href="#interplot.repeat"><code class="docutils literal notranslate"><span class="pre">repeat()</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#filter-nozip"><cite>filter_nozip</cite></a><ul>
-<li><a class="reference internal" href="#toolbox.iter.filter_nozip"><code class="docutils literal notranslate"><span class="pre">iter.filter_nozip()</span></code></a></li>
+<li><a class="reference internal" href="#interplot.filter_nozip"><code class="docutils literal notranslate"><span class="pre">filter_nozip()</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#sum-nested"><cite>sum_nested</cite></a><ul>
-<li><a class="reference internal" href="#toolbox.iter.sum_nested"><code class="docutils literal notranslate"><span class="pre">iter.sum_nested()</span></code></a></li>
+<li><a class="reference internal" href="#interplot.sum_nested"><code class="docutils literal notranslate"><span class="pre">sum_nested()</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#deprecated">Deprecated</a><ul>
-<li><a class="reference internal" href="#toolbox.iter.NoZip"><code class="docutils literal notranslate"><span class="pre">NoZip</span></code></a><ul>
-<li><a class="reference internal" href="#toolbox.iter.NoZip.release"><code class="docutils literal notranslate"><span class="pre">NoZip.release()</span></code></a></li>
+<li><a class="reference internal" href="#interplot.NoZip"><code class="docutils literal notranslate"><span class="pre">NoZip</span></code></a><ul>
+<li><a class="reference internal" href="#interplot.NoZip.release"><code class="docutils literal notranslate"><span class="pre">NoZip.release()</span></code></a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#id0"><code class="docutils literal notranslate"><span class="pre">iter.repeat()</span></code></a></li>
+<li><a class="reference internal" href="#id0"><code class="docutils literal notranslate"><span class="pre">repeat()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -328,13 +323,8 @@ By default, toolbox.iter.CUSTOM_DIGESTION will be used:</p>
   </div>
   <div>
     <h4>Previous topic</h4>
-    <p class="topless"><a href="index.html"
-                          title="previous chapter">Welcome to toolbox’s documentation!</a></p>
-  </div>
-  <div>
-    <h4>Next topic</h4>
     <p class="topless"><a href="api_plot.html"
-                          title="next chapter"><cite>toolbox.plot</cite> Documentation and API reference</a></p>
+                          title="previous chapter"><cite>interplot</cite> Documentation and API reference</a></p>
   </div>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
@@ -367,13 +357,10 @@ By default, toolbox.iter.CUSTOM_DIGESTION will be used:</p>
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="api_plot.html" title="toolbox.plot Documentation and API reference"
-             >next</a> |</li>
-        <li class="right" >
-          <a href="index.html" title="Welcome to toolbox’s documentation!"
+          <a href="api_plot.html" title="interplot Documentation and API reference"
              >previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="index.html">toolbox  documentation</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href=""><cite>toolbox.iter</cite> Documentation and API reference</a></li> 
+        <li class="nav-item nav-item-this"><a href=""><cite>interplot</cite> zip tools Documentation and API reference</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
