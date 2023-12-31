@@ -3,15 +3,43 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-interplot documentation and API reference
-=========================================
+.. mdinclude:: ../README.md
 
-|GitHub license|
 
-.. |GitHub license| image:: https://img.shields.io/badge/License-GPLv3-blue.svg
-   :target: https://www.gnu.org/licenses/gpl-3.0
+Example
+-------
 
-Check out the `GitHub project page <https://github.com/janjoch/interplot>`_ for further information.
+.. code-block:: python
+
+   >>> @interplot.magic_plot
+   ... def plot_lines(samples=100, n=10, label="sigma={0}, mu={1}", fig=None):
+   ...     """
+   ...     Plot Gaussian noise.
+   ...
+   ...     The function must accept the `fig` parameter from the decorator.
+   ...     """
+   ...     for i in range(1, n+1):
+   ...         fig.add_line(
+   ...             np.random.normal(i*10,i,samples),
+   ...             label=label.format(i, i*10),
+   ...         )
+
+
+.. code-block:: python
+
+   >>> plot_lines(samples=200, title="Normally distributed Noise")
+
+.. raw:: html
+     :file: ../source/plot_examples/gauss_plot_pty.html
+
+.. code-block:: python
+
+   >>> plot_lines(
+   ...     samples=200, interactive=False, title="Normally distributed Noise")
+
+.. image:: plot_examples/gauss_plot_mpl.png
+    :alt: [matplotlib plot "Normally distributed Noise]
+
 
 Documentation and API reference
 ===============================

@@ -6,6 +6,7 @@ jupyter
 # documentation
 sphinx
 numpydoc
+sphinx-mdinclude
 
 # flake8 checks
 flake8

@@ -39,23 +39,15 @@ Examples:
 >>> @interplot.magic_plot
 ... def plot_lines(samples=100, n=10, label="sigma={0}, mu={1}", fig=None):
 ...     \"\"\"
-...     Plot a line!
+...     Plot Gaussian noise.
 ...
-...     Parameters
-...     ----------
-...     samples: int, optional
-...         Default 100
-...     n: int, optional
-...         Number of traces.
-...         Default: 10
-...     label: str, optional
-...         Trace label. May contain {0} for sigma and {1} for mu values.
-...         Default: "sigma={0}, mu={1}"
-...     [decorator parameters will be added automatically]
+...     The function must accept the `fig` parameter from the decorator.
 ...     \"\"\"
 ...     for i in range(1, n+1):
 ...         fig.add_line(
-...             np.random.normal(i*10,i,samples), label=label.format(i, i*10))
+...             np.random.normal(i*10,i,samples),
+...             label=label.format(i, i*10),
+...         )
 
 >>> plot_lines(samples=200, title="Normally distributed Noise")
 
@@ -67,6 +59,36 @@ Examples:
 
 .. image:: plot_examples/gauss_plot_mpl.png
     :alt: [matplotlib plot "Normally distributed Noise]
+
+>>> fig = interplot.Plot(
+...     interactive=True,
+...     title="Everything Under Control",
+...     fig_size=(800, 500),
+...     rows=1,
+...     cols=2,
+...     shared_yaxes=True,
+...     save_fig=True,
+...     save_format=("html", "png"),
+...     # ...
+... )
+... fig.add_hist(np.random.normal(1, 0.5, 1000), row=0, col=0)
+... fig.add_boxplot(
+...     [
+...         np.random.normal(20, 5, 1000),
+...         np.random.normal(40, 8, 1000),
+...         np.random.normal(60, 5, 1000),
+...     ],
+...     row=0,
+...     col=1,
+... )
+... # ...
+... fig.post_process()
+... fig.show()
+saved figure at Everything-Under-Control.html
+saved figure at Everything-Under-Control.png
+
+.. raw:: html
+     :file: ../source/plot_examples/Everything-Under-Control.html
 """
 
 
@@ -197,10 +219,16 @@ DOCSTRING_DECORATOR = """
         The figure will only be saved on calling the instance's
         `.post_process()`.
 
-        If a directory (or True for local directory) is provided,
+        If a directory (or `True` for local directory) is provided,
         the filename will be automatically generated based on the title.
+
+        An iterable of multiple paths / filenames may be provided. In this case
+        the save command will be repeated for each element.
     save_format: str, default: None
-        Provide a format for the exported plot.
+        Provide a format for the exported plot, if not declared in `save_fig`.
+
+        An iterable of multiple formats may be provided. In this case
+        the save command will be repeated for each element.
     pty_update_layout: dict, default: None
         PLOTLY ONLY.
         Pass keyword arguments to plotly's
@@ -330,6 +358,13 @@ def _rewrite_docstring(doc_core, doc_decorator=None, kwargs_remove=()):
         r"(?P<params>(?P<indent_core>[ \t]*)Parameters[ \t]*"  # params header
         r"(?:\n(?!(?:[ \t]*\n)|(?:[ \t]*$)).*)*)"  # non-whitespace lines
         r"(?P<rest>(?:.*\n)*.*$)"
+    )
+    docstring_query = (
+        r"(?P<desc>(?:.*\n)*?)"  # desc
+        r"(?P<params>(?P<indent_core>[ \t]*)Parameters[ \t]*"  # params header
+        r"(?:.*\n)*?)"  # params content
+        r"(?P<rest>[ \t]*\n[ \t]*[A-Za-z0-9 \t]*[ \t]*\n[ \t]*---(?:.*\n)*.*)$"
+        # next chapter
     )
     match = re.match(docstring_query, doc_core)
     if match:
@@ -478,6 +513,29 @@ def _serialize_2d(core):
             return
 
         return core(self, x, y, label=label, **kwargs)
+
+    return wrapper
+
+
+def _serialize_save(core):
+    """Decorator to serialise saving multiple figures."""
+
+    @wraps(core)
+    def wrapper(self, path, export_format=None, **kwargs):
+        """
+        Wrapper function for a method.
+
+        """
+        if (
+            isinstance(path, ITERABLE_TYPES)
+            or isinstance(export_format, ITERABLE_TYPES)
+        ):
+            for path_, export_format_ in zip_smart(path, export_format):
+                self.save(path_, export_format_, **kwargs)
+
+            return
+
+        return core(self, path, export_format=export_format, **kwargs)
 
     return wrapper
 
@@ -1772,8 +1830,9 @@ class Plot(NotebookInteraction):
                 self.fig, self.ax = mpl_custom_func(self.fig, self.ax)
 
         if self.save_fig is not None:
-            self.save(self.save_fig, self.save_format)
+            self.save(self.save_fig, export_format=self.save_format)
 
+    @_serialize_save
     def save(self, path, export_format=None, print_confirm=True, **kwargs):
         """
         Save the plot.
@@ -1782,10 +1841,16 @@ class Plot(NotebookInteraction):
         ----------
         path: str, pathlib.Path, bool
             May point to a directory or a filename.
-            If only a directory is provided (or True for local directory),
+            If only a directory is provided (or `True` for local directory),
             the filename will automatically be generated from the plot title.
+
+            An iterable of multiple paths may be provided. In this case
+            the save command will be repeated for each element.
         export_format: str, optional
             If the format is not indicated in the file name, specify a format.
+
+            An iterable of multiple formats may be provided. In this case
+            the save command will be repeated for each element.
         print_confirm: bool, optional
             Print a confirmation message where the file has been saved.
             Default: True
@@ -1865,10 +1930,15 @@ class Plot(NotebookInteraction):
         return self.fig.show()
 
     def _repr_mimebundle_(self, *args, **kwargs):
+        self.post_process()
         if self.interactive:
             return self.fig._repr_mimebundle_(*args, **kwargs)
 
+        else:
+            raise NotImplementedError
+
     def _repr_html_(self):
+        self.post_process()
         if self.interactive:
             init_notebook_mode()
             return self.JS_RENDER_WARNING + self.fig._repr_html_()

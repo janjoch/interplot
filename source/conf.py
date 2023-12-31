@@ -30,6 +30,7 @@ author = 'Janosch Jörg'
 extensions = [
     "sphinx.ext.autodoc",
     "numpydoc",
+    "sphinx_mdinclude",
 ]
 
 # Add any paths that contain templates here, relative to this directory.

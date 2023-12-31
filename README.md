@@ -18,20 +18,30 @@ Currently supported:
 - color cycling
 
 
+## Resources
+
+- **Documentation:** https://interplot.janjo.ch
+- **Source Code:** https://github.com/janjoch/interplot
+
+
 ## Licence
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
-## Docs
-See [interplot.janjo.ch](https://interplot.janjo.ch) for the documentation.
 
 ## Demo
-View on NBViewer: [![NBViewer](https://raw.githubusercontent.com/jupyter/design/master/logos/Badges/nbviewer_badge.svg)](https://nbviewer.org/github/janjoch/interplot/tree/main/demo/)
 
-Try on Binder: [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/janjoch/interplot/HEAD)
+View on `NBViewer`:
+[![NBViewer](https://raw.githubusercontent.com/jupyter/design/master/logos/Badges/nbviewer_badge.svg)](https://nbviewer.org/github/janjoch/interplot/tree/main/demo/)
+
+
+Try on `Binder`:
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/janjoch/interplot/HEAD)
+
 
 ## Install
 ```pip install git+https://github.com/janjoch/interplot#egg=interplot```
 
+
 ### dev installation
-1. Navigate to interplot dir
+1. Navigate to `interplot` dir
 2. ```pip install -e .```
