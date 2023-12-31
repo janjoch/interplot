@@ -22,6 +22,7 @@ Currently supported:
 
 - **Documentation:** https://interplot.janjo.ch
 - **Source Code:** https://github.com/janjoch/interplot
+- **PyPI:** https://pypi.org/project/interplot/
 
 
 ## Licence
@@ -31,7 +32,7 @@ Currently supported:
 ## Demo
 
 View on `NBViewer`:
-[![NBViewer](https://raw.githubusercontent.com/jupyter/design/master/logos/Badges/nbviewer_badge.svg)](https://nbviewer.org/github/janjoch/interplot/tree/main/demo/)
+[![NBViewer](https://raw.githubusercontent.com/jupyter/design/master/logos/Badges/nbviewer_badge.svg)](https://nbviewer.org/github/janjoch/interplot/tree/main/)
 
 
 Try on `Binder`:
@@ -43,5 +44,6 @@ Try on `Binder`:
 
 
 ### dev installation
-1. Navigate to `interplot` dir
+1. ```git clone https://github.com/janjoch/interplot/tree/main```
+2. ```cd interplot```
 2. ```pip install -e .```

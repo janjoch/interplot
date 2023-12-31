@@ -14,5 +14,9 @@ flake8
 # testing
 pytest
 
+# deployment
+build
+twine
+
 # editable
 -e .
