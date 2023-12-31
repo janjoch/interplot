@@ -44,6 +44,6 @@ Try on `Binder`:
 
 
 ### dev installation
-1. ```git clone https://github.com/janjoch/interplot/tree/main```
+1. ```git clone https://github.com/janjoch/interplot```
 2. ```cd interplot```
 2. ```pip install -e .```

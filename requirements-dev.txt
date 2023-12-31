@@ -1,6 +1,6 @@
 -r requirements.txt
 
-# developping
+# development
 jupyter
 
 # documentation
