@@ -6,8 +6,85 @@
 .. mdinclude:: ../README.md
 
 
+Documentation and API reference
+===============================
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Contents:
+
+.. toctree::
+    :maxdepth: 2
+    :caption: interplot
+
+    api_plot
+
+.. toctree::
+    :maxdepth: 2
+    :caption: zip iteration helper functions
+
+    api_iter
+
+
 Example
 -------
+
+.. code-block:: python
+
+   >>> interplot.line([0,4,6,7], [1,2,4,8])
+
+.. raw:: html
+     :file: ../source/plot_examples/basic_plot_pty.html
+
+
+.. code-block:: python
+
+   >>> interplot.line(
+   ...     x=[0,4,6,7],
+   ...     y=[1,2,4,8],
+   ...     interactive=False,
+   ...     color="red",
+   ...     title="matplotlib static figure",
+   ...     xlabel="abscissa",
+   ...     ylabel="ordinate",
+   ... )
+
+.. image:: plot_examples/basic_plot_mpl.png
+    :alt: [matplotlib plot "Normally distributed Noise]
+
+
+.. code-block:: python
+
+   >>> fig = interplot.Plot(
+   ...     interactive=True,
+   ...     title="Everything Under Control",
+   ...     fig_size=(800, 500),
+   ...     rows=1,
+   ...     cols=2,
+   ...     shared_yaxes=True,
+   ...     save_fig=True,
+   ...     save_format=("html", "png"),
+   ...     # ...
+   ... )
+   ... fig.add_hist(np.random.normal(1, 0.5, 1000), row=0, col=0)
+   ... fig.add_boxplot(
+   ...     [
+   ...         np.random.normal(20, 5, 1000),
+   ...         np.random.normal(40, 8, 1000),
+   ...         np.random.normal(60, 5, 1000),
+   ...     ],
+   ...     row=0,
+   ...     col=1,
+   ... )
+   ... # ...
+   ... fig.post_process()
+   ... fig.show()
+   saved figure at Everything-Under-Control.html
+   saved figure at Everything-Under-Control.png
+
+.. raw:: html
+     :file: ../source/plot_examples/Everything-Under-Control.html
+
 
 .. code-block:: python
 
@@ -39,26 +116,6 @@ Example
 
 .. image:: plot_examples/gauss_plot_mpl.png
     :alt: [matplotlib plot "Normally distributed Noise]
-
-
-Documentation and API reference
-===============================
-
-.. toctree::
-   :maxdepth: 2
-   :caption: Contents:
-
-.. toctree::
-    :maxdepth: 2
-    :caption: interplot
-
-    api_plot
-
-.. toctree::
-    :maxdepth: 2
-    :caption: zip iteration helper functions
-
-    api_iter
 
 
 Indices and tables

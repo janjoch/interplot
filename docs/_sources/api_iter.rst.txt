@@ -36,4 +36,3 @@ Deprecated
     :members:
     :undoc-members:
 
-.. autofunction:: interplot.repeat

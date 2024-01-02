@@ -40,7 +40,7 @@ Try on `Binder`:
 
 
 ## Install
-```pip install git+https://github.com/janjoch/interplot#egg=interplot```
+```pip install interplot```
 
 
 ### dev installation

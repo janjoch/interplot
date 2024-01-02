@@ -25,12 +25,13 @@ Examples:
      :file: ../source/plot_examples/basic_plot_pty.html
 
 >>> interplot.line(
-...     [0,4,6,7],
-...     [1,2,4,8],
+...     x=[0,4,6,7],
+...     y=[1,2,4,8],
 ...     interactive=False,
-...     title="matploblib static figure",
-...     xlabel="X",
-...     ylabel="Y",
+...     color="red",
+...     title="matplotlib static figure",
+...     xlabel="abscissa",
+...     ylabel="ordinate",
 ... )
 
 .. image:: plot_examples/basic_plot_mpl.png
@@ -817,12 +818,16 @@ class Plot(NotebookInteraction):
                         self.ax[i_row, i_col].sharey(self.ax[i_row, 0])
 
             # axis labels
-            if isinstance(self.xlabel, ITERABLE_TYPES):
+            if isinstance(self.xlabel, ITERABLE_TYPES) or (
+                self.cols == 1 and self.rows == 1
+            ):
                 for text, i_col in zip_smart(self.xlabel, range(self.cols)):
                     self.ax[self.rows - 1, i_col].set_xlabel(text)
             else:
                 self.fig.supxlabel(self.xlabel)
-            if isinstance(self.ylabel, ITERABLE_TYPES):
+            if isinstance(self.ylabel, ITERABLE_TYPES) or (
+                self.cols == 1 and self.rows == 1
+            ):
                 for text, i_row in zip_smart(self.ylabel, range(self.rows)):
                     self.ax[i_row, 0].set_ylabel(text)
             else:
@@ -1872,6 +1877,11 @@ class Plot(NotebookInteraction):
         # auto-generate filename
         if path.is_dir():
             filename = self.title
+            if filename is None or str(filename) == "":
+                filename = "interplot_figure"
+            else:
+                filename = str(filename)
+
             for key, value in EXPORT_REPLACE.items():
                 filename = re.sub(key, value, filename)
             filename += "." + (
@@ -1930,7 +1940,6 @@ class Plot(NotebookInteraction):
         return self.fig.show()
 
     def _repr_mimebundle_(self, *args, **kwargs):
-        self.post_process()
         if self.interactive:
             return self.fig._repr_mimebundle_(*args, **kwargs)
 
@@ -1938,7 +1947,6 @@ class Plot(NotebookInteraction):
             raise NotImplementedError
 
     def _repr_html_(self):
-        self.post_process()
         if self.interactive:
             init_notebook_mode()
             return self.JS_RENDER_WARNING + self.fig._repr_html_()
