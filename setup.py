@@ -10,7 +10,7 @@ long_description = (this_directory / "README.md").read_text()
 
 setup(
     name='interplot',
-    version='0.1',
+    version='0.1.1',
     description=(
         "Create matplotlib/plotly hybrid plots with a few lines of code."
     ),
