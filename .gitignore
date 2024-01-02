@@ -162,8 +162,15 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
 
-# Apple .DS_Store
-.DS_Store
+# OS generated files
+.DS_Store*
+.VolumeIcon.icns
+.fseventsd
+Icon?
+.gdb_history
+ehthumbs.db
+Thumbs.db
+.directory
 
 # Jupyter Notebook playground
 /playground/
