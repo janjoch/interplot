@@ -1072,10 +1072,11 @@ class Plot(NotebookInteraction):
         # MATPLOTLIB
         return tuple(rgba)
 
+    @staticmethod
     def digest_marker(
-        self,
         marker,
         mode,
+        interactive,
         recursive=False,
         **pty_marker_kwargs,
     ):
@@ -1100,12 +1101,13 @@ class Plot(NotebookInteraction):
             otherwise None.
         """
         if isinstance(marker, ITERABLE_TYPES):
-            if self.interactive:
+            if interactive:
                 return dict(
                     symbol=[
-                        self.digest_marker(
+                        Plot.digest_marker(
                             marker=m,
                             mode=mode,
+                            interactive=interactive,
                             recursive=True,
                         )
                         for m
@@ -1113,22 +1115,23 @@ class Plot(NotebookInteraction):
                     ],
                     **pty_marker_kwargs,
                 )
-            return self.digest_marker(
+            return Plot.digest_marker(
                 marker=marker[0],
                 mode=mode,
+                interactive=interactive,
                 recursive=True,
             )
 
         if "markers" not in mode:
             return None
 
-        if isinstance(marker, int):
+        if isinstance(marker, (int, np.integer)):
             marker = PTY_MARKERS_LIST[marker]
 
         if marker is None:
             marker = PTY_MARKERS_LIST[0]
 
-        if self.interactive:
+        if interactive:
             if marker not in PTY_MARKERS_LIST:
                 marker = PTY_MARKERS.get(marker, marker)
             if recursive:
@@ -1180,8 +1183,8 @@ class Plot(NotebookInteraction):
             Else `x` will be an increment, starting from `0`.
             If a 2D numpy `array` is provided, the method call
             is looped for each column.
-        xerr, yerrfloat or array-like, shape(N,) or shape(2, N), optional
-            The errorbar sizes (matplotlib style):
+        x_error, y_error: number or shape(N,) or shape(2, N), optional
+            The errorbar sizes (`matplotlib` style):
                 - scalar: Symmetric +/- values for all data points.
                 - shape(N,): Symmetric +/-values for each data point.
                 - shape(2, N): Separate - and + values for each bar. First row
@@ -1189,18 +1192,22 @@ class Plot(NotebookInteraction):
                     upper errors.
                 - None: No errorbar.
         mode: str, optional
-            Options: lines / lines+markers / markers
+            Options: `lines` / `lines+markers` / `markers`
 
-            The default depends on the method called.
+            The default depends on the method called:
+                - `add_line`: `lines`
+                - `add_scatter`: `markers`
+                - `add_linescatter`: `lines+markers`
         line_style: str, optional
             Line style.
-            Options: solid, dashed, dotted, dashdot
-            Aliases: -, --, :, -.
+            Options: `solid`, `dashed`, `dotted`, `dashdot`
+
+            Aliases: `-`, `--`, `dash`, `:`, `dot`, `-.`
         marker: int or str, optional
             Marker style.
             If an integer is provided, it will be converted to the
             corresponding string marker using `plotly` numbering.
-            If not provided, the default marker "circle" is used.
+            If not provided, the default marker `circle` is used.
         marker_size: int, optional
         marker_line_width: int, optional
         marker_line_color: str, optional
@@ -1300,6 +1307,7 @@ class Plot(NotebookInteraction):
                     marker=self.digest_marker(
                         marker,
                         mode,
+                        interactive=self.interactive,
                         **pty_marker_kwargs,
                     ),
                     **self._get_plotly_legend_args(
@@ -1338,6 +1346,7 @@ class Plot(NotebookInteraction):
                 marker=self.digest_marker(
                     marker,
                     mode,
+                    interactive=self.interactive,
                 ),
                 markersize=marker_size,
                 markeredgewidth=marker_line_width,
