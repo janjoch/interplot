@@ -148,6 +148,101 @@ COLOR_CYCLE = [  # optimised for color vision deficiencies
     '#C85200', '#898989', '#A2C8EC', '#FFBC79', '#CFCFCF',
 ]
 
+PTY_MARKERS = {
+    ".": "circle",
+    "s": "square",
+    "D": "diamond",
+    "P": "cross",
+    "X": "x",
+    "^": "triangle-up",
+    "v": "triangle-down",
+    "<": "triangle-left",
+    ">": "triangle-right",
+    "triangle-ne": "triangle-ne",
+    "triangle-se": "triangle-se",
+    "triangle-sw": "triangle-sw",
+    "triangle-nw": "triangle-nw",
+    "p": "pentagon",
+    "h": "hexagon",
+    "H": "hexagon2",
+    "8": "octagon",
+    "*": "star",
+    "hexagram": "hexagram",
+    "star-triangle-up": "star-triangle-up",
+    "star-triangle-down": "star-triangle-down",
+    "star-square": "star-square",
+    "star-diamond": "star-diamond",
+    "d": "diamond-tall",
+    "diamond-wide": "diamond-wide",
+    "hourglass": "hourglass",
+    "bowtie": "bowtie",
+    "circle-cross": "circle-cross",
+    "circle-x": "circle-x",
+    "square-cross": "square-cross",
+    "square-x": "square-x",
+    "diamond-cross": "diamond-cross",
+    "diamond-x": "diamond-x",
+    "+": "cross-thin",
+    "x": "x-thin",
+    "asterisk": "asterisk",
+    "hash": "hash",
+    "2": "y-up",
+    "1": "y-down",
+    "3": "y-left",
+    "4": "y-right",
+    "_": "line-ew",
+    "|": "line-ns",
+    "line-ne": "line-ne",
+    "line-nw": "line-nw",
+    6: "arrow-up",
+    7: "arrow-down",
+    4: "arrow-left",
+    5: "arrow-right",
+    "arrow-bar-up": "arrow-bar-up",
+    "arrow-bar-down": "arrow-bar-down",
+    "arrow-bar-left": "arrow-bar-left",
+    "arrow-bar-right": "arrow-bar-right",
+    "arrow": "arrow",
+    "arrow-wide": "arrow-wide",
+}
+PTY_MARKERS_LIST = list(PTY_MARKERS.values())
+MPL_MARKERS = {
+    value: key for key, value in PTY_MARKERS.items()
+}
+MPL_MARKERS.update({  # next best matches
+    "triangle-nw": "^",
+    "triangle-ne": ">",
+    "triangle-se": "v",
+    "triangle-sw": "<",
+    "hexagram": "*",
+    "star-triangle-up": "^",
+    "star-triangle-down": "v",
+    "star-square": "s",
+    "star-diamond": "D",
+    "diamond-wide": "D",
+    "hourglass": "d",
+    "bowtie": "D",
+    "circle-cross": "+",
+    "circle-x": "x",
+    "cross-thin": "+",
+    "square-cross": "s",
+    "square-x": "s",
+    "diamond-cross": "D",
+    "diamond-x": "D",
+    "x-thin": "x",
+    "hash": "*",
+    "asterisk": "*",
+    "line-ne": "|",
+    "line-nw": "_",
+    "arrow-bar-up": 6,
+    "arrow-bar-down": 7,
+    "arrow-bar-left": 4,
+    "arrow-bar-right": 5,
+    "arrow": 6,
+    "arrow-wide": 6,
+})
+MPL_MARKERS_LIST = list(MPL_MARKERS.values())
+
 EXPORT_FORMAT = "png"
 EXPORT_REPLACE = {
     "[ ]?/[ ]?": "_",
@@ -963,11 +1058,84 @@ class Plot(NotebookInteraction):
         # MATPLOTLIB
         return tuple(rgba)
 
+    def digest_marker(
+        self,
+        marker,
+        mode,
+        recursive=False,
+        **pty_marker_kwargs,
+    ):
+        """
+        Digests the marker parameter based on the given mode.
+
+        Parameters:
+        ----------
+        marker: int or str
+            The marker to be digested. If an integer is provided, it is
+            converted to the corresponding string marker using `plotly`
+            numbering.
+            If not provided, the default marker "circle" is used.
+        mode: str
+            The mode to determine if markers should be used.
+            If no markers should be drawn, None is returned.
+
+        Returns:
+        -------
+        str or None
+            The digested marker string if markers are requested,
+            otherwise None.
+        """
+        if isinstance(marker, ITERABLE_TYPES):
+            if self.interactive:
+                return dict(
+                    symbol=[
+                        self.digest_marker(
+                            marker=m,
+                            mode=mode,
+                            recursive=True,
+                        )
+                        for m
+                        in marker
+                    ],
+                    **pty_marker_kwargs,
+                )
+            return self.digest_marker(
+                marker=marker[0],
+                mode=mode,
+                recursive=True,
+            )
+
+        if "markers" not in mode:
+            return None
+
+        if isinstance(marker, int):
+            marker = PTY_MARKERS_LIST[marker]
+
+        if marker is None:
+            marker = PTY_MARKERS_LIST[0]
+
+        if self.interactive:
+            if marker not in PTY_MARKERS_LIST:
+                marker = PTY_MARKERS.get(marker, marker)
+            if recursive:
+                return marker
+            return dict(
+                symbol=marker,
+                **pty_marker_kwargs,
+            )
+
+        return MPL_MARKERS.get(marker, marker)
+
     @_serialize_2d
     def add_line(
         self,
         x,
         y=None,
+        mode=None,
+        marker=None,
+        marker_size=None,
+        marker_line_width=1,
+        marker_line_color=None,
         label=None,
         show_legend=None,
         color=None,
@@ -975,6 +1143,7 @@ class Plot(NotebookInteraction):
         linewidth=None,
         row=0,
         col=0,
+        pty_marker_kwargs=None,
         kwargs_pty=None,
         kwargs_mpl=None,
         **kwargs,
@@ -986,7 +1155,7 @@ class Plot(NotebookInteraction):
         ----------
         x: array-like
         y: array-like, optional
-            If only `x` is defined, it will be assumed as y.
+            If only `x` is defined, it will be assumed as `y`.
             If a pandas `Series` is provided, the index will
             be taken as `x`.
             Else if a pandas `DataFrame` is provided, the method call
@@ -994,6 +1163,14 @@ class Plot(NotebookInteraction):
             Else `x` will be an increment, starting from `0`.
             If a 2D numpy `array` is provided, the method call
             is looped for each column.
+        mode: str, optional
+            Options: lines / lines+markers / markers
+        marker: int or str, optional
+            Marker style.
+            If an integer is provided, it will be converted to the
+            corresponding string marker using `plotly` numbering.
+            If not provided, the default marker "circle" is used.
+        marker_size: int, optional
         label: str, optional
             Trace label for legend.
         show_legend: bool, optional
@@ -1017,26 +1194,51 @@ class Plot(NotebookInteraction):
             If the plot contains a grid, provide the coordinates.
 
             Attention: Indexing starts with 0!
+        pty_marker_kwargs: dict, optional
+            PLOTLY ONLY.
+
+            Additional marker arguments.
         kwargs_pty, kwargs_mpl, **kwargs: optional
             Pass specific keyword arguments to the line core method.
         """
         self.element_count[row, col] += 1
+        mode = "lines" if mode is None else mode
+        color = self.digest_color(color, opacity)
 
         # PLOTLY
         if self.interactive:
             if kwargs_pty is None:
                 kwargs_pty = dict()
+            if pty_marker_kwargs is None:
+                pty_marker_kwargs = dict()
+            pty_marker_kwargs.update(
+                dict(
+                    size=marker_size,
+                    line_width=marker_line_width,
+                    line_color=(
+                        color
+                        if marker_line_color is None
+                        else self.digest_color(marker_line_color, 1)
+                    ),
+                )
+            )
             row += 1
             col += 1
             self.fig.add_trace(
                 go.Scatter(
                     x=x,
                     y=y,
+                    mode=mode,
+                    marker=self.digest_marker(
+                        marker,
+                        mode,
+                        **pty_marker_kwargs,
+                    ),
                     **self._get_plotly_legend_args(
                         label,
                         show_legend=show_legend,
                     ),
-                    marker_color=self.digest_color(color, opacity),
+                    marker_color=color,
                     line=dict(width=linewidth),
                     **kwargs_pty,
                     **kwargs,
@@ -1053,11 +1255,49 @@ class Plot(NotebookInteraction):
                 x,
                 y,
                 label=None if show_legend is False else label,
-                color=self.digest_color(color, opacity),
-                lw=linewidth,
+                color=color,
+                lw=linewidth if "lines" in mode else 0,
+                marker=self.digest_marker(
+                    marker,
+                    mode,
+                ),
+                markersize=marker_size,
+                markeredgewidth=marker_line_width,
+                markeredgecolor=(
+                    color
+                    if marker_line_color is None
+                    else self.digest_color(marker_line_color)
+                ),
                 **kwargs_mpl,
                 **kwargs,
             )
+
+    @wraps(add_line)
+    def add_scatter(
+        self,
+        *args,
+        mode="markers",
+        **kwargs,
+    ):
+        self.add_line(
+            *args,
+            mode=mode,
+            **kwargs,
+        )
+
+    @wraps(add_line)
+    def add_linescatter(
+        self,
+        *args,
+        mode="markers+lines",
+        **kwargs,
+    ):
+        # __doc__ = self.add_line.__doc__
+        self.add_line(
+            *args,
+            mode=mode,
+            **kwargs,
+        )
 
     def add_hist(
         self,
@@ -2144,6 +2384,26 @@ def line(
     **kwargs,
 ):
     fig.add_line(*args, **kwargs)
+
+
+@magic_plot
+@wraps(Plot.add_scatter)
+def scatter(
+    *args,
+    fig,
+    **kwargs,
+):
+    fig.add_scatter(*args, **kwargs)
+
+
+@magic_plot
+@wraps(Plot.add_linescatter)
+def linescatter(
+    *args,
+    fig,
+    **kwargs,
+):
+    fig.add_linescatter(*args, **kwargs)
 
 
 @magic_plot
