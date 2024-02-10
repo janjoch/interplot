@@ -148,6 +148,20 @@ COLOR_CYCLE = [  # optimised for color vision deficiencies
     '#C85200', '#898989', '#A2C8EC', '#FFBC79', '#CFCFCF',
 ]
 
+PTY_LINE_STYLES = {
+    "-": "solid",
+    "--": "dash",
+    "-.": "dashdot",
+    ":": "dot",
+    "solid": "solid",
+    "dashed": "dash",
+    "dashdot": "dashdot",
+    "dotted": "dot",
+}
+MPL_LINE_STYLES = {
+    value: key for key, value in PTY_LINE_STYLES.items()
+}
+
 PTY_MARKERS = {
     ".": "circle",
     "s": "square",
@@ -1131,7 +1145,10 @@ class Plot(NotebookInteraction):
         self,
         x,
         y=None,
+        x_error=None,
+        y_error=None,
         mode=None,
+        line_style="solid",
         marker=None,
         marker_size=None,
         marker_line_width=1,
@@ -1163,10 +1180,22 @@ class Plot(NotebookInteraction):
             Else `x` will be an increment, starting from `0`.
             If a 2D numpy `array` is provided, the method call
             is looped for each column.
+        xerr, yerrfloat or array-like, shape(N,) or shape(2, N), optional
+            The errorbar sizes (matplotlib style):
+                - scalar: Symmetric +/- values for all data points.
+                - shape(N,): Symmetric +/-values for each data point.
+                - shape(2, N): Separate - and + values for each bar. First row
+                    contains the lower errors, the second row contains the
+                    upper errors.
+                - None: No errorbar.
         mode: str, optional
             Options: lines / lines+markers / markers
 
             The default depends on the method called.
+        line_style: str, optional
+            Line style.
+            Options: solid, dashed, dotted, dashdot
+            Aliases: -, --, :, -.
         marker: int or str, optional
             Marker style.
             If an integer is provided, it will be converted to the
@@ -1230,12 +1259,43 @@ class Plot(NotebookInteraction):
                     ),
                 )
             )
+            if x_error is not None:
+                if not isinstance(x_error, ITERABLE_TYPES):
+                    x_error = np.array((x_error, ) * len(x))
+                if isinstance(x_error[0], ITERABLE_TYPES):
+                    x_error = dict(
+                        type="data",
+                        array=x_error[1],
+                        arrayminus=x_error[0],
+                    )
+                else:
+                    x_error = dict(
+                        type="data",
+                        array=x_error,
+                    )
+            if y_error is not None:
+                if not isinstance(y_error, ITERABLE_TYPES):
+                    y_error = np.array((y_error, ) * len(y))
+                if isinstance(y_error[0], ITERABLE_TYPES):
+                    y_error = dict(
+                        type="data",
+                        array=y_error[1],
+                        arrayminus=y_error[0],
+                    )
+                else:
+                    y_error = dict(
+                        type="data",
+                        array=y_error,
+                    )
             row += 1
             col += 1
+
             self.fig.add_trace(
                 go.Scatter(
                     x=x,
                     y=y,
+                    error_x=x_error,
+                    error_y=y_error,
                     mode=mode,
                     marker=self.digest_marker(
                         marker,
@@ -1247,7 +1307,10 @@ class Plot(NotebookInteraction):
                         show_legend=show_legend,
                     ),
                     marker_color=color,
-                    line=dict(width=linewidth),
+                    line=dict(
+                        width=linewidth,
+                        dash=PTY_LINE_STYLES.get(line_style, line_style),
+                    ),
                     **kwargs_pty,
                     **kwargs,
                 ),
@@ -1259,12 +1322,19 @@ class Plot(NotebookInteraction):
         else:
             if kwargs_mpl is None:
                 kwargs_mpl = dict()
-            self.ax[row, col].plot(
+            self.ax[row, col].errorbar(
                 x,
                 y,
+                xerr=x_error,
+                yerr=y_error,
                 label=None if show_legend is False else label,
                 color=color,
-                lw=linewidth if "lines" in mode else 0,
+                lw=linewidth,
+                linestyle=(
+                    MPL_LINE_STYLES.get(line_style, line_style)
+                    if "lines" in mode
+                    else "None"
+                ),
                 marker=self.digest_marker(
                     marker,
                     mode,
