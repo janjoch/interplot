@@ -26,6 +26,10 @@ One-line Plotting
 
 .. autofunction:: interplot.line
 
+.. autofunction:: interplot.scatter
+
+.. autofunction:: interplot.linescatter
+
 .. autofunction:: interplot.hist
 
 .. autofunction:: interplot.boxplot

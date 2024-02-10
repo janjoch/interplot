@@ -286,6 +286,8 @@ class LinearRegression(plot.NotebookInteraction):
         label_reg="regression",
         label_ci="confidence interval",
         label_pi="prediction interval",
+        line_style_reg="solid",
+        line_style_pi="dotted",
         color=None,
         color_data=None,
         color_reg=None,
@@ -334,13 +336,8 @@ class LinearRegression(plot.NotebookInteraction):
         if color is None:
             color = fig.get_cycle_color()
 
-        # data as dots
-        if fig.interactive:
-            kwargs_data.update(dict(mode="markers"))
-        else:
-            kwargs_data.update(dict(linestyle="", marker="o"))
-
-        fig.add_line(
+        # data points
+        fig.add_scatter(
             self.x,
             self.y,
             label=label_data,
@@ -349,9 +346,11 @@ class LinearRegression(plot.NotebookInteraction):
             **kwargs,
         )
 
+        # regression line
         fig.add_line(
             self.x2,
             self.y2,
+            line_style=line_style_reg,
             label=label_reg,
             color=color if color_reg is None else color_reg,
             **kwargs_reg,
@@ -378,6 +377,7 @@ class LinearRegression(plot.NotebookInteraction):
                 self.x2,
                 self.y2 + self.pi,
                 label=label_pi,
+                line_style=line_style_pi,
                 color=color if color_pi is None else color_pi,
                 kwargs_pty=dict(
                     legendgroup=legendgroup,
@@ -389,6 +389,7 @@ class LinearRegression(plot.NotebookInteraction):
                 self.x2,
                 self.y2 - self.pi,
                 label=label_pi,
+                line_style=line_style_pi,
                 show_legend=False,
                 color=color if color_pi is None else color_pi,
                 kwargs_pty=dict(
