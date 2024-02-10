@@ -1149,7 +1149,7 @@ class Plot(NotebookInteraction):
         **kwargs,
     ):
         """
-        Draw a line plot.
+        Draw a line or scatter plot.
 
         Parameters
         ----------
@@ -1165,12 +1165,20 @@ class Plot(NotebookInteraction):
             is looped for each column.
         mode: str, optional
             Options: lines / lines+markers / markers
+
+            The default depends on the method called.
         marker: int or str, optional
             Marker style.
             If an integer is provided, it will be converted to the
             corresponding string marker using `plotly` numbering.
             If not provided, the default marker "circle" is used.
         marker_size: int, optional
+        marker_line_width: int, optional
+        marker_line_color: str, optional
+            Can be hex, rgb(a) or any named color that is understood
+            by matplotlib.
+
+            Default: same color as `color`.
         label: str, optional
             Trace label for legend.
         show_legend: bool, optional
@@ -1292,7 +1300,6 @@ class Plot(NotebookInteraction):
         mode="markers+lines",
         **kwargs,
     ):
-        # __doc__ = self.add_line.__doc__
         self.add_line(
             *args,
             mode=mode,
