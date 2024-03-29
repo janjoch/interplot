@@ -561,72 +561,104 @@ def _adjust_indent(indent_decorator, indent_core, docstring):
     )
 
 
-def _serialize_2d(core):
+def _serialize_2d(serialize_mpl=True, serialize_pty=True):
     """Decorator to catch 2D arrays and other data types to unpack."""
 
-    @wraps(core)
-    def wrapper(self, x, y=None, label=None, **kwargs):
-        """
-        Wrapper function for a method.
+    def decorator(core):
 
-        If a pandas object is provided, the index will be used as x
-        if no x is provided.
-        Pandas column naming:
-            * If no label is set, the column name will be used by default.
-            * Manually set label string has priority.
-            * Label strings may contain a {} to insert the column name.
-            * Instead of setting a string, a callable may be provided to
-              reformat the column name. It must accept the column name
-              and return a string. E.g.:
+        @wraps(core)
+        def wrapper(self, x, y=None, label=None, **kwargs):
+            """
+            Wrapper function for a method.
 
-              > interplot.line(df, label=lambda n: n.strip())
+            If a pandas object is provided, the index will be used as x
+            if no x is provided.
+            Pandas column naming:
+                * If no label is set, the column name will be used by default.
+                * Manually set label string has priority.
+                * Label strings may contain a {} to insert the column name.
+                * Instead of setting a string, a callable may be provided to
+                reformat the column name. It must accept the column name
+                and return a string. E.g.:
 
-              > def capitalize(prefix="", suffix=""):
-              >     return lambda name: prefix + name.upper() + suffix
-              > interplot.line(df, label=capitalize("Cat. A: "))
-        xarray DataArrays will be convered to pandas and then handled
-        accordingly.
-        """
-        if y is None:
+                > interplot.line(df, label=lambda n: n.strip())
 
-            # xarray DataArray
-            if isinstance(x, xr_DataArray):
-                x = x.to_pandas()
+                > def capitalize(prefix="", suffix=""):
+                >     return lambda name: prefix + name.upper() + suffix
+                > interplot.line(df, label=capitalize("Cat. A: "))
+            xarray DataArrays will be convered to pandas and then handled
+            accordingly.
+            """
+            # reallocate x/y
+            if y is None:
 
-            # pd.Series
-            if isinstance(x, pd_Series):
-                index = x.index
-                y = x
-                x = index
-                if label is None:
-                    label = y.name
-                elif isinstance(label, str) and "{}" in label:
-                    label = label.format(y.name)
-                elif callable(label):
-                    label = label(y.name)
+                # xarray DataArray
+                if isinstance(x, xr_DataArray):
+                    x = x.to_pandas()
 
-            # pd.DataFrame: split columns to pd.Series and iterate
-            elif isinstance(x, pd_DataFrame):
-                for (_, series), label_ in zip_smart(x.items(), label):
-                    self.add_line(series, label=label_, **kwargs)
-                return
-
-            else:
-                if hasattr(x, 'copy') and callable(getattr(x, 'copy')):
-                    y = x.copy()
-                else:
+                # pd.Series
+                if isinstance(x, pd_Series):
+                    index = x.index
                     y = x
-                x = np.arange(len(y))
+                    x = index
+                    if label is None:
+                        label = y.name
+                    elif isinstance(label, str) and "{}" in label:
+                        label = label.format(y.name)
+                    elif callable(label):
+                        label = label(y.name)
 
-        # 2D np.array
-        if isinstance(y, np.ndarray) and len(y.shape) == 2:
-            for y_, label_ in zip_smart(y.T, label):
-                self.add_line(x, y_, label=label_, **kwargs)
-            return
+                # pd.DataFrame: split columns to pd.Series and iterate
+                elif isinstance(x, pd_DataFrame):
+                    if (
+                        self.interactive and serialize_pty
+                        or not self.interactive and serialize_mpl
+                    ):
+                        for (
+                            i, (_, series), label_
+                        ) in enumerate(zip_smart(x.items(), label)):
+                            core(
+                                self,
+                                series,
+                                label=label_,
+                                _serial_i=i,
+                                _serial_n=len(x.columns),
+                                **kwargs,
+                            )
+                        return
 
-        return core(self, x, y, label=label, **kwargs)
+                else:
+                    if hasattr(x, 'copy') and callable(getattr(x, 'copy')):
+                        y = x.copy()
+                    else:
+                        y = x
+                    x = np.arange(len(y))
 
-    return wrapper
+            # 2D np.array
+            if isinstance(y, np.ndarray) and len(y.shape) == 2:
+                if (
+                    self.interactive and serialize_pty
+                    or not self.interactive and serialize_mpl
+                ):
+                    for (
+                        i, (y_, label_)
+                    ) in enumerate(zip_smart(y.T, label)):
+                        core(
+                            self,
+                            x,
+                            y_,
+                            label=label_,
+                            _serial_i=i,
+                            _serial_n=y.shape[1],
+                            **kwargs,
+                        )
+                    return
+
+            return core(self, x, y, label=label, **kwargs)
+
+        return wrapper
+
+    return decorator
 
 
 def _serialize_save(core):
@@ -835,7 +867,7 @@ class Plot(NotebookInteraction):
                 legend_title=legend_title,
                 height=height,
                 width=width,
-                barmode="overlay",
+                barmode="group",
             )
 
             # axis limits
@@ -1163,7 +1195,7 @@ class Plot(NotebookInteraction):
 
         return MPL_MARKERS.get(marker, marker)
 
-    @_serialize_2d
+    @_serialize_2d()
     def add_line(
         self,
         x,
@@ -1183,6 +1215,8 @@ class Plot(NotebookInteraction):
         linewidth=None,
         row=0,
         col=0,
+        _serial_i=0,
+        _serial_n=1,
         pty_marker_kwargs=None,
         kwargs_pty=None,
         kwargs_mpl=None,
@@ -1404,6 +1438,146 @@ class Plot(NotebookInteraction):
             mode=mode,
             **kwargs,
         )
+
+    @_serialize_2d()
+    def add_bar(
+        self,
+        x,
+        y=None,
+        horizontal=False,
+        width=0.8,
+        label=None,
+        show_legend=None,
+        color=None,
+        opacity=None,
+        line_width=1,
+        line_color=None,
+        row=0,
+        col=0,
+        _serial_i=0,
+        _serial_n=1,
+        kwargs_pty=None,
+        kwargs_mpl=None,
+        **kwargs,
+    ):
+        """
+        Draw a bar plot.
+
+        Parameters
+        ----------
+        x: array-like
+        y: array-like, optional
+            If only `x` is defined, it will be assumed as `y`.
+            If a pandas `Series` is provided, the index will
+            be taken as `x`.
+            Else if a pandas `DataFrame` is provided, the method call
+            is looped for each column.
+            Else `x` will be an increment, starting from `0`.
+            If a 2D numpy `array` is provided, the method call
+            is looped for each column.
+        horizontal: bool, optional
+            If True, the bars are drawn horizontally. Default is False.
+            Warning: The `x` and `y` axis are swapped in this case.
+        label: str, optional
+            Trace label for legend.
+        show_legend: bool, optional
+            Whether to show the label in the legend.
+
+            By default, it will be shown if a label is defined.
+        color: str, optional
+            Trace color.
+
+            Can be hex, rgb(a) or any named color that is understood
+            by matplotlib.
+
+            Default: color is retrieved from `Plot.digest_color`,
+            which cycles through `COLOR_CYCLE`.
+        opacity: float, optional
+            Opacity (=alpha) of the fill.
+
+            By default, fallback to alpha value provided with color argument,
+            or 1.
+        row, col: int, optional
+            If the plot contains a grid, provide the coordinates.
+
+            Attention: Indexing starts with 0!
+        line_width: float, optional
+            The width of the bar outline. Default is 1.
+        line_color: str, optional
+            The color of the bar outline. This can be a named color or a tuple
+            specifying the RGB values. Default is None.
+        kwargs_pty, kwargs_mpl, **kwargs: optional
+            Pass specific keyword arguments to the line core method.
+        """
+        self.element_count[row, col] += 1
+        # PLOTLY
+        if self.interactive:
+            if kwargs_pty is None:
+                kwargs_pty = dict()
+
+            if horizontal:
+                x, y = y, x
+
+            row += 1
+            col += 1
+            self.fig.add_trace(
+                go.Bar(
+                    x=x,
+                    y=y,
+                    orientation="h" if horizontal else "v",
+                    **self._get_plotly_legend_args(
+                        label,
+                        show_legend=show_legend,
+                    ),
+                    marker_color=self.digest_color(color, opacity),
+                    marker=dict(
+                        line=dict(
+                            width=0 if line_color is None else line_width,
+                            color=(
+                                color
+                                if line_color is None
+                                else self.digest_color(line_color, 1)
+                            ),
+                        ),
+                    ),
+                    **kwargs_pty,
+                    **kwargs,
+                ),
+                row=row,
+                col=col,
+            )
+
+        else:
+            if kwargs_mpl is None:
+                kwargs_mpl = dict()
+            offset = ((2*_serial_i + 1) / 2 / _serial_n - 0.5) * width
+            (
+                self.ax[row, col].barh
+                if horizontal
+                else self.ax[row, col].bar
+            )(
+                np.arange(len(x)) + offset,
+                y,
+                (width / _serial_n),
+                color=self.digest_color(color, opacity),
+                edgecolor=(
+                    self.digest_color(line_color, 1)
+                    if line_color is not None
+                    else None
+                ),
+                linewidth=line_width,
+                label=None if show_legend is False else label,
+                **kwargs_mpl,
+                **kwargs,
+            )
+            (
+                self.ax[row, col].set_yticks
+                if horizontal
+                else self.ax[row, col].set_xticks
+            )(
+                np.arange(len(x)),
+                x,
+            )
 
     def add_hist(
         self,
@@ -2530,6 +2704,16 @@ def linescatter(
     **kwargs,
 ):
     fig.add_linescatter(*args, **kwargs)
+
+
+@magic_plot
+@wraps(Plot.add_bar)
+def bar(
+    *args,
+    fig,
+    **kwargs,
+):
+    fig.add_bar(*args, **kwargs)
 
 
 @magic_plot

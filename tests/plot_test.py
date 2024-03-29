@@ -135,6 +135,13 @@ def test_complex_plot(interactive):
     fig.add_linescatter((20, 50, 80), (0, 20, 40), marker="*", label="line 2")
     fig.add_text(50, 10, "some\nannotation", color="red")
 
+    fig.add_bar(
+        ("f", "g", "h", "a"), (1, 2, 5, 2), horizontal=True, col=1,
+        label="secondary", color="black")
+    fig.add_bar(
+        ("f", "g", "h", "a"), (1, 2, 5, 2), label="styling", color=None,
+        line_width=10, line_color="blue")
+
     fig.add_hist(y=np.random.normal(0, 10, 1000), row=0, col=1,
                  label="hist 1, horizontal", bins=40)
 
