@@ -98,6 +98,7 @@ from warnings import warn
 from pathlib import Path
 from functools import wraps
 from datetime import datetime
+from io import BytesIO
 
 import numpy as np
 
@@ -135,7 +136,7 @@ def init_notebook_mode(connected=False):
 # if imported in notebook, init plotly notebook mode
 try:
     __IPYTHON__  # type: ignore
-    from IPython.core.display import display_html
+    from IPython.core.display import display_html, display_png
     CALLED_FROM_NOTEBOOK = True
 except NameError:
     CALLED_FROM_NOTEBOOK = False
@@ -267,6 +268,7 @@ EXPORT_REPLACE = {
     r"<\s*br\s*/?\s*>": "_",
 }
 PTY_CONFIG = dict(
+    displayModeBar=True,
     displaylogo=False,
 )
 
@@ -941,6 +943,24 @@ class Plot(NotebookInteraction):
                     self.ax[i_row, 0].set_ylabel(text)
             else:
                 self.fig.supylabel(self.ylabel)
+
+    @staticmethod
+    def init(fig, *args, **kwargs):
+        """
+        Initialize a Plot instance, if not already initialized.
+
+        Parameters
+        ----------
+        fig: Plot or any
+            If fig is a Plot instance, return it.
+            Otherwise, create a new Plot instance.
+        *args, **kwargs: any
+            Passed to Plot constructor.
+        """
+        if isinstance(fig, Plot):
+            return fig
+        else:
+            return Plot(*args, **kwargs)
 
     @staticmethod
     def _get_plotly_legend_args(label, default_label=None, show_legend=None):
@@ -2255,9 +2275,19 @@ class Plot(NotebookInteraction):
 
     def show(self):
         """Show the plot."""
+        if CALLED_FROM_NOTEBOOK:
+            if self.interactive:
+                init_notebook_mode()
+                display_html(self.JS_RENDER_WARNING, raw=True)
+                return self.fig.show(
+                    config=PTY_CONFIG
+                    if self.save_config is None
+                    else self.save_config
+                )
+            display_png(self._repr_png_(), raw=True)
+            return
+
         if self.interactive:
-            init_notebook_mode()
-            display_html(self.JS_RENDER_WARNING, raw=True)
             return self.fig.show(
                 config=PTY_CONFIG
                 if self.save_config is None
@@ -2276,7 +2306,17 @@ class Plot(NotebookInteraction):
         if self.interactive:
             init_notebook_mode()
             return self.JS_RENDER_WARNING + self.fig._repr_html_()
-        return self.fig.show()
+        # return self.fig.show()
+        raise NotImplementedError
+        # return self.fig._repr_html_()
+
+    def _repr_png_(self):
+        if self.interactive:
+            raise NotImplementedError
+        bio = BytesIO()
+        self.fig.savefig(bio, format="png")
+        bio.seek(0)
+        return bio.read()
 
 
 def magic_plot(core, doc_decorator=None):
