@@ -12,7 +12,7 @@ setup(
     name='interplot',
     version='0.1.2',
     description=(
-        "Create matplotlib/plotly hybrid plots with a few lines of code."
+        "Create matplotlib and plotly charts with the same few lines of code."
     ),
     long_description=long_description,
     long_description_content_type='text/markdown',

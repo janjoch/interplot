@@ -121,7 +121,8 @@ from interplot import arraytools
 
 def init_notebook_mode(connected=False):
     """
-    Initialize plotly.js in the browser if not already done.
+    Initialize plotly.js in the browser if not already done,
+    and deactivate matplotlib auto-display.
 
     Parameters
     ----------
@@ -131,6 +132,11 @@ def init_notebook_mode(connected=False):
         Default: False
     """
     plotly.offline.init_notebook_mode(connected=connected)
+
+    # turn off matplotlib auto-display
+    plt.plot()
+    plt.close()
+    plt.ioff()
 
 
 # if imported in notebook, init plotly notebook mode
@@ -142,7 +148,6 @@ except NameError:
     CALLED_FROM_NOTEBOOK = False
 if CALLED_FROM_NOTEBOOK:
     init_notebook_mode()
-
 
 COLOR_CYCLE = [  # optimised for color vision deficiencies
     '#006BA4', '#FF800E', '#ABABAB', '#595959', '#5F9ED1',
@@ -561,7 +566,7 @@ def _adjust_indent(indent_decorator, indent_core, docstring):
     )
 
 
-def _serialize_2d(serialize_mpl=True, serialize_pty=True):
+def _serialize_2d(serialize_pty=True, serialize_mpl=True):
     """Decorator to catch 2D arrays and other data types to unpack."""
 
     def decorator(core):
@@ -598,9 +603,7 @@ def _serialize_2d(serialize_mpl=True, serialize_pty=True):
 
                 # pd.Series
                 if isinstance(x, pd_Series):
-                    index = x.index
-                    y = x
-                    x = index
+                    x, y = x.index, x
                     if label is None:
                         label = y.name
                     elif isinstance(label, str) and "{}" in label:
@@ -615,9 +618,12 @@ def _serialize_2d(serialize_mpl=True, serialize_pty=True):
                         or not self.interactive and serialize_mpl
                     ):
                         for (
-                            i, (_, series), label_
+                            i, ((_, series), label_)
                         ) in enumerate(zip_smart(x.items(), label)):
-                            core(
+                            _serialize_2d(
+                                serialize_pty=serialize_pty,
+                                serialize_mpl=serialize_mpl,
+                            )(core)(
                                 self,
                                 series,
                                 label=label_,
@@ -643,7 +649,10 @@ def _serialize_2d(serialize_mpl=True, serialize_pty=True):
                     for (
                         i, (y_, label_)
                     ) in enumerate(zip_smart(y.T, label)):
-                        core(
+                        _serialize_2d(
+                            serialize_pty=serialize_pty,
+                            serialize_mpl=serialize_mpl,
+                        )(core)(
                             self,
                             x,
                             y_,
@@ -1467,17 +1476,20 @@ class Plot(NotebookInteraction):
         ----------
         x: array-like
         y: array-like, optional
-            If only `x` is defined, it will be assumed as `y`.
+            If only either `x` or `y` is defined, it will be assumed
+            as the size of the bar, regardless whether it's horizontal
+            or vertical.
+            If both `x` and `y` are defined, `x` will be taken as the
+            position of the bar, and `y` as the size, regardless of
+            the orientation.
             If a pandas `Series` is provided, the index will
-            be taken as `x`.
+            be taken as the position.
             Else if a pandas `DataFrame` is provided, the method call
             is looped for each column.
-            Else `x` will be an increment, starting from `0`.
             If a 2D numpy `array` is provided, the method call
-            is looped for each column.
+            is looped for each column, with the index as the position.
         horizontal: bool, optional
             If True, the bars are drawn horizontally. Default is False.
-            Warning: The `x` and `y` axis are swapped in this case.
         label: str, optional
             Trace label for legend.
         show_legend: bool, optional
@@ -2555,31 +2567,31 @@ def magic_plot(core, doc_decorator=None):
         **kwargs,
     ):
         # init Plot
-        if fig is None:
-            fig = Plot(
-                interactive=interactive,
-                rows=rows,
-                cols=cols,
-                title=title,
-                xlabel=xlabel,
-                ylabel=ylabel,
-                xlim=xlim,
-                ylim=ylim,
-                shared_xaxes=shared_xaxes,
-                shared_yaxes=shared_yaxes,
-                column_widths=column_widths,
-                row_heights=row_heights,
-                fig_size=fig_size,
-                dpi=dpi,
-                legend_loc=legend_loc,
-                legend_title=legend_title,
-                save_fig=save_fig,
-                save_format=save_format,
-                save_config=save_config,
-                pty_update_layout=pty_update_layout,
-                pty_custom_func=pty_custom_func,
-                mpl_custom_func=mpl_custom_func,
-            )
+        fig = Plot.init(
+            fig,
+            interactive=interactive,
+            rows=rows,
+            cols=cols,
+            title=title,
+            xlabel=xlabel,
+            ylabel=ylabel,
+            xlim=xlim,
+            ylim=ylim,
+            shared_xaxes=shared_xaxes,
+            shared_yaxes=shared_yaxes,
+            column_widths=column_widths,
+            row_heights=row_heights,
+            fig_size=fig_size,
+            dpi=dpi,
+            legend_loc=legend_loc,
+            legend_title=legend_title,
+            save_fig=save_fig,
+            save_format=save_format,
+            save_config=save_config,
+            pty_update_layout=pty_update_layout,
+            pty_custom_func=pty_custom_func,
+            mpl_custom_func=mpl_custom_func,
+        )
 
         # execute core method
         core(*args, fig=fig, **kwargs)

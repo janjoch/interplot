@@ -30,6 +30,8 @@ One-line Plotting
 
 .. autofunction:: interplot.linescatter
 
+.. autofunction:: interplot.bar
+
 .. autofunction:: interplot.hist
 
 .. autofunction:: interplot.boxplot
