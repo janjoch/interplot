@@ -32,7 +32,7 @@ Supported
         [plotly line figure]
 
         >>> interplot.hist(np.random.normal(40, 8, 1000), interactive=False)
-        [plotly hist figure]
+        [matplotlib hist figure]
 
         >>> interplot.boxplot(
         >>>     [
