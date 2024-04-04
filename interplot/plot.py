@@ -1280,6 +1280,8 @@ class Plot(NotebookInteraction):
             is looped for each column, with the index as the position.
         horizontal: bool, optional
             If True, the bars are drawn horizontally. Default is False.
+        width: float, optional
+            Relative width of the bar. Must be in the range (0, 1).
         label: str, optional
             Trace label for legend.
         show_legend: bool, optional
@@ -1299,15 +1301,17 @@ class Plot(NotebookInteraction):
 
             By default, fallback to alpha value provided with color argument,
             or 1.
-        row, col: int, optional
-            If the plot contains a grid, provide the coordinates.
-
-            Attention: Indexing starts with 0!
         line_width: float, optional
             The width of the bar outline. Default is 1.
         line_color: str, optional
             The color of the bar outline. This can be a named color or a tuple
-            specifying the RGB values. Default is None.
+            specifying the RGB values.
+
+            By default, the same color as the fill is used.
+        row, col: int, optional
+            If the plot contains a grid, provide the coordinates.
+
+            Attention: Indexing starts with 0!
         kwargs_pty, kwargs_mpl, **kwargs: optional
             Pass specific keyword arguments to the line core method.
         """
