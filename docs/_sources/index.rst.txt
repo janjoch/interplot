@@ -20,6 +20,12 @@ Documentation and API reference
     api_plot
 
 .. toctree::
+    :maxdepth: 1
+    :caption: interplot preconfiguration
+
+    api_conf
+
+.. toctree::
     :maxdepth: 2
     :caption: zip iteration helper functions
 
@@ -50,7 +56,7 @@ Example
    ... )
 
 .. image:: plot_examples/basic_plot_mpl.png
-    :alt: [matplotlib plot "Normally distributed Noise]
+    :alt: [matplotlib plot "Normally distributed Noise"]
 
 
 .. code-block:: python

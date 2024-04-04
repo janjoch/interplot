@@ -3,6 +3,7 @@
 import pkg_resources
 
 __all__ = [  # noqa F405
+    "conf",
     "arraytools",
     "iter",
     "plot",

@@ -1,0 +1,36 @@
+============================
+`interplot` preconfiguration
+============================
+
+.. automodule:: interplot.conf
+
+
+-----------
+`VARIABLES`
+-----------
+
+.. autovariable:: interplot.conf.INTERACTIVE
+
+.. autovariable:: interplot.conf.COLOR_CYCLE
+
+.. autovariable:: interplot.conf.DPI
+
+.. autovariable:: interplot.conf.PTY_FIG_SIZE
+
+.. autovariable:: interplot.conf.MPL_FIG_SIZE
+
+.. autovariable:: interplot.conf.EXPORT_FORMAT
+
+.. autovariable:: interplot.conf.EXPORT_REPLACE
+
+.. autovariable:: interplot.conf.PTY_CONFIG
+
+.. autovariable:: interplot.conf.PTY_LINE_STYLES
+
+.. autovariable:: interplot.conf.MPL_LINE_STYLES
+
+.. autovariable:: interplot.conf.PTY_MARKERS
+
+.. autovariable:: interplot.conf.PTY_MARKERS_LIST
+
+.. autovariable:: interplot.conf.MPL_MARKERS
