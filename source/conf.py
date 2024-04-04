@@ -31,6 +31,7 @@ extensions = [
     "sphinx.ext.autodoc",
     "numpydoc",
     "sphinx_mdinclude",
+    'sphinx_toolbox.more_autodoc.variables',
 ]
 
 # Add any paths that contain templates here, relative to this directory.

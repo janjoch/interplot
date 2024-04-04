@@ -1,9 +1,12 @@
 # interplot
-Create `matplotlib/plotly` hybrid plots with a few lines of code.
 
-It combines the best of the `matplotlib` and the `plotly` worlds through
-a unified, flat API.
-All the necessary boilerplate code is contained in this module.
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0) [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/janjoch/interplot/HEAD) [![NBViewer](https://raw.githubusercontent.com/jupyter/design/master/logos/Badges/nbviewer_badge.svg)](https://nbviewer.org/github/janjoch/interplot/tree/main/)
+
+Create `matplotlib` and `plotly` charts with the same few lines of code.
+
+It combines the best of the `matplotlib` and the `plotly` worlds through a unified, flat API.
+
+Switch between `matplotlib` and `plotly` with the single keyword `interactive`. All the necessary boilerplate code to translate between the packages is contained in this module.
 
 Currently supported building blocks:
 
@@ -11,6 +14,7 @@ Currently supported building blocks:
     - `line`
     - `scatter`
     - `linescatter`
+- bar charts `bar`
 - histogram `hist`
 - boxplot `boxplot`
 - heatmap `heatmap`
@@ -99,6 +103,7 @@ Supported
 ## Resources
 
 - **Documentation:** https://interplot.janjo.ch
+- **Demo Notebooks:** https://nbviewer.org/github/janjoch/interplot/tree/main/demo/
 - **Source Code:** https://github.com/janjoch/interplot
 - **PyPI:** https://pypi.org/project/interplot/
 
@@ -125,3 +130,8 @@ Try on `Binder`:
 1. ```git clone https://github.com/janjoch/interplot```
 2. ```cd interplot```
 2. ```pip install -e .```
+
+
+## Contribute
+
+Ideas, bug reports/fixes, feature requests and code submissions are very welcome! Please write to [janjo@duck.com](mailto:janjo@duck.com) or directly into a pull request.

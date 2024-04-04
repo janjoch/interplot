@@ -37,12 +37,12 @@ def repeat(arg, unpack_nozip=True):
 
     Examples
     --------
-    >>> for a, b, c, d, e in zip_smart(
+    >>> for a, b, c, d, e in interplot.zip_smart(
     ...     ("A", "B", "C", "D"),
     ...     True,
-    ...     [1, 2, 3, 4],
+    ...     [1, 2, 3, 4, 5],  # notice the extra element won't be unpacked
     ...     "always the same",
-    ...     repeat((1, 2)),
+    ...     interplot.repeat((1, 2)),
     ... ):
     ...     print(a, b, c, d, e)
     A True 1 always the same (1, 2)
@@ -93,12 +93,12 @@ def zip_smart(*iterables, unpack_nozip=True, strict=False):
 
     Examples
     --------
-    >>> for a, b, c, d, e in zip_smart(
+    >>> for a, b, c, d, e in interplot.zip_smart(
     ...     ("A", "B", "C", "D"),
     ...     True,
-    ...     [1, 2, 3, 4],
+    ...     [1, 2, 3, 4, 5],  # notice the extra element won't be unpacked
     ...     "always the same",
-    ...     repeat((1, 2)),
+    ...     interplot.repeat((1, 2)),
     ... ):
     ...     print(a, b, c, d, e)
     A True 1 always the same (1, 2)
@@ -257,12 +257,14 @@ def filter_nozip(iterable, no_iter_types=None, recursive=False, length=2):
 
 class NoZip:
     """
-    DEPRECATED: use `repeat` instead.
+    DEPRECATED: use `interplot.repeat` instead.
 
-    Avoid iteration in `zip` and `zip_smart`"""
+    Avoid iteration in `zip` and `interplot.zip_smart`
+    """
+
     def __init__(self, iterable):
         """
-        DEPRECATED: use `repeat` instead.
+        DEPRECATED: use `interplot.repeat` instead.
 
         Avoid iteration of an iterable data type in the `zip` function.
 

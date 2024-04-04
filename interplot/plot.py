@@ -115,13 +115,15 @@ import plotly.express as px
 import plotly.subplots as sp
 import plotly.offline
 
+from . import conf
 from .iter import ITERABLE_TYPES, zip_smart, filter_nozip
 from interplot import arraytools
 
 
 def init_notebook_mode(connected=False):
     """
-    Initialize plotly.js in the browser if not already done.
+    Initialize plotly.js in the browser if not already done,
+    and deactivate matplotlib auto-display.
 
     Parameters
     ----------
@@ -131,6 +133,11 @@ def init_notebook_mode(connected=False):
         Default: False
     """
     plotly.offline.init_notebook_mode(connected=connected)
+
+    # turn off matplotlib auto-display
+    plt.plot()
+    plt.close()
+    plt.ioff()
 
 
 # if imported in notebook, init plotly notebook mode
@@ -144,240 +151,11 @@ if CALLED_FROM_NOTEBOOK:
     init_notebook_mode()
 
 
-COLOR_CYCLE = [  # optimised for color vision deficiencies
-    '#006BA4', '#FF800E', '#ABABAB', '#595959', '#5F9ED1',
-    '#C85200', '#898989', '#A2C8EC', '#FFBC79', '#CFCFCF',
-]
-
-PTY_LINE_STYLES = {
-    "-": "solid",
-    "--": "dash",
-    "-.": "dashdot",
-    ":": "dot",
-    "solid": "solid",
-    "dashed": "dash",
-    "dashdot": "dashdot",
-    "dotted": "dot",
-}
-MPL_LINE_STYLES = {
-    value: key for key, value in PTY_LINE_STYLES.items()
-}
-
-PTY_MARKERS = {
-    ".": "circle",
-    "s": "square",
-    "D": "diamond",
-    "P": "cross",
-    "X": "x",
-    "^": "triangle-up",
-    "v": "triangle-down",
-    "<": "triangle-left",
-    ">": "triangle-right",
-    "triangle-ne": "triangle-ne",
-    "triangle-se": "triangle-se",
-    "triangle-sw": "triangle-sw",
-    "triangle-nw": "triangle-nw",
-    "p": "pentagon",
-    "h": "hexagon",
-    "H": "hexagon2",
-    "8": "octagon",
-    "*": "star",
-    "hexagram": "hexagram",
-    "star-triangle-up": "star-triangle-up",
-    "star-triangle-down": "star-triangle-down",
-    "star-square": "star-square",
-    "star-diamond": "star-diamond",
-    "d": "diamond-tall",
-    "diamond-wide": "diamond-wide",
-    "hourglass": "hourglass",
-    "bowtie": "bowtie",
-    "circle-cross": "circle-cross",
-    "circle-x": "circle-x",
-    "square-cross": "square-cross",
-    "square-x": "square-x",
-    "diamond-cross": "diamond-cross",
-    "diamond-x": "diamond-x",
-    "+": "cross-thin",
-    "x": "x-thin",
-    "asterisk": "asterisk",
-    "hash": "hash",
-    "2": "y-up",
-    "1": "y-down",
-    "3": "y-left",
-    "4": "y-right",
-    "_": "line-ew",
-    "|": "line-ns",
-    "line-ne": "line-ne",
-    "line-nw": "line-nw",
-    6: "arrow-up",
-    7: "arrow-down",
-    4: "arrow-left",
-    5: "arrow-right",
-    "arrow-bar-up": "arrow-bar-up",
-    "arrow-bar-down": "arrow-bar-down",
-    "arrow-bar-left": "arrow-bar-left",
-    "arrow-bar-right": "arrow-bar-right",
-    "arrow": "arrow",
-    "arrow-wide": "arrow-wide",
-}
-PTY_MARKERS_LIST = list(PTY_MARKERS.values())
-MPL_MARKERS = {
-    value: key for key, value in PTY_MARKERS.items()
-}
-MPL_MARKERS.update({  # next best matches
-    "triangle-nw": "^",
-    "triangle-ne": ">",
-    "triangle-se": "v",
-    "triangle-sw": "<",
-    "hexagram": "*",
-    "star-triangle-up": "^",
-    "star-triangle-down": "v",
-    "star-square": "s",
-    "star-diamond": "D",
-    "diamond-wide": "D",
-    "hourglass": "d",
-    "bowtie": "D",
-    "circle-cross": "+",
-    "circle-x": "x",
-    "cross-thin": "+",
-    "square-cross": "s",
-    "square-x": "s",
-    "diamond-cross": "D",
-    "diamond-x": "D",
-    "x-thin": "x",
-    "hash": "*",
-    "asterisk": "*",
-    "line-ne": "|",
-    "line-nw": "_",
-    "arrow-bar-up": 6,
-    "arrow-bar-down": 7,
-    "arrow-bar-left": 4,
-    "arrow-bar-right": 5,
-    "arrow": 6,
-    "arrow-wide": 6,
-})
-MPL_MARKERS_LIST = list(MPL_MARKERS.values())
-
-EXPORT_FORMAT = "png"
-EXPORT_REPLACE = {
-    "[ ]?/[ ]?": "_",
-    " ": "-",
-    "[@!?,:;+*%&()=#|'\"]": "",
-    r"\\": "_",
-    r"\s": "_",
-    r"<\s*br\s*/?\s*>": "_",
-}
-PTY_CONFIG = dict(
-    displayModeBar=True,
-    displaylogo=False,
-)
-
-REWRITE_DOCSTRING = True
-
-DOCSTRING_DECORATOR = """
-    interactive: bool, default: True
-        Display an interactive plotly line plot
-        instead of the default matplotlib figure.
-    rows, cols: int, default: 1
-        Create a grid with x rows and y columns.
-    title: str, default: None
-        Plot title.
-    xlabel, ylabel: str or str tuple, default: None
-        Axis labels.
-
-        Either one title for the entire axis or one for each row/column.
-    xlim, ylim: tuple of 2 numbers or nested, default: None
-        Axis range limits.
-
-        In case of multiple rows/cols provide either:
-            - a tuple
-            - a tuple for each row
-            - a tuple for each row containing tuple for each column.
-    shared_xaxes, shared_yaxes: str, default: None
-        Define how multiple subplots share there axes.
-
-        Options:
-            - "all" or True
-            - "rows"
-            - "columns" or "cols"
-            - None or False
-    column_widths, row_heights: tuple/list, default: None
-        Ratios of the width/height dimensions in each column/row.
-        Will be normalised to a sum of 1.
-    fig_size: tuple of 2x float, optional
-        Figure size in pixels.
-
-        Default behavior:
-            - MPL: Default figure size.
-            - PLT: Responsive sizing.
-    dpi: int, default: 100
-        Plot resolution.
-    legend_loc: str, optional
-        MATPLOTLIB ONLY.
-
-        Default:
-            - In case of 1 line: None
-            - In case of >1 line: "best" (auto-detect)
-    legend_title: str, default: None
-        MPL: Each subplot has its own legend, so a 2d list in the shape of
-        the subplots may be provided.
-
-        PTY: Just provide a `str`.
-    save_fig: str or pathlib.Path, default: None
-        Provide a path to export the plot.
-
-        Possible formats: png, jpg, svg, html, ...
-
-        The figure will only be saved on calling the instance's
-        `.post_process()`.
-
-        If a directory (or `True` for local directory) is provided,
-        the filename will be automatically generated based on the title.
-
-        An iterable of multiple paths / filenames may be provided. In this case
-        the save command will be repeated for each element.
-    save_format: str, default: None
-        Provide a format for the exported plot, if not declared in `save_fig`.
-
-        An iterable of multiple formats may be provided. In this case
-        the save command will be repeated for each element.
-    pty_update_layout: dict, default: None
-        PLOTLY ONLY.
-        Pass keyword arguments to plotly's
-        `fig.update_layout(**pty_update_layout)`
-        Thus, take full control over
-    pty_custom_func: function, default: None
-        PLOTLY ONLY.
-        Pass a function reference to further style the plotly graphs.
-        Function must accept `fig` and return `fig`.
-
-        >>> def pty_custom_func(fig):
-        ...     fig.do_stuff()
-        ...     return fig
-    mpl_custom_func: function, default: None
-        MATPLOTLIB ONLY.
-        Pass a function reference to further style the matplotlib graphs.
-        Function must accept `fig, ax` and return `fig, ax`.
-
-        Note: `ax` always has `row` and `col` coordinates, even if the plot is
-        just 1x1.
-
-        >>> def mpl_custom_func(fig, ax):
-        ...     fig.do_stuff()
-        ...     ax[0, 0].do_more()
-        ...     return fig, ax
-
-    Returns
-    -------
-    `interplot.Plot` instance
-"""
-
-
 def _rewrite_docstring(doc_core, doc_decorator=None, kwargs_remove=()):
     """
     Appends arguments to a docstring.
 
-    Returns original docstring if REWRITE_DOCSTRING is set to False.
+    Returns original docstring if conf._REWRITE_DOCSTRING is set to False.
 
     Attempts:
     1. Search for [decorator.*?].
@@ -399,13 +177,13 @@ def _rewrite_docstring(doc_core, doc_decorator=None, kwargs_remove=()):
         Rewritten docstring
     """
     # check rewrite flag
-    if not REWRITE_DOCSTRING:
+    if not conf._REWRITE_DOCSTRING:
         return doc_core
 
     # input check
     doc_core = "" if doc_core is None else doc_core
     doc_decorator = (
-        DOCSTRING_DECORATOR
+        conf._DOCSTRING_DECORATOR
         if doc_decorator is None
         else doc_decorator
     )
@@ -492,7 +270,7 @@ def _rewrite_docstring(doc_core, doc_decorator=None, kwargs_remove=()):
             + doc_parts["rest"]
         )
 
-    # non-numpy DOCSTRING_DECORATOR, just append in the end
+    # non-numpy _DOCSTRING_DECORATOR, just append in the end
     return doc_core + _adjust_indent(
         indent_decorator,
         indent_core,
@@ -561,72 +339,108 @@ def _adjust_indent(indent_decorator, indent_core, docstring):
     )
 
 
-def _serialize_2d(core):
+def _serialize_2d(serialize_pty=True, serialize_mpl=True):
     """Decorator to catch 2D arrays and other data types to unpack."""
 
-    @wraps(core)
-    def wrapper(self, x, y=None, label=None, **kwargs):
-        """
-        Wrapper function for a method.
+    def decorator(core):
 
-        If a pandas object is provided, the index will be used as x
-        if no x is provided.
-        Pandas column naming:
-            * If no label is set, the column name will be used by default.
-            * Manually set label string has priority.
-            * Label strings may contain a {} to insert the column name.
-            * Instead of setting a string, a callable may be provided to
-              reformat the column name. It must accept the column name
-              and return a string. E.g.:
+        @wraps(core)
+        def wrapper(self, x, y=None, label=None, **kwargs):
+            """
+            Wrapper function for a method.
 
-              > interplot.line(df, label=lambda n: n.strip())
+            If a pandas object is provided, the index will be used as x
+            if no x is provided.
+            Pandas column naming:
+                * If no label is set, the column name will be used by default.
+                * Manually set label string has priority.
+                * Label strings may contain a {} to insert the column name.
+                * Instead of setting a string, a callable may be provided to
+                reformat the column name. It must accept the column name
+                and return a string. E.g.:
 
-              > def capitalize(prefix="", suffix=""):
-              >     return lambda name: prefix + name.upper() + suffix
-              > interplot.line(df, label=capitalize("Cat. A: "))
-        xarray DataArrays will be convered to pandas and then handled
-        accordingly.
-        """
-        if y is None:
+                > interplot.line(df, label=lambda n: n.strip())
 
-            # xarray DataArray
-            if isinstance(x, xr_DataArray):
-                x = x.to_pandas()
+                > def capitalize(prefix="", suffix=""):
+                >     return lambda name: prefix + name.upper() + suffix
+                > interplot.line(df, label=capitalize("Cat. A: "))
+            xarray DataArrays will be convered to pandas and then handled
+            accordingly.
+            """
+            # reallocate x/y
+            if y is None:
 
-            # pd.Series
-            if isinstance(x, pd_Series):
-                index = x.index
-                y = x
-                x = index
-                if label is None:
-                    label = y.name
-                elif isinstance(label, str) and "{}" in label:
-                    label = label.format(y.name)
-                elif callable(label):
-                    label = label(y.name)
+                # xarray DataArray
+                if isinstance(x, xr_DataArray):
+                    x = x.to_pandas()
 
-            # pd.DataFrame: split columns to pd.Series and iterate
-            elif isinstance(x, pd_DataFrame):
-                for (_, series), label_ in zip_smart(x.items(), label):
-                    self.add_line(series, label=label_, **kwargs)
-                return
+                # pd.Series
+                if isinstance(x, pd_Series):
+                    x, y = x.index, x
+                    if label is None:
+                        label = y.name
+                    elif isinstance(label, str) and "{}" in label:
+                        label = label.format(y.name)
+                    elif callable(label):
+                        label = label(y.name)
 
-            else:
-                if hasattr(x, 'copy') and callable(getattr(x, 'copy')):
-                    y = x.copy()
+                # pd.DataFrame: split columns to pd.Series and iterate
+                elif isinstance(x, pd_DataFrame):
+                    if (
+                        self.interactive and serialize_pty
+                        or not self.interactive and serialize_mpl
+                    ):
+                        for (
+                            i, ((_, series), label_)
+                        ) in enumerate(zip_smart(x.items(), label)):
+                            _serialize_2d(
+                                serialize_pty=serialize_pty,
+                                serialize_mpl=serialize_mpl,
+                            )(core)(
+                                self,
+                                series,
+                                label=label_,
+                                _serial_i=i,
+                                _serial_n=len(x.columns),
+                                **kwargs,
+                            )
+                        return
+
                 else:
-                    y = x
-                x = np.arange(len(y))
+                    if hasattr(x, 'copy') and callable(getattr(x, 'copy')):
+                        y = x.copy()
+                    else:
+                        y = x
+                    x = np.arange(len(y))
 
-        # 2D np.array
-        if isinstance(y, np.ndarray) and len(y.shape) == 2:
-            for y_, label_ in zip_smart(y.T, label):
-                self.add_line(x, y_, label=label_, **kwargs)
-            return
+            # 2D np.array
+            if isinstance(y, np.ndarray) and len(y.shape) == 2:
+                if (
+                    self.interactive and serialize_pty
+                    or not self.interactive and serialize_mpl
+                ):
+                    for (
+                        i, (y_, label_)
+                    ) in enumerate(zip_smart(y.T, label)):
+                        _serialize_2d(
+                            serialize_pty=serialize_pty,
+                            serialize_mpl=serialize_mpl,
+                        )(core)(
+                            self,
+                            x,
+                            y_,
+                            label=label_,
+                            _serial_i=i,
+                            _serial_n=y.shape[1],
+                            **kwargs,
+                        )
+                    return
 
-        return core(self, x, y, label=label, **kwargs)
+            return core(self, x, y, label=label, **kwargs)
 
-    return wrapper
+        return wrapper
+
+    return decorator
 
 
 def _serialize_save(core):
@@ -751,7 +565,7 @@ class Plot(NotebookInteraction):
 
     def __init__(
         self,
-        interactive=True,
+        interactive=None,
         rows=1,
         cols=1,
         title=None,
@@ -764,7 +578,7 @@ class Plot(NotebookInteraction):
         column_widths=None,
         row_heights=None,
         fig_size=None,
-        dpi=100,
+        dpi=None,
         legend_loc=None,
         legend_title=None,
         save_fig=None,
@@ -780,7 +594,11 @@ class Plot(NotebookInteraction):
         if shared_yaxes == "cols":
             shared_yaxes = "columns"
 
-        self.interactive = interactive
+        self.interactive = (
+            conf.INTERACTIVE
+            if interactive is None
+            else interactive
+        )
         self.rows = rows
         self.cols = cols
         self.title = title
@@ -790,7 +608,7 @@ class Plot(NotebookInteraction):
         self.ylim = ylim
         self.legend_loc = legend_loc
         self.legend_title = legend_title
-        self.dpi = dpi
+        self.dpi = conf.DPI if dpi is None else dpi
         self.save_fig = save_fig
         self.save_format = save_format
         self.save_config = save_config
@@ -803,6 +621,11 @@ class Plot(NotebookInteraction):
         # init plotly
         if self.interactive:
             self.title = self._encode_html(self.title)
+            self.fig_size = (
+                conf.PTY_FIG_SIZE
+                if fig_size is None
+                else fig_size
+            )
 
             # init fig
             figure = go.Figure(
@@ -819,7 +642,7 @@ class Plot(NotebookInteraction):
             )
 
             # unpacking
-            width, height = fig_size if fig_size is not None else (None, None)
+            width, height = self.fig_size
             if isinstance(legend_title, ITERABLE_TYPES):
                 warn(
                     "Plotly only has one legend, however multiple legend_"
@@ -835,7 +658,7 @@ class Plot(NotebookInteraction):
                 legend_title=legend_title,
                 height=height,
                 width=width,
-                barmode="overlay",
+                barmode="group",
             )
 
             # axis limits
@@ -880,14 +703,22 @@ class Plot(NotebookInteraction):
                 width_ratios=column_widths,
                 height_ratios=row_heights,
             )
-            if fig_size is not None:
-                px = 1 / dpi
-                fig_size = (fig_size[0] * px, fig_size[1] * px)
+
+            # convert px to inches
+            self.fig_size = (
+                conf.MPL_FIG_SIZE
+                if fig_size is None
+                else fig_size
+            )
+            px = 1 / self.dpi
+            figsize = (self.fig_size[0] * px, self.fig_size[1] * px)
+
+            # init fig
             self.fig, self.ax = plt.subplots(
                 rows,
                 cols,
-                figsize=fig_size,
-                dpi=dpi,
+                figsize=figsize,
+                dpi=self.dpi,
                 squeeze=False,
                 gridspec_kw=gridspec_kw,
             )
@@ -1045,13 +876,13 @@ class Plot(NotebookInteraction):
             HEX color, with leading hashtag
         """
         if i is None:
-            if self.i_color >= len(COLOR_CYCLE):
+            if self.i_color >= len(conf.COLOR_CYCLE):
                 self.i_color = 0
-            color = COLOR_CYCLE[self.i_color]
+            color = conf.COLOR_CYCLE[self.i_color]
             self.i_color += increment
             return color
         else:
-            return COLOR_CYCLE[i]
+            return conf.COLOR_CYCLE[i]
 
     def digest_color(self, color=None, alpha=None, increment=1):
         """
@@ -1076,7 +907,7 @@ class Plot(NotebookInteraction):
 
         # get index from COLOR_CYCLE
         elif color[0] == "C" or color[0] == "c":
-            color = COLOR_CYCLE[int(color[1:])]
+            color = conf.COLOR_CYCLE[int(color[1:])]
 
         rgba = list(mcolors.to_rgba(color))
         if alpha is not None:
@@ -1146,14 +977,14 @@ class Plot(NotebookInteraction):
             return None
 
         if isinstance(marker, (int, np.integer)):
-            marker = PTY_MARKERS_LIST[marker]
+            marker = conf.PTY_MARKERS_LIST[marker]
 
         if marker is None:
-            marker = PTY_MARKERS_LIST[0]
+            marker = conf.PTY_MARKERS_LIST[0]
 
         if interactive:
-            if marker not in PTY_MARKERS_LIST:
-                marker = PTY_MARKERS.get(marker, marker)
+            if marker not in conf.PTY_MARKERS_LIST:
+                marker = conf.PTY_MARKERS.get(marker, marker)
             if recursive:
                 return marker
             return dict(
@@ -1161,9 +992,9 @@ class Plot(NotebookInteraction):
                 **pty_marker_kwargs,
             )
 
-        return MPL_MARKERS.get(marker, marker)
+        return conf.MPL_MARKERS.get(marker, marker)
 
-    @_serialize_2d
+    @_serialize_2d()
     def add_line(
         self,
         x,
@@ -1183,6 +1014,8 @@ class Plot(NotebookInteraction):
         linewidth=None,
         row=0,
         col=0,
+        _serial_i=0,
+        _serial_n=1,
         pty_marker_kwargs=None,
         kwargs_pty=None,
         kwargs_mpl=None,
@@ -1337,7 +1170,7 @@ class Plot(NotebookInteraction):
                     marker_color=color,
                     line=dict(
                         width=linewidth,
-                        dash=PTY_LINE_STYLES.get(line_style, line_style),
+                        dash=conf.PTY_LINE_STYLES.get(line_style, line_style),
                     ),
                     **kwargs_pty,
                     **kwargs,
@@ -1359,7 +1192,7 @@ class Plot(NotebookInteraction):
                 color=color,
                 lw=linewidth,
                 linestyle=(
-                    MPL_LINE_STYLES.get(line_style, line_style)
+                    conf.MPL_LINE_STYLES.get(line_style, line_style)
                     if "lines" in mode
                     else "None"
                 ),
@@ -1404,6 +1237,149 @@ class Plot(NotebookInteraction):
             mode=mode,
             **kwargs,
         )
+
+    @_serialize_2d()
+    def add_bar(
+        self,
+        x,
+        y=None,
+        horizontal=False,
+        width=0.8,
+        label=None,
+        show_legend=None,
+        color=None,
+        opacity=None,
+        line_width=1,
+        line_color=None,
+        row=0,
+        col=0,
+        _serial_i=0,
+        _serial_n=1,
+        kwargs_pty=None,
+        kwargs_mpl=None,
+        **kwargs,
+    ):
+        """
+        Draw a bar plot.
+
+        Parameters
+        ----------
+        x: array-like
+        y: array-like, optional
+            If only either `x` or `y` is defined, it will be assumed
+            as the size of the bar, regardless whether it's horizontal
+            or vertical.
+            If both `x` and `y` are defined, `x` will be taken as the
+            position of the bar, and `y` as the size, regardless of
+            the orientation.
+            If a pandas `Series` is provided, the index will
+            be taken as the position.
+            Else if a pandas `DataFrame` is provided, the method call
+            is looped for each column.
+            If a 2D numpy `array` is provided, the method call
+            is looped for each column, with the index as the position.
+        horizontal: bool, optional
+            If True, the bars are drawn horizontally. Default is False.
+        label: str, optional
+            Trace label for legend.
+        show_legend: bool, optional
+            Whether to show the label in the legend.
+
+            By default, it will be shown if a label is defined.
+        color: str, optional
+            Trace color.
+
+            Can be hex, rgb(a) or any named color that is understood
+            by matplotlib.
+
+            Default: color is retrieved from `Plot.digest_color`,
+            which cycles through `COLOR_CYCLE`.
+        opacity: float, optional
+            Opacity (=alpha) of the fill.
+
+            By default, fallback to alpha value provided with color argument,
+            or 1.
+        row, col: int, optional
+            If the plot contains a grid, provide the coordinates.
+
+            Attention: Indexing starts with 0!
+        line_width: float, optional
+            The width of the bar outline. Default is 1.
+        line_color: str, optional
+            The color of the bar outline. This can be a named color or a tuple
+            specifying the RGB values. Default is None.
+        kwargs_pty, kwargs_mpl, **kwargs: optional
+            Pass specific keyword arguments to the line core method.
+        """
+        self.element_count[row, col] += 1
+        # PLOTLY
+        if self.interactive:
+            if kwargs_pty is None:
+                kwargs_pty = dict()
+
+            if horizontal:
+                x, y = y, x
+
+            row += 1
+            col += 1
+            self.fig.add_trace(
+                go.Bar(
+                    x=x,
+                    y=y,
+                    orientation="h" if horizontal else "v",
+                    **self._get_plotly_legend_args(
+                        label,
+                        show_legend=show_legend,
+                    ),
+                    marker_color=self.digest_color(color, opacity),
+                    marker=dict(
+                        line=dict(
+                            width=0 if line_color is None else line_width,
+                            color=(
+                                color
+                                if line_color is None
+                                else self.digest_color(line_color, 1)
+                            ),
+                        ),
+                    ),
+                    **kwargs_pty,
+                    **kwargs,
+                ),
+                row=row,
+                col=col,
+            )
+
+        else:
+            if kwargs_mpl is None:
+                kwargs_mpl = dict()
+            offset = ((2*_serial_i + 1) / 2 / _serial_n - 0.5) * width
+            (
+                self.ax[row, col].barh
+                if horizontal
+                else self.ax[row, col].bar
+            )(
+                np.arange(len(x)) + offset,
+                y,
+                (width / _serial_n),
+                color=self.digest_color(color, opacity),
+                edgecolor=(
+                    self.digest_color(line_color, 1)
+                    if line_color is not None
+                    else None
+                ),
+                linewidth=line_width,
+                label=None if show_legend is False else label,
+                **kwargs_mpl,
+                **kwargs,
+            )
+            (
+                self.ax[row, col].set_yticks
+                if horizontal
+                else self.ax[row, col].set_xticks
+            )(
+                np.arange(len(x)),
+                x,
+            )
 
     def add_hist(
         self,
@@ -2228,10 +2204,10 @@ class Plot(NotebookInteraction):
             else:
                 filename = str(filename)
 
-            for key, value in EXPORT_REPLACE.items():
+            for key, value in conf.EXPORT_REPLACE.items():
                 filename = re.sub(key, value, filename)
             filename += "." + (
-                EXPORT_FORMAT if export_format is None else export_format
+                conf.EXPORT_FORMAT if export_format is None else export_format
             )
             path = path / filename
 
@@ -2243,7 +2219,7 @@ class Plot(NotebookInteraction):
                 self.fig.write_html(
                     path,
                     config=(
-                        PTY_CONFIG
+                        conf.PTY_CONFIG
                         if self.save_config is None
                         else self.save_config
                     ),
@@ -2280,18 +2256,22 @@ class Plot(NotebookInteraction):
                 init_notebook_mode()
                 display_html(self.JS_RENDER_WARNING, raw=True)
                 return self.fig.show(
-                    config=PTY_CONFIG
-                    if self.save_config is None
-                    else self.save_config
+                    config=(
+                        conf.PTY_CONFIG
+                        if self.save_config is None
+                        else self.save_config
+                    )
                 )
             display_png(self._repr_png_(), raw=True)
             return
 
         if self.interactive:
             return self.fig.show(
-                config=PTY_CONFIG
-                if self.save_config is None
-                else self.save_config
+                config=(
+                    conf.PTY_CONFIG
+                    if self.save_config is None
+                    else self.save_config
+                )
             )
         return self.fig.show()
 
@@ -2306,9 +2286,7 @@ class Plot(NotebookInteraction):
         if self.interactive:
             init_notebook_mode()
             return self.JS_RENDER_WARNING + self.fig._repr_html_()
-        # return self.fig.show()
         raise NotImplementedError
-        # return self.fig._repr_html_()
 
     def _repr_png_(self):
         if self.interactive:
@@ -2344,17 +2322,17 @@ def magic_plot(core, doc_decorator=None):
     doc_decorator: str, optional
         Append the docstring with the decorated parameters.
 
-        By default, the global variable `DOCSTRING_DECORATOR` will be used.
+        By default, the global variable `_DOCSTRING_DECORATOR` will be used.
     """
     doc_decorator = (
-        DOCSTRING_DECORATOR
+        conf._DOCSTRING_DECORATOR
         if doc_decorator is None
         else doc_decorator
     )
 
     def wrapper(
         *args,
-        interactive=True,
+        interactive=None,
         rows=1,
         cols=1,
         fig=None,
@@ -2369,7 +2347,7 @@ def magic_plot(core, doc_decorator=None):
         column_widths=None,
         row_heights=None,
         fig_size=None,
-        dpi=100,
+        dpi=None,
         legend_loc=None,
         legend_title=None,
         save_fig=None,
@@ -2381,31 +2359,31 @@ def magic_plot(core, doc_decorator=None):
         **kwargs,
     ):
         # init Plot
-        if fig is None:
-            fig = Plot(
-                interactive=interactive,
-                rows=rows,
-                cols=cols,
-                title=title,
-                xlabel=xlabel,
-                ylabel=ylabel,
-                xlim=xlim,
-                ylim=ylim,
-                shared_xaxes=shared_xaxes,
-                shared_yaxes=shared_yaxes,
-                column_widths=column_widths,
-                row_heights=row_heights,
-                fig_size=fig_size,
-                dpi=dpi,
-                legend_loc=legend_loc,
-                legend_title=legend_title,
-                save_fig=save_fig,
-                save_format=save_format,
-                save_config=save_config,
-                pty_update_layout=pty_update_layout,
-                pty_custom_func=pty_custom_func,
-                mpl_custom_func=mpl_custom_func,
-            )
+        fig = Plot.init(
+            fig,
+            interactive=interactive,
+            rows=rows,
+            cols=cols,
+            title=title,
+            xlabel=xlabel,
+            ylabel=ylabel,
+            xlim=xlim,
+            ylim=ylim,
+            shared_xaxes=shared_xaxes,
+            shared_yaxes=shared_yaxes,
+            column_widths=column_widths,
+            row_heights=row_heights,
+            fig_size=fig_size,
+            dpi=dpi,
+            legend_loc=legend_loc,
+            legend_title=legend_title,
+            save_fig=save_fig,
+            save_format=save_format,
+            save_config=save_config,
+            pty_update_layout=pty_update_layout,
+            pty_custom_func=pty_custom_func,
+            mpl_custom_func=mpl_custom_func,
+        )
 
         # execute core method
         core(*args, fig=fig, **kwargs)
@@ -2417,7 +2395,7 @@ def magic_plot(core, doc_decorator=None):
         # return
         return fig
 
-    # rewrite DOCSTRING_DECORATOR
+    # rewrite _DOCSTRING_DECORATOR
     wrapper.__doc__ = _rewrite_docstring(
         core.__doc__,
         doc_decorator,
@@ -2455,7 +2433,8 @@ def magic_plot_preset(doc_decorator=None, **kwargs_preset):
     doc_decorator: str, optional
         Append the docstring with the decorated parameters.
 
-        By default, the global variable `DOCSTRING_DECORATOR` will be used.
+        By default, the global variable `conf._DOCSTRING_DECORATOR`
+        will be used.
     **kwargs_preset: dict
         Define presets for any keyword arguments accepted by `Plot`.
 
@@ -2530,6 +2509,16 @@ def linescatter(
     **kwargs,
 ):
     fig.add_linescatter(*args, **kwargs)
+
+
+@magic_plot
+@wraps(Plot.add_bar)
+def bar(
+    *args,
+    fig,
+    **kwargs,
+):
+    fig.add_bar(*args, **kwargs)
 
 
 @magic_plot

@@ -8,6 +8,18 @@ import matplotlib.pyplot as plt
 
 import numpy as np
 
+import pandas as pd
+
+
+# prepare some 2d data
+np.random.seed(10)
+data2d = np.random.normal(1, 1, (5, 5))
+df2d = pd.DataFrame(
+    data=data2d,
+    columns=("A", "B", "C", "D", "E"),
+    index=(5, 10, 15, 20, 25),
+)
+
 
 @pytest.mark.skip(reason="just a decorator, for no error assertion")
 def test_for_errors(f=lambda: None):
@@ -98,6 +110,44 @@ def test_line_colors(color, interactive):
     ip.line([1, 2, 3], [4, 5, 6], color=color, interactive=interactive)
 
 
+@test_for_errors
+def test_bar_basic(interactive):
+    ip.bar([1, 2, 3], [4, 5, 6], interactive=interactive)
+
+
+@test_for_errors
+def test_bar_adv(interactive):
+    ip.bar(
+        interactive=interactive,
+        x=np.array(((1, 2), (3, 4))),
+        horizontal=True,
+        width=0.2,
+        label="test",
+        show_legend=True,
+        color="blue",
+        opacity=0.5,
+        line_width=2,
+        line_color="red",
+        rows=2,
+        cols=2,
+        row=1,
+        col=1,
+    )
+
+
+@test_for_errors
+def test_2d_data(interactive):
+    fig = ip.Plot(rows=2, cols=2)
+
+    fig.add_line(data2d)
+    fig.add_line(df2d, col=1)
+
+    fig.add_bar(data2d, row=1)
+    fig.add_bar(df2d, col=1, row=1)
+
+    fig.post_process()
+
+
 @pytest.mark.parametrize(
     "opacity",
     (0, 0.5, 1),
@@ -134,6 +184,13 @@ def test_complex_plot(interactive):
                  line_style="dashdot", label="line 1")
     fig.add_linescatter((20, 50, 80), (0, 20, 40), marker="*", label="line 2")
     fig.add_text(50, 10, "some\nannotation", color="red")
+
+    fig.add_bar(
+        ("f", "g", "h", "a"), (1, 2, 5, 2), horizontal=True, col=1,
+        label="secondary", color="black")
+    fig.add_bar(
+        ("f", "g", "h", "a"), (1, 2, 5, 2), label="styling", color=None,
+        line_width=10, line_color="blue")
 
     fig.add_hist(y=np.random.normal(0, 10, 1000), row=0, col=1,
                  label="hist 1, horizontal", bins=40)
