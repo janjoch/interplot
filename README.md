@@ -41,7 +41,7 @@ Supported
         >>>         np.random.normal(60, 5, 1000),
         >>>     ],
         >>> )
-        [matplotlib boxplots]
+        [plotly boxplots]
         ```
 
     - Decorator to auto-initialize plots to use in your methods
