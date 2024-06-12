@@ -915,7 +915,7 @@ class Plot(NotebookInteraction):
 
         # PLOTLY
         if self.interactive:
-            return "rgba({},{},{},{})".format(
+            return "rgba({},{},{},{:.4f})".format(
                 *[int(d * 255) for d in rgba[:3]],
                 rgba[3],
             )
