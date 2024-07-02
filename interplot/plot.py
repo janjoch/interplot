@@ -907,7 +907,7 @@ class Plot(NotebookInteraction):
 
         # get index from COLOR_CYCLE
         elif color[0] == "C" or color[0] == "c":
-            color = conf.COLOR_CYCLE[int(color[1:])]
+            color = conf.COLOR_CYCLE[int(color[1:]) % len(conf.COLOR_CYCLE)]
 
         rgba = list(mcolors.to_rgba(color))
         if alpha is not None:
