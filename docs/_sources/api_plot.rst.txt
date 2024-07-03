@@ -2,7 +2,10 @@
 `interplot` Documentation and API reference
 ===========================================
 
-Full API documentation of the `interplot` Python module.
+
+.. contents:: On this page
+    :depth: 3
+
 
 .. automodule:: interplot.plot
 

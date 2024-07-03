@@ -65,16 +65,18 @@ def zip_smart(*iterables, unpack_nozip=True, strict=False):
     but if an argument is not iterable, it will be repeated each iteration.
 
     Exception: strings will be repeated by default.
-    Override the `NON_ITERABLE_TYPES` constant of the module
-    to change this behavior.
+    Override `interplot.conf.NON_ITERABLE_TYPES` to change this behavior.
 
     To be iterated, the item needs to have an `__iter__` attribute.
     Otherwise, it will be repeated.
 
     Pay attention with the `strict` parameter:
-        - only working with Python <3.10
-        - always raises an error if an item is repeated, since the generator \
-        is endless.
+        - only working with Python >=3.10
+            - will be ignored on Python <3.10
+            - raises a warning if ignored,
+              unless `interplot.conf.MUTE_STRICT_ZIP_WARNING` is set to `False`
+        - always raises an error if an item is repeated using \
+        `interplot.repeat()`, since the generator is endless.
 
     Parameters
     ----------
@@ -84,7 +86,8 @@ def zip_smart(*iterables, unpack_nozip=True, strict=False):
         Unpack a `NoZip`-wrapped iterable.
     strict: bool, default: True
         Fail if iterables are not the same length.
-        Warning: Not supported in Python < 3.10.
+
+        Warning: Not supported in Python <3.10.
 
     Returns
     -------
@@ -142,25 +145,31 @@ def sum_nested(
     ----------
     inp: iterable
         Object to iterate over.
+
         If it is not a iterable type, the object itself is returned.
     iterable_types: tuple of types, optional
         If iterable is one of these types, hand to zip() directly without
         repeating.
+
         Default: (tuple, list, np.ndarray, pandas.Series)
     depth: int, optional
         Maximum depth to recurse.
         Set to -1 to recurse infinitely.
+
         Default -1.
     custom_digestion: tuple of tuples, optional
         Each element of the tuple must be a tuple of the following structure:
-            (
-                type or tuple of types,
-                lambda function to digest the elements,
-            )
+
+        ( \
+            type or tuple of types, \
+            lambda function to digest the elements,
+        )
+
         The result of the lambda function will then be treated
         like the new type.
-        By default, interplot.CUSTOM_DIGESTION will be used:
-            Dicts will be digested to a list of their values.
+
+        By default, `interplot.CUSTOM_DIGESTION` will be used:
+        Dicts will be digested to a list of their values.
 
     Returns
     -------
@@ -206,9 +215,29 @@ def sum_nested(
     return val
 
 
-def filter_nozip(iterable, no_iter_types=None, recursive=False, length=2):
+def filter_nozip(iterable, no_iter_types=None, recursive=False, length=(2, )):
     """
-    Filter patterns which should not be unpacked in zip.
+    Prevent certain patterns from being unpacked in `interplot.zip_smart`.
+
+    Wraps fixed patterns into `interplot.repeat`, so that they are not unpacked
+    in `interplot.zip_smart`.
+
+    By default, iterables of length 2 containing only `float`, `int`, and
+    `datetime` objects will not be unpacked.
+
+    Example
+    -------
+    >>> A = [1, 2]
+    ... B = ["a", "b"]
+    ...
+    ... for a, b in interplot.zip_smart(
+    ...     interplot.filter_nozip(A),
+    ...     interplot.filter_nozip(B),
+    ... ):
+    ...     print(a, b)
+
+    [1, 2] a
+    [1, 2] b
 
     Parameters
     ----------
@@ -228,13 +257,15 @@ def filter_nozip(iterable, no_iter_types=None, recursive=False, length=2):
         if no_iter_types is None
         else no_iter_types
     )
+    if not isinstance(length, ITERABLE_TYPES):
+        length = (length, )
 
     # non-iterable
     if not isinstance(iterable, ITERABLE_TYPES):
         return iterable
 
     # catch forbidden iterable
-    if isinstance(iterable, ITERABLE_TYPES) and len(iterable) == length:
+    if isinstance(iterable, ITERABLE_TYPES) and len(iterable) in length:
         all_allowed = True
         for elem in iterable:
             if not isinstance(elem, no_iter_types):
