@@ -24,7 +24,7 @@ setup(
     install_requires=requirements,
 
     classifiers=[
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Science/Research',
         'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
         'Operating System :: MacOS :: MacOS X',
@@ -33,5 +33,8 @@ setup(
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
+        'Framework :: Jupyter :: JupyterLab :: 4',
+        'Framework :: Matplotlib',
+        'Topic :: Scientific/Engineering :: Visualization',
     ],
 )
