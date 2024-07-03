@@ -10,7 +10,7 @@ long_description = (this_directory / "README.md").read_text()
 
 setup(
     name='interplot',
-    version='0.1.2',
+    version='1.0.0',
     description=(
         "Create matplotlib and plotly charts with the same few lines of code."
     ),

@@ -3,11 +3,12 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-.. mdinclude:: ../README.md
 
+interplot
+=========
 
-Documentation and API reference
-===============================
+Quick Start
+-----------
 
 .. toctree::
    :maxdepth: 2
@@ -15,25 +16,29 @@ Documentation and API reference
 
 .. toctree::
     :maxdepth: 2
-    :caption: interplot
 
     api_plot
 
 .. toctree::
     :maxdepth: 1
-    :caption: interplot preconfiguration
 
     api_conf
 
 .. toctree::
     :maxdepth: 2
-    :caption: zip iteration helper functions
 
     api_iter
 
 
-Example
--------
+.. contents:: On this page
+    :depth: 3
+
+
+.. mdinclude:: ../README.md
+
+
+Examples
+========
 
 .. code-block:: python
 
@@ -123,6 +128,18 @@ Example
 .. image:: plot_examples/gauss_plot_mpl.png
     :alt: [matplotlib plot "Normally distributed Noise]
 
+|br|
+
+.. note::
+   More examples can be found on `NBViewer`_.
+
+.. _NBViewer: https://nbviewer.org/github/janjoch/interplot/tree/main/demo/
+
+.. |br| raw:: html
+
+   <br />
+
+|br|
 
 Indices and tables
 ==================

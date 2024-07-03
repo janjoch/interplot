@@ -103,7 +103,7 @@ def test_line_markers(marker, interactive):
 
 @pytest.mark.parametrize(
     "color",
-    ("red", "c0", "C1", "#FF00FF", None),
+    ("red", "c0", "C1", "C123", "#FF00FF", None),
 )
 @test_for_errors
 def test_line_colors(color, interactive):

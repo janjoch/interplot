@@ -1,6 +1,10 @@
-============================
-`interplot` preconfiguration
-============================
+===============================================
+`interplot.conf`: Module Defaults Configuration
+===============================================
+
+.. contents:: On this page
+    :depth: 3
+
 
 .. automodule:: interplot.conf
 

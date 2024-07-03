@@ -16,80 +16,6 @@ Currently supported:
 - text annotations
 - 2D subplots
 - color cycling
-
-Examples:
-
->>> interplot.line([0,4,6,7], [1,2,4,8])
-
-.. raw:: html
-     :file: ../source/plot_examples/basic_plot_pty.html
-
->>> interplot.line(
-...     x=[0,4,6,7],
-...     y=[1,2,4,8],
-...     interactive=False,
-...     color="red",
-...     title="matplotlib static figure",
-...     xlabel="abscissa",
-...     ylabel="ordinate",
-... )
-
-.. image:: plot_examples/basic_plot_mpl.png
-    :alt: [matplotlib plot "Normally distributed Noise]
-
->>> @interplot.magic_plot
-... def plot_lines(samples=100, n=10, label="sigma={0}, mu={1}", fig=None):
-...     \"\"\"
-...     Plot Gaussian noise.
-...
-...     The function must accept the `fig` parameter from the decorator.
-...     \"\"\"
-...     for i in range(1, n+1):
-...         fig.add_line(
-...             np.random.normal(i*10,i,samples),
-...             label=label.format(i, i*10),
-...         )
-
->>> plot_lines(samples=200, title="Normally distributed Noise")
-
-.. raw:: html
-     :file: ../source/plot_examples/gauss_plot_pty.html
-
->>> plot_lines(
-...     samples=200, interactive=False, title="Normally distributed Noise")
-
-.. image:: plot_examples/gauss_plot_mpl.png
-    :alt: [matplotlib plot "Normally distributed Noise]
-
->>> fig = interplot.Plot(
-...     interactive=True,
-...     title="Everything Under Control",
-...     fig_size=(800, 500),
-...     rows=1,
-...     cols=2,
-...     shared_yaxes=True,
-...     save_fig=True,
-...     save_format=("html", "png"),
-...     # ...
-... )
-... fig.add_hist(np.random.normal(1, 0.5, 1000), row=0, col=0)
-... fig.add_boxplot(
-...     [
-...         np.random.normal(20, 5, 1000),
-...         np.random.normal(40, 8, 1000),
-...         np.random.normal(60, 5, 1000),
-...     ],
-...     row=0,
-...     col=1,
-... )
-... # ...
-... fig.post_process()
-... fig.show()
-saved figure at Everything-Under-Control.html
-saved figure at Everything-Under-Control.png
-
-.. raw:: html
-     :file: ../source/plot_examples/Everything-Under-Control.html
 """
 
 
@@ -560,6 +486,38 @@ class Plot(NotebookInteraction):
 
     Parameters
     ----------
+
+    Examples
+    --------
+    >>> fig = interplot.Plot(
+    ...     interactive=True,
+    ...     title="Everything Under Control",
+    ...     fig_size=(800, 500),
+    ...     rows=1,
+    ...     cols=2,
+    ...     shared_yaxes=True,
+    ...     save_fig=True,
+    ...     save_format=("html", "png"),
+    ...     # ...
+    ... )
+    ... fig.add_hist(np.random.normal(1, 0.5, 1000), row=0, col=0)
+    ... fig.add_boxplot(
+    ...     [
+    ...         np.random.normal(20, 5, 1000),
+    ...         np.random.normal(40, 8, 1000),
+    ...         np.random.normal(60, 5, 1000),
+    ...     ],
+    ...     row=0,
+    ...     col=1,
+    ... )
+    ... # ...
+    ... fig.post_process()
+    ... fig.show()
+    saved figure at Everything-Under-Control.html
+    saved figure at Everything-Under-Control.png
+
+    .. raw:: html
+        :file: ../source/plot_examples/Everything-Under-Control.html
     """
     __doc__ = _rewrite_docstring(__doc__)
 
@@ -786,12 +744,11 @@ class Plot(NotebookInteraction):
             If fig is a Plot instance, return it.
             Otherwise, create a new Plot instance.
         *args, **kwargs: any
-            Passed to Plot constructor.
+            Passed to Plot.__init__.
         """
         if isinstance(fig, Plot):
             return fig
-        else:
-            return Plot(*args, **kwargs)
+        return Plot(*args, **kwargs)
 
     @staticmethod
     def _get_plotly_legend_args(label, default_label=None, show_legend=None):
@@ -891,7 +848,7 @@ class Plot(NotebookInteraction):
         Parameters
         ----------
         color: any color format matplotlib accepts, optional
-            E.g. "blue", "#0000ff"
+            E.g. "blue", "#0000ff", "C3"
             If None is provided, the next one from COLOR_CYCLE will be picked.
         alpha: float, optional
             Set alpha / opacity.
@@ -907,7 +864,7 @@ class Plot(NotebookInteraction):
 
         # get index from COLOR_CYCLE
         elif color[0] == "C" or color[0] == "c":
-            color = conf.COLOR_CYCLE[int(color[1:])]
+            color = conf.COLOR_CYCLE[int(color[1:]) % len(conf.COLOR_CYCLE)]
 
         rgba = list(mcolors.to_rgba(color))
         if alpha is not None:
@@ -915,7 +872,7 @@ class Plot(NotebookInteraction):
 
         # PLOTLY
         if self.interactive:
-            return "rgba({},{},{},{})".format(
+            return "rgba({},{},{},{:.4f})".format(
                 *[int(d * 255) for d in rgba[:3]],
                 rgba[3],
             )
@@ -934,7 +891,7 @@ class Plot(NotebookInteraction):
         """
         Digests the marker parameter based on the given mode.
 
-        Parameters:
+        Parameters
         ----------
         marker: int or str
             The marker to be digested. If an integer is provided, it is
@@ -945,7 +902,7 @@ class Plot(NotebookInteraction):
             The mode to determine if markers should be used.
             If no markers should be drawn, None is returned.
 
-        Returns:
+        Returns
         -------
         str or None
             The digested marker string if markers are requested,
@@ -1080,6 +1037,8 @@ class Plot(NotebookInteraction):
             Can be hex, rgb(a) or any named color that is understood
             by matplotlib.
 
+            The color cycle can be accessed with "C0", "C1", ...
+
             Default: color is retrieved from `Plot.digest_color`,
             which cycles through `COLOR_CYCLE`.
         opacity: float, optional
@@ -1097,6 +1056,40 @@ class Plot(NotebookInteraction):
             Additional marker arguments.
         kwargs_pty, kwargs_mpl, **kwargs: optional
             Pass specific keyword arguments to the line core method.
+
+        Examples
+        --------
+
+        Using the interplot.Plot method:
+
+        >>> fig = interplot.Plot(title="line, linescatter and scatter")
+        ... fig.add_line([0,4,6,7], [1,2,4,8])
+        ... fig.add_linescatter([0,4,6,7], [8,4,2,1])
+        ... fig.add_scatter([0,4,6,7], [2,4,4,2], )
+        ... fig.post_process()
+        ... fig.show()
+
+        [plotly figure, "line, linescatter and scatter"]
+
+        Using interplot.line:
+
+        >>> interplot.line([0,4,6,7], [1,2,4,8])
+
+        .. raw:: html
+            :file: ../source/plot_examples/basic_plot_pty.html
+
+        >>> interplot.line(
+        ...     x=[0,4,6,7],
+        ...     y=[1,2,4,8],
+        ...     interactive=False,
+        ...     color="red",
+        ...     title="matplotlib static figure",
+        ...     xlabel="abscissa",
+        ...     ylabel="ordinate",
+        ... )
+
+        .. image:: plot_examples/basic_plot_mpl.png
+            :alt: [matplotlib plot "Normally distributed Noise]
         """
         self.element_count[row, col] += 1
         mode = "lines" if mode is None else mode
@@ -1294,6 +1287,8 @@ class Plot(NotebookInteraction):
             Can be hex, rgb(a) or any named color that is understood
             by matplotlib.
 
+            The color cycle can be accessed with "C0", "C1", ...
+
             Default: color is retrieved from `Plot.digest_color`,
             which cycles through `COLOR_CYCLE`.
         opacity: float, optional
@@ -1416,8 +1411,11 @@ class Plot(NotebookInteraction):
             Trace label for legend.
         color: str, optional
             Trace color.
+
             Can be hex, rgb(a) or any named color that is understood
             by matplotlib.
+
+            The color cycle can be accessed with "C0", "C1", ...
 
             Default: color is retrieved from `Plot.digest_color`,
             which cycles through `COLOR_CYCLE`.
@@ -1519,6 +1517,8 @@ class Plot(NotebookInteraction):
 
             Can be hex, rgb(a) or any named color that is understood
             by matplotlib.
+
+            The color cycle can be accessed with "C0", "C1", ...
 
             Default: color is retrieved from `Plot.digest_color`,
             which cycles through `COLOR_CYCLE`.
@@ -1819,6 +1819,9 @@ class Plot(NotebookInteraction):
 
             Can be hex, rgb(a) or any named color that is understood
             by matplotlib.
+
+            The color cycle can be accessed with "C0", "C1", ...
+
             If line_color is undefined, the the fill color will be used.
 
             Default: color is retrieved from `Plot.digest_color`,
@@ -1966,8 +1969,14 @@ class Plot(NotebookInteraction):
             Specify the anchor for each axis separate.
         color: str, default: "black"
             Trace color.
+
             Can be hex, rgb(a) or any named color that is understood
             by matplotlib.
+
+            The color cycle can be accessed with "C0", "C1", ...
+
+            Default: color is retrieved from `Plot.digest_color`,
+            which cycles through `COLOR_CYCLE`.
         opacity: float, optional
             Opacity (=alpha) of the fill.
 
@@ -2070,21 +2079,27 @@ class Plot(NotebookInteraction):
             PLOTLY ONLY.
             Pass a function reference to further style the plotly graphs.
             Function must accept fig and return fig.
-            Example:
-            >>> def pty_custom_func(fig):
-            >>>     fig.do_stuff()
-            >>>     return fig
+
             Default: None
+
+            Example:
+
+            >>> def pty_custom_func(fig):
+            ...     fig.do_stuff()
+            ...     return fig
         mpl_custom_func: function, optional
             MATPLOTLIB ONLY.
             Pass a function reference to further style the matplotlib graphs.
             Function must accept fig, ax and return fig, ax.
-            Example:
-            >>> def mpl_custom_func(fig, ax):
-            >>>     fig.do_stuff()
-            >>>     ax.do_more()
-            >>>     return fig, ax
+
             Default: None
+
+            Example:
+
+            >>> def mpl_custom_func(fig, ax):
+            ...     fig.do_stuff()
+            ...     ax.do_more()
+            ...     return fig, ax
         """
         # input verification
         pty_update_layout = (
@@ -2308,25 +2323,38 @@ def magic_plot(core, doc_decorator=None):
     Your function feeds the data, the wrapper gives control over the plot
     to the user.
 
-    Examples
-    --------
-    >>> @interplot.magic_plot
-    ... def line(
-    ...     data,
-    ...     fig,
-    ...     **kwargs,
-    ... ):
-    ...     fig.add_line(data)
-    ...
-    ... line([0,4,6,7], title="Plot title", interactive=False)
-    [matplotlib figure, "Plot title"]
-
     Parameters
     ----------
     doc_decorator: str, optional
         Append the docstring with the decorated parameters.
 
         By default, the global variable `_DOCSTRING_DECORATOR` will be used.
+
+    Examples
+    --------
+    >>> @interplot.magic_plot
+    ... def plot_lines(samples=100, n=10, label="sigma={0}, mu={1}", fig=None):
+    ...     \"\"\"
+    ...     Plot Gaussian noise.
+    ...
+    ...     The function must accept the `fig` parameter from the decorator.
+    ...     \"\"\"
+    ...     for i in range(1, n+1):
+    ...         fig.add_line(
+    ...             np.random.normal(i*10,i,samples),
+    ...             label=label.format(i, i*10),
+    ...         )
+
+    >>> plot_lines(samples=200, title="Normally distributed Noise")
+
+    .. raw:: html
+        :file: ../source/plot_examples/gauss_plot_pty.html
+
+    >>> plot_lines(
+    ...     samples=200, interactive=False, title="Normally distributed Noise")
+
+    .. image:: plot_examples/gauss_plot_mpl.png
+        :alt: [matplotlib plot "Normally distributed Noise]
     """
     doc_decorator = (
         conf._DOCSTRING_DECORATOR
@@ -2415,6 +2443,18 @@ def magic_plot_preset(doc_decorator=None, **kwargs_preset):
     Your function feeds the data, the wrapper gives control over the plot
     to the user.
 
+    Parameters
+    ----------
+    doc_decorator: str, optional
+        Append the docstring with the decorated parameters.
+
+        By default, the global variable `conf._DOCSTRING_DECORATOR`
+        will be used.
+    **kwargs_preset: dict
+        Define presets for any keyword arguments accepted by `Plot`.
+
+        Setting `strict_preset=True` prevents overriding the preset.
+
     Examples
     --------
     >>> @interplot.magic_plot_preset(
@@ -2430,19 +2470,8 @@ def magic_plot_preset(doc_decorator=None, **kwargs_preset):
     ...     fig.add_line(data)
     ...
     ... line([0,4,6,7], xlabel="X axis")
+
     [matplotlib figure, "Data view"]
-
-    Parameters
-    ----------
-    doc_decorator: str, optional
-        Append the docstring with the decorated parameters.
-
-        By default, the global variable `conf._DOCSTRING_DECORATOR`
-        will be used.
-    **kwargs_preset: dict
-        Define presets for any keyword arguments accepted by `Plot`.
-
-        Setting `strict_preset=True` prevents overriding the preset.
     """
     strict_preset = kwargs_preset.get("strict_preset", False)
     if "strict_preset" in kwargs_preset:

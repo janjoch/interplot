@@ -1,6 +1,10 @@
-=====================================================
-`interplot` zip tools Documentation and API reference
-=====================================================
+=================================================================
+`interplot.iter`: Iteration Tools Documentation and API reference
+=================================================================
+
+.. contents:: On this page
+    :depth: 3
+
 
 .. automodule:: interplot.iter
 
