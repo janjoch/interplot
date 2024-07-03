@@ -131,7 +131,7 @@ Examples
 |br|
 
 .. note::
-   More examples can be found on `NBViewer`_
+   More examples can be found on `NBViewer`_.
 
 .. _NBViewer: https://nbviewer.org/github/janjoch/interplot/tree/main/demo/
 
