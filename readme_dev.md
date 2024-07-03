@@ -20,4 +20,15 @@
 
 ```twine upload dist/*```
 
-(save access tokens locally in the `.pypirc` file)
+Save access tokens locally in the `~/.pypirc` file (in the user home directory).
+
+
+### Backup dist files (optional)
+
+Move the files to the local dists backup folder.
+
+
+### Merge Branch to `main`
+
+
+### Create GitHub release
