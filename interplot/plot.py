@@ -77,6 +77,26 @@ if CALLED_FROM_NOTEBOOK:
     init_notebook_mode()
 
 
+def pick_non_none(*args):
+    """
+    Return the first non-None argument.
+
+    Parameters
+    ----------
+    *args: any
+        Any number of arguments.
+
+    Returns
+    -------
+    any
+        The first non-None argument.
+    """
+    for arg in args:
+        if arg is not None:
+            return arg
+    return None
+
+
 def _rewrite_docstring(doc_core, doc_decorator=None, kwargs_remove=()):
     """
     Appends arguments to a docstring.
@@ -539,12 +559,14 @@ class Plot(NotebookInteraction):
         dpi=None,
         legend_loc=None,
         legend_title=None,
+        color_cycle=None,
         save_fig=None,
         save_format=None,
         save_config=None,
-        pty_update_layout=None,
-        pty_custom_func=None,
+        global_custom_func=None,
         mpl_custom_func=None,
+        pty_custom_func=None,
+        pty_update_layout=None,
     ):
         # input verification
         if shared_xaxes == "cols":
@@ -552,10 +574,9 @@ class Plot(NotebookInteraction):
         if shared_yaxes == "cols":
             shared_yaxes = "columns"
 
-        self.interactive = (
-            conf.INTERACTIVE
-            if interactive is None
-            else interactive
+        self.interactive = pick_non_none(
+            interactive,
+            conf.INTERACTIVE,
         )
         self.rows = rows
         self.cols = cols
@@ -564,25 +585,32 @@ class Plot(NotebookInteraction):
         self.ylabel = ylabel
         self.xlim = xlim
         self.ylim = ylim
+        self.dpi = pick_non_none(
+            dpi,
+            conf.DPI,
+        )
         self.legend_loc = legend_loc
         self.legend_title = legend_title
-        self.dpi = conf.DPI if dpi is None else dpi
+        self.color_cycle = pick_non_none(
+            color_cycle,
+            conf.COLOR_CYCLE,
+        )
         self.save_fig = save_fig
         self.save_format = save_format
         self.save_config = save_config
-        self.pty_update_layout = pty_update_layout
-        self.pty_custom_func = pty_custom_func
+        self.global_custom_func = global_custom_func
         self.mpl_custom_func = mpl_custom_func
+        self.pty_custom_func = pty_custom_func
+        self.pty_update_layout = pty_update_layout
         self.element_count = np.zeros((rows, cols), dtype=int)
         self.i_color = 0
 
         # init plotly
         if self.interactive:
             self.title = self._encode_html(self.title)
-            self.fig_size = (
-                conf.PTY_FIG_SIZE
-                if fig_size is None
-                else fig_size
+            self.fig_size = pick_non_none(
+                fig_size,
+                conf.PTY_FIG_SIZE,
             )
 
             # init fig
@@ -663,10 +691,9 @@ class Plot(NotebookInteraction):
             )
 
             # convert px to inches
-            self.fig_size = (
-                conf.MPL_FIG_SIZE
-                if fig_size is None
-                else fig_size
+            self.fig_size = pick_non_none(
+                fig_size,
+                conf.MPL_FIG_SIZE,
             )
             px = 1 / self.dpi
             figsize = (self.fig_size[0] * px, self.fig_size[1] * px)
@@ -771,7 +798,7 @@ class Plot(NotebookInteraction):
             on hover)
         """
         legend_kwargs = dict(
-            name=default_label if label is None else str(label)
+            name=pick_non_none(label, default_label),
         )
         if show_legend:
             legend_kwargs["showlegend"] = True
@@ -833,13 +860,13 @@ class Plot(NotebookInteraction):
             HEX color, with leading hashtag
         """
         if i is None:
-            if self.i_color >= len(conf.COLOR_CYCLE):
+            if self.i_color >= len(self.color_cycle):
                 self.i_color = 0
-            color = conf.COLOR_CYCLE[self.i_color]
+            color = self.color_cycle[self.i_color]
             self.i_color += increment
             return color
         else:
-            return conf.COLOR_CYCLE[i]
+            return self.color_cycle[i]
 
     def digest_color(self, color=None, alpha=None, increment=1):
         """
@@ -864,7 +891,7 @@ class Plot(NotebookInteraction):
 
         # get index from COLOR_CYCLE
         elif color[0] == "C" or color[0] == "c":
-            color = conf.COLOR_CYCLE[int(color[1:]) % len(conf.COLOR_CYCLE)]
+            color = self.color_cycle[int(color[1:]) % len(self.color_cycle)]
 
         rgba = list(mcolors.to_rgba(color))
         if alpha is not None:
@@ -2059,71 +2086,111 @@ class Plot(NotebookInteraction):
 
     def post_process(
         self,
-        pty_update_layout=None,
-        pty_custom_func=None,
+        global_custom_func=None,
         mpl_custom_func=None,
+        pty_custom_func=None,
+        pty_update_layout=None,
     ):
         """
         Finish the plot.
 
         Parameters
         ----------
-        Note: If not provided, the parameters given on init will be used.
-        pty_update_layout: dict, optional
-            PLOTLY ONLY.
-            Pass keyword arguments to plotly's
-            fig.update_layout(**pty_update_layout)
-            Thus, take full control over
-            Default: None
-        pty_custom_func: function, optional
-            PLOTLY ONLY.
-            Pass a function reference to further style the plotly graphs.
-            Function must accept fig and return fig.
-
-            Default: None
-
-            Example:
-
-            >>> def pty_custom_func(fig):
-            ...     fig.do_stuff()
-            ...     return fig
-        mpl_custom_func: function, optional
+        Note: If not provided, the parameters given on init or
+        the `interplot.conf` default values will be used.
+        mpl_custom_func: function, default: None
             MATPLOTLIB ONLY.
+
             Pass a function reference to further style the matplotlib graphs.
-            Function must accept fig, ax and return fig, ax.
+            Function must accept `fig, ax` and return `fig, ax`.
 
-            Default: None
+            If providing your own function reference, `conf.MPL_CUSTOM_FUNC`
+            will not be executed.
 
-            Example:
+            Note: `ax` always has `row` and `col` coordinates, even if the
+            plot is just 1x1.
 
             >>> def mpl_custom_func(fig, ax):
+            ...     # do your customisations
             ...     fig.do_stuff()
-            ...     ax.do_more()
+            ...     ax[0, 0].do_more()
+            ...
+            ...     # also include default function
+            ...     fig, ax = conf.MPL_CUSTOM_FUNC(fig, ax)
+            ...
             ...     return fig, ax
+            ...
+            ... fig = interplot.Plot(
+            ...     interactive=False,
+            ...     mpl_custom_func=mpl_custom_func
+            ... )
+            ... fig.add_line(x, y)
+            ... fig.post_process()  # mpl_custom_func will be executed here
+            ... fig.show()
+        pty_custom_func: function, default: None
+            PLOTLY ONLY.
+
+            Pass a function reference to further style the plotly graphs.
+            Function must accept `fig` and return `fig`.
+
+            If providing your own function reference, `conf.PTY_CUSTOM_FUNC`
+            will not be executed.
+
+            >>> def pty_custom_func(fig):
+            ...     # do your customisations
+            ...     fig.do_stuff()
+            ...
+            ...     # also include default function
+            ...     fig = conf.PTY_CUSTOM_FUNC(fig)
+            ...
+            ...     return fig
+            ...
+            ... fig = interplot.Plot(
+            ...     interactive=True,
+            ...     pty_custom_func=pty_custom_func
+            ... )
+            ... fig.add_line(x, y)
+            ... fig.post_process()  # pty_custom_func will be executed here
+            ... fig.show()
+        pty_update_layout: dict, default: None
+            PLOTLY ONLY.
+
+            Pass keyword arguments to plotly's
+            `plotly.graph_objects.Figure.update_layout(**pty_update_layout)`
         """
         # input verification
-        pty_update_layout = (
-            self.pty_update_layout
-            if pty_update_layout is None
-            else pty_update_layout
+        global_custom_func = pick_non_none(
+            global_custom_func,
+            self.global_custom_func,
+            conf.GLOBAL_CUSTOM_FUNC,
+            lambda _: None,
         )
-        pty_custom_func = (
-            self.pty_custom_func
-            if pty_custom_func is None
-            else pty_custom_func
+        mpl_custom_func = pick_non_none(
+            mpl_custom_func,
+            self.mpl_custom_func,
+            conf.MPL_CUSTOM_FUNC,
+            lambda fig, ax: (fig, ax),
         )
-        mpl_custom_func = (
-            self.mpl_custom_func
-            if mpl_custom_func is None
-            else mpl_custom_func
+        pty_custom_func = pick_non_none(
+            pty_custom_func,
+            self.pty_custom_func,
+            conf.PTY_CUSTOM_FUNC,
+            lambda fig: fig,
         )
+        pty_update_layout = pick_non_none(
+            pty_update_layout,
+            self.pty_update_layout,
+            conf.PTY_UPDATE_LAYOUT,
+            dict(),
+        )
+
+        # global custom function
+        global_custom_func(self)
 
         # PLOTLY
         if self.interactive:
-            if pty_update_layout is not None:
-                self.fig.update_layout(**pty_update_layout)
-            if pty_custom_func is not None:
-                self.fig = pty_custom_func(self.fig)
+            self.fig.update_layout(**pty_update_layout)
+            self.fig = pty_custom_func(self.fig)
 
         # MATPLOTLIB
         else:
@@ -2294,6 +2361,14 @@ class Plot(NotebookInteraction):
             )
         return self.fig.show()
 
+    def close(self):
+        """Close the plot."""
+        if not self.interactive:
+            plt.close(self.fig)
+
+        else:
+            warn("close() is not supported for interactive plots.")
+
     def _repr_mimebundle_(self, *args, **kwargs):
         if self.interactive:
             return self.fig._repr_mimebundle_(*args, **kwargs)
@@ -2364,11 +2439,11 @@ def magic_plot(core, doc_decorator=None):
 
     def wrapper(
         *args,
+        fig=None,
+        skip_post_process=False,
         interactive=None,
         rows=1,
         cols=1,
-        fig=None,
-        skip_post_process=False,
         title=None,
         xlabel=None,
         ylabel=None,
@@ -2382,12 +2457,14 @@ def magic_plot(core, doc_decorator=None):
         dpi=None,
         legend_loc=None,
         legend_title=None,
+        color_cycle=None,
         save_fig=None,
         save_format=None,
         save_config=None,
-        pty_update_layout=None,
-        pty_custom_func=None,
+        global_custom_func=None,
         mpl_custom_func=None,
+        pty_custom_func=None,
+        pty_update_layout=None,
         **kwargs,
     ):
         # init Plot
@@ -2409,12 +2486,14 @@ def magic_plot(core, doc_decorator=None):
             dpi=dpi,
             legend_loc=legend_loc,
             legend_title=legend_title,
+            color_cycle=color_cycle,
             save_fig=save_fig,
             save_format=save_format,
             save_config=save_config,
-            pty_update_layout=pty_update_layout,
-            pty_custom_func=pty_custom_func,
+            global_custom_func=global_custom_func,
             mpl_custom_func=mpl_custom_func,
+            pty_custom_func=pty_custom_func,
+            pty_update_layout=pty_update_layout,
         )
 
         # execute core method

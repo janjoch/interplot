@@ -35,7 +35,7 @@ def test_for_errors(f=lambda: None):
         try:
             f(*args, **kwargs, interactive=interactive)
             if not interactive:
-                plt.close()
+                plt.close("all")
         except:  # noqa: E722
             no_error = False
 
@@ -155,6 +155,47 @@ def test_2d_data(interactive):
 @test_for_errors
 def test_line_opacity(opacity, interactive):
     ip.line([1, 2, 3], [4, 5, 6], opacity=opacity, interactive=interactive)
+
+
+def test_default_funcs():
+    def mpl_custom_func_1(fig, ax):
+        fig.customvalue = 1
+        return fig, ax
+
+    def mpl_custom_func_2(fig, ax):
+        fig.customvalue = 2
+        return fig, ax
+
+    def mpl_custom_func_3(fig, ax):
+        fig.customvalue = 3
+        return fig, ax
+
+    ip.conf.MPL_CUSTOM_FUNC = mpl_custom_func_1
+
+    fig = ip.Plot(
+        interactive=False,
+    )
+    fig.add_line((1, 4))
+    fig.post_process()
+    assert fig.fig.customvalue == 1
+
+    fig = ip.Plot(
+        interactive=False,
+        mpl_custom_func=mpl_custom_func_2,
+    )
+    fig.add_line((1, 4))
+    fig.post_process()
+    assert fig.fig.customvalue == 2
+
+    fig = ip.Plot(
+        interactive=False,
+        mpl_custom_func=mpl_custom_func_2,
+    )
+    fig.add_line((1, 4))
+    fig.post_process(mpl_custom_func=mpl_custom_func_3)
+    assert fig.fig.customvalue == 3
+
+    plt.close("all")
 
 
 @test_for_errors

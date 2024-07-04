@@ -90,3 +90,9 @@ One-line Plotting
     :private-members: _repr_html_, _repr_mimebundle_
     :member-order: bysource
 
+
+----------------
+Helper functions
+----------------
+
+.. autofunction:: interplot.pick_non_none

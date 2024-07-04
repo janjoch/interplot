@@ -69,7 +69,7 @@ Supported
         [matplotlib figure "Preset Title"]
         ```
 
-    - The ```interplot.Plot``` class for full control
+    - The `interplot.Plot` class for full control
         ```python
         >>> fig = interplot.Plot(
         >>>     interactive=True,

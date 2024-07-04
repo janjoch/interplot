@@ -27,6 +27,12 @@
 
 .. autovariable:: interplot.conf.EXPORT_REPLACE
 
+.. autofunction:: interplot.conf.GLOBAL_CUSTOM_FUNC
+
+.. autofunction:: interplot.conf.MPL_CUSTOM_FUNC
+
+.. autofunction:: interplot.conf.PTY_CUSTOM_FUNC
+
 .. autovariable:: interplot.conf.PTY_CONFIG
 
 .. autovariable:: interplot.conf.PTY_LINE_STYLES
