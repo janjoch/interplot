@@ -77,7 +77,7 @@ if CALLED_FROM_NOTEBOOK:
     init_notebook_mode()
 
 
-def pick_non_none(*args):
+def pick_non_none(*args, fail=False):
     """
     Return the first non-None argument.
 
@@ -85,6 +85,10 @@ def pick_non_none(*args):
     ----------
     *args: any
         Any number of arguments.
+    fail: bool, default: False
+        Throw a ValueError if all args are None.
+
+        If set to False, None will be returned.
 
     Returns
     -------
@@ -94,6 +98,8 @@ def pick_non_none(*args):
     for arg in args:
         if arg is not None:
             return arg
+    if fail:
+        raise ValueError("All arguments have value None.")
     return None
 
 
