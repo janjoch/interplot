@@ -1,3 +1,32 @@
+"""
+This is the compressed version of interplot.
+
+Unpacking:
+
+>>> from interplot_minimal import unpack
+... unpack()
+
+Then either:
+```bash
+cd interplot_module
+pip install -e .
+```
+
+or
+1. move to the directory interplot_module
+2. create a new notebook
+3. >>> pip install -e .
+4. if no imports possible: >>> pip install --no-dependencies -e .
+
+or
+1. move the inner `interplot` folder to the directory where you want to use it.
+
+
+to use it:
+>>> import interplot as ip
+"""
+
+
 import re
 import io
 from pathlib import Path
