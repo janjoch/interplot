@@ -1,2 +1,4 @@
-docs/* linguist-vendored
-build/* linguist-vendored
+* linguist-vendored
+*.py linguist-vendored=false
+*.ipynb linguist-vendored=false
+*.md linguist-vendored=false
