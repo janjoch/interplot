@@ -1,3 +1,17 @@
+# Roadmap for future development
+
+- [ ] `fig.add_image`
+- [ ] enable `zorder` (supported in `plotly>=5.21.0`)
+- [ ] `fig.add_text` more options
+    - [ ] font size
+    - [ ] rotation
+    - [ ] font (?)
+    - [ ] fontstyle
+        - plotly: supports inline HTML tags
+        - plt: only entirely text formatting
+        - LaTeX support: on both platforms with $ \dots $, but on plotly it doesn't work in Notebooks...???
+
+
 # Development workflows
 
 
