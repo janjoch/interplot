@@ -141,6 +141,127 @@ Use <cite>None</cite> for adaptive size.</p>
 and the (regex) replacement as values.</p>
 </dd></dl>
 
+<dl class="py function">
+<dt class="sig sig-object py" id="interplot.conf.GLOBAL_CUSTOM_FUNC">
+<span class="sig-prename descclassname"><span class="pre">interplot.conf.</span></span><span class="sig-name descname"><span class="pre">GLOBAL_CUSTOM_FUNC</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fig</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#interplot.conf.GLOBAL_CUSTOM_FUNC" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply a custom function on figures on finishing the plot.</p>
+<p>Will be called in <cite>interplot.Plot.post_process()</cite>.</p>
+<p>When overriding this function, make sure it accepts <cite>fig</cite>.
+There is no need to return <cite>fig</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>fig: interplot.Plot instance</strong></dt><dd></dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">global_custom_func</span><span class="p">(</span><span class="n">fig</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="c1"># do your customisations</span>
+<span class="gp">... </span>    <span class="n">fig</span><span class="o">.</span><span class="n">add_text</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;watermark&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;gray&quot;</span><span class="p">)</span>
+<span class="gp">...</span>
+<span class="gp">... </span>    <span class="c1"># also include default function</span>
+<span class="gp">... </span>    <span class="n">conf</span><span class="o">.</span><span class="n">GLOBAL_CUSTOM_FUNC</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
+<span class="gp">...</span>
+<span class="gp">... </span><span class="n">fig</span> <span class="o">=</span> <span class="n">interplot</span><span class="o">.</span><span class="n">Plot</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">global_custom_func</span><span class="o">=</span><span class="n">global_custom_func</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">... </span><span class="n">fig</span><span class="o">.</span><span class="n">add_line</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="gp">... </span><span class="n">fig</span><span class="o">.</span><span class="n">post_process</span><span class="p">()</span>  <span class="c1"># global_custom_func will be executed here</span>
+<span class="gp">... </span><span class="n">fig</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="interplot.conf.MPL_CUSTOM_FUNC">
+<span class="sig-prename descclassname"><span class="pre">interplot.conf.</span></span><span class="sig-name descname"><span class="pre">MPL_CUSTOM_FUNC</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fig</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#interplot.conf.MPL_CUSTOM_FUNC" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply a custom function on matplotlib figures on finishing the plot.</p>
+<p>Will be called in <cite>interplot.Plot.post_process()</cite>.</p>
+<p>When overriding this function, make sure it accepts <cite>fig</cite> and <cite>ax</cite>
+and returns <cite>fig</cite> and <cite>ax</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>fig</strong><span class="classifier">matplotlib.figure.Figure</span></dt><dd><p>The figure object.</p>
+</dd>
+<dt><strong>ax</strong><span class="classifier">matplotlib.axes.Axes</span></dt><dd><p>The axes object.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>fig</strong><span class="classifier">matplotlib.figure.Figure</span></dt><dd><p>The modified figure object.</p>
+</dd>
+<dt><strong>ax</strong><span class="classifier">matplotlib.axes.Axes</span></dt><dd><p>The modified axes object.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">mpl_custom_func</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="c1"># do your customisations</span>
+<span class="gp">... </span>    <span class="n">fig</span><span class="o">.</span><span class="n">do_stuff</span><span class="p">()</span>
+<span class="gp">... </span>    <span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">do_more</span><span class="p">()</span>
+<span class="gp">...</span>
+<span class="gp">... </span>    <span class="c1"># also include default function</span>
+<span class="gp">... </span>    <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">conf</span><span class="o">.</span><span class="n">MPL_CUSTOM_FUNC</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span><span class="p">)</span>
+<span class="gp">...</span>
+<span class="gp">... </span>    <span class="k">return</span> <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span>
+<span class="gp">...</span>
+<span class="gp">... </span><span class="n">fig</span> <span class="o">=</span> <span class="n">interplot</span><span class="o">.</span><span class="n">Plot</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">interactive</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">mpl_custom_func</span><span class="o">=</span><span class="n">mpl_custom_func</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">... </span><span class="n">fig</span><span class="o">.</span><span class="n">add_line</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="gp">... </span><span class="n">fig</span><span class="o">.</span><span class="n">post_process</span><span class="p">()</span>  <span class="c1"># mpl_custom_func will be executed here</span>
+<span class="gp">... </span><span class="n">fig</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="interplot.conf.PTY_CUSTOM_FUNC">
+<span class="sig-prename descclassname"><span class="pre">interplot.conf.</span></span><span class="sig-name descname"><span class="pre">PTY_CUSTOM_FUNC</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fig</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#interplot.conf.PTY_CUSTOM_FUNC" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply a custom function on plotly figures on finishing the plot.</p>
+<p>Will be called in <cite>interplot.Plot.post_process()</cite>.</p>
+<p>When overriding this function, make sure it accepts <cite>fig</cite>
+and returns <cite>fig</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>fig</strong><span class="classifier">plotly.graph_objects.Figure</span></dt><dd><p>The figure object.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>fig</strong><span class="classifier">plotly.graph_objects.Figure</span></dt><dd><p>The modified figure object.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">pty_custom_func</span><span class="p">(</span><span class="n">fig</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="c1"># do your customisations</span>
+<span class="gp">... </span>    <span class="n">fig</span><span class="o">.</span><span class="n">do_stuff</span><span class="p">()</span>
+<span class="gp">...</span>
+<span class="gp">... </span>    <span class="c1"># also include default function</span>
+<span class="gp">... </span>    <span class="n">fig</span> <span class="o">=</span> <span class="n">conf</span><span class="o">.</span><span class="n">PTY_CUSTOM_FUNC</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
+<span class="gp">...</span>
+<span class="gp">... </span>    <span class="k">return</span> <span class="n">fig</span>
+<span class="gp">...</span>
+<span class="gp">... </span><span class="n">fig</span> <span class="o">=</span> <span class="n">interplot</span><span class="o">.</span><span class="n">Plot</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">interactive</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">pty_custom_func</span><span class="o">=</span><span class="n">pty_custom_func</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">... </span><span class="n">fig</span><span class="o">.</span><span class="n">add_line</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="gp">... </span><span class="n">fig</span><span class="o">.</span><span class="n">post_process</span><span class="p">()</span>  <span class="c1"># pty_custom_func will be executed here</span>
+<span class="gp">... </span><span class="n">fig</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</dd></dl>
+
 <dl class="py data">
 <dt class="sig sig-object py" id="interplot.conf.PTY_CONFIG">
 <span class="sig-prename descclassname"><span class="pre">interplot.conf.</span></span><span class="sig-name descname"><span class="pre">PTY_CONFIG</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'displayModeBar':</span> <span class="pre">True,</span> <span class="pre">'displaylogo':</span> <span class="pre">False}</span></em><a class="headerlink" href="#interplot.conf.PTY_CONFIG" title="Permalink to this definition">¶</a></dt>
@@ -217,6 +338,9 @@ and the (regex) replacement as values.</p>
 <li><a class="reference internal" href="#interplot.conf.MPL_FIG_SIZE"><code class="docutils literal notranslate"><span class="pre">MPL_FIG_SIZE</span></code></a></li>
 <li><a class="reference internal" href="#interplot.conf.EXPORT_FORMAT"><code class="docutils literal notranslate"><span class="pre">EXPORT_FORMAT</span></code></a></li>
 <li><a class="reference internal" href="#interplot.conf.EXPORT_REPLACE"><code class="docutils literal notranslate"><span class="pre">EXPORT_REPLACE</span></code></a></li>
+<li><a class="reference internal" href="#interplot.conf.GLOBAL_CUSTOM_FUNC"><code class="docutils literal notranslate"><span class="pre">GLOBAL_CUSTOM_FUNC()</span></code></a></li>
+<li><a class="reference internal" href="#interplot.conf.MPL_CUSTOM_FUNC"><code class="docutils literal notranslate"><span class="pre">MPL_CUSTOM_FUNC()</span></code></a></li>
+<li><a class="reference internal" href="#interplot.conf.PTY_CUSTOM_FUNC"><code class="docutils literal notranslate"><span class="pre">PTY_CUSTOM_FUNC()</span></code></a></li>
 <li><a class="reference internal" href="#interplot.conf.PTY_CONFIG"><code class="docutils literal notranslate"><span class="pre">PTY_CONFIG</span></code></a></li>
 <li><a class="reference internal" href="#interplot.conf.PTY_LINE_STYLES"><code class="docutils literal notranslate"><span class="pre">PTY_LINE_STYLES</span></code></a></li>
 <li><a class="reference internal" href="#interplot.conf.MPL_LINE_STYLES"><code class="docutils literal notranslate"><span class="pre">MPL_LINE_STYLES</span></code></a></li>
