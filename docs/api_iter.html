@@ -166,7 +166,7 @@ unless <cite>interplot.conf.MUTE_STRICT_ZIP_WARNING</cite> is set to <cite>False
 <h2><a class="toc-backref" href="#id4" role="doc-backlink"><cite>filter_nozip</cite></a><a class="headerlink" href="#filter-nozip" title="Permalink to this heading">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="interplot.filter_nozip">
-<span class="sig-prename descclassname"><span class="pre">interplot.</span></span><span class="sig-name descname"><span class="pre">filter_nozip</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iterable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">no_iter_types</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recursive</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(2,)</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#interplot.filter_nozip" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">interplot.</span></span><span class="sig-name descname"><span class="pre">filter_nozip</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iterable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">no_iter_types</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(2,)</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#interplot.filter_nozip" title="Permalink to this definition">¶</a></dt>
 <dd><p>Prevent certain patterns from being unpacked in <cite>interplot.zip_smart</cite>.</p>
 <p>Wraps fixed patterns into <cite>interplot.repeat</cite>, so that they are not unpacked
 in <cite>interplot.zip_smart</cite>.</p>
@@ -175,9 +175,19 @@ in <cite>interplot.zip_smart</cite>.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl>
-<dt><strong>iterable</strong></dt><dd></dd>
-<dt><strong>no_iter_types, tuple, optional</strong></dt><dd><p>Types which, if found, indicate this iterable should not be unpacked.</p>
+<dt><strong>iterable: Any</strong></dt><dd><p>The object to potentially iterate.</p>
+</dd>
+<dt><strong>no_iter_types, tuple, optional</strong></dt><dd><p>If only these types are found in the iterable, it will not be unpacked,
+given it has the correct length.</p>
 <p>Default: (<cite>float</cite>, <cite>int</cite>, <cite>datetime</cite>)</p>
+</dd>
+<dt><strong>depth: int, default: 0</strong></dt><dd><p>Maximum depth to recurse.</p>
+<p>Depth 0 will only check the first level,
+depth 1 will check two levels, …</p>
+<p>Set to -1 to recurse infinitely.</p>
+</dd>
+<dt><strong>length: tuple, default: (2, )</strong></dt><dd><p>If the iterable has one of the lengths in this tuple,
+it will not be unpacked.</p>
 </dd>
 </dl>
 </dd>
