@@ -169,6 +169,3 @@ cython_debug/
 
 # Jupyter Notebook playground
 /playground/
-
-# minimalized interplot
-interplot_minimal.py

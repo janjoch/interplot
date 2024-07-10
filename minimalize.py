@@ -139,4 +139,6 @@ def unpack(dir="interplot_module"):
 if __name__ == "__main__":
     minimalize(None)
 
+    print("Successfully minimized interplot to interplot_minimal.py.")
+
     # unpack()
