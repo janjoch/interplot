@@ -169,3 +169,6 @@ cython_debug/
 
 # Jupyter Notebook playground
 /playground/
+
+# pycharm stuff
+.idea
