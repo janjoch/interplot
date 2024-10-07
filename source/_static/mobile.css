@@ -34,11 +34,13 @@
 
 	.sphinxsidebarwrapper {
 		width: 100% !important;
-		height: auto !important;
 		display: none !important;
 		background-color: #143f52 !important;
 		padding: 10px !important;
 		box-sizing: border-box !important;
+		height: auto !important;
+		max-height: 100vh !important;
+		overflow-y: auto !important;
 	}
 	.sphinxsidebar.opened .sphinxsidebarwrapper {
 		display: block !important;
