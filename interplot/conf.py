@@ -392,6 +392,10 @@ _DOCSTRING_DECORATOR = """
             - a tuple
             - a tuple for each row
             - a tuple for each row containing a tuple for each column.
+    xlog, ylog: bool or bool tuple, default: False
+        Logarithmic scale for the axis.
+
+        Either one boolean for the entire axis or one for each row/column.
     shared_xaxes, shared_yaxes: str, default: None
         Define how multiple subplots share there axes.
 

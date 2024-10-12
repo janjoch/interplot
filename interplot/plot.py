@@ -557,6 +557,8 @@ class Plot(NotebookInteraction):
         ylabel=None,
         xlim=None,
         ylim=None,
+        xlog=False,
+        ylog=False,
         shared_xaxes=False,
         shared_yaxes=False,
         column_widths=None,
@@ -591,6 +593,8 @@ class Plot(NotebookInteraction):
         self.ylabel = ylabel
         self.xlim = xlim
         self.ylim = ylim
+        self.xlog = xlog
+        self.ylog = ylog
         self.dpi = pick_non_none(
             dpi,
             conf.DPI,
@@ -653,16 +657,20 @@ class Plot(NotebookInteraction):
                 barmode="group",
             )
 
-            # axis limits
-            for i_row, xlim_row, ylim_row in zip_smart(
+            # axis limits and log scale
+            for i_row, xlim_row, ylim_row, xlog_row, ylog_row in zip_smart(
                 range(1, self.rows + 1),
                 filter_nozip(self.xlim),
                 filter_nozip(self.ylim),
+                xlog,
+                ylog,
             ):
-                for i_col, xlim_tile, ylim_tile in zip_smart(
+                for i_col, xlim_tile, ylim_tile, xlog_tile, ylog_tile in zip_smart(
                     range(1, self.cols + 1),
                     filter_nozip(xlim_row),
                     filter_nozip(ylim_row),
+                    xlog_row,
+                    ylog_row,
                 ):
                     if (
                         xlim_tile is not None
@@ -676,11 +684,13 @@ class Plot(NotebookInteraction):
                         range=xlim_tile,
                         row=i_row,
                         col=i_col,
+                        type="log" if xlog_tile else None,
                     )
                     self.fig.update_yaxes(
                         range=ylim_tile,
                         row=i_row,
                         col=i_col,
+                        type="log" if ylog_tile else None,
                     )
 
             # axis labels
@@ -766,8 +776,18 @@ class Plot(NotebookInteraction):
             else:
                 self.fig.supylabel(self.ylabel)
 
+            # log scale
+            for row, xlog_row in zip_smart(range(self.rows), xlog):
+                for col, xlog_tile in zip_smart(range(self.cols), xlog_row):
+                    if xlog_tile:
+                        self.ax[row, col].set_xscale("log")
+            for row, ylog_row in zip_smart(range(self.rows), ylog):
+                for col, ylog_tile in zip_smart(range(self.cols), ylog_row):
+                    if ylog_tile:
+                        self.ax[row, col].set_yscale("log")
+
     @staticmethod
-    def init(fig, *args, **kwargs):
+    def init(fig=None, *args, **kwargs):
         """
         Initialize a Plot instance, if not already initialized.
 
