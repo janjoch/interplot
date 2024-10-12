@@ -32,7 +32,7 @@ import io
 from pathlib import Path
 
 
-files_to_minimalize = [
+files_to_minimize = [
     "setup.py",
     "requirements.txt",
     "README.md",
@@ -40,19 +40,19 @@ files_to_minimalize = [
 ]
 
 
-def minimalize(files: None):
+def minimize(files: None):
     if files is None:
-        files = files_to_minimalize
+        files = files_to_minimize
 
     with io.open(Path(__file__), "r", encoding="utf-8") as f:
-        minimalizer = f.read()
+        minimizer = f.read()
 
     with io.open(Path("interplot_minimal.py"), "w+", encoding="utf-8") as f:
 
-        f.write(minimalizer)
+        f.write(minimizer)
 
         for file in files:
-            minimalize_path_object(file, f)
+            minimize_path_object(file, f)
 
         f.write(
             "\n#############\n"
@@ -61,18 +61,18 @@ def minimalize(files: None):
         )
 
 
-def minimalize_path_object(path, f):
+def minimize_path_object(path, f):
     if isinstance(path, str):
         path = Path(path)
     if path.is_dir():
         for path_ in path.iterdir():
-            minimalize_path_object(path_, f)
+            minimize_path_object(path_, f)
     else:
         if re.search(r"\.(py|txt|md)$", path.name):
-            minimalize_file(path, f)
+            minimize_file(path, f)
 
 
-def minimalize_file(file, f):
+def minimize_file(file, f):
     print("WRITING", file)
 
     path_str = str(file)
@@ -137,7 +137,7 @@ def unpack(dir="interplot_module"):
 
 
 if __name__ == "__main__":
-    minimalize(None)
+    minimize(None)
 
     print("Successfully minimized interplot to interplot_minimal.py.")
 

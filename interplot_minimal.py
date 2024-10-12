@@ -32,7 +32,7 @@ import io
 from pathlib import Path
 
 
-files_to_minimalize = [
+files_to_minimize = [
     "setup.py",
     "requirements.txt",
     "README.md",
@@ -40,19 +40,19 @@ files_to_minimalize = [
 ]
 
 
-def minimalize(files: None):
+def minimize(files: None):
     if files is None:
-        files = files_to_minimalize
+        files = files_to_minimize
 
     with io.open(Path(__file__), "r", encoding="utf-8") as f:
-        minimalizer = f.read()
+        minimizer = f.read()
 
     with io.open(Path("interplot_minimal.py"), "w+", encoding="utf-8") as f:
 
-        f.write(minimalizer)
+        f.write(minimizer)
 
         for file in files:
-            minimalize_path_object(file, f)
+            minimize_path_object(file, f)
 
         f.write(
             "\n#############\n"
@@ -61,18 +61,18 @@ def minimalize(files: None):
         )
 
 
-def minimalize_path_object(path, f):
+def minimize_path_object(path, f):
     if isinstance(path, str):
         path = Path(path)
     if path.is_dir():
         for path_ in path.iterdir():
-            minimalize_path_object(path_, f)
+            minimize_path_object(path_, f)
     else:
         if re.search(r"\.(py|txt|md)$", path.name):
-            minimalize_file(path, f)
+            minimize_file(path, f)
 
 
-def minimalize_file(file, f):
+def minimize_file(file, f):
     print("WRITING", file)
 
     path_str = str(file)
@@ -137,8 +137,7 @@ def unpack(dir="interplot_module"):
 
 
 if __name__ == "__main__":
-    minimalize(None)
-
+    minimize(None)
 
     print("Successfully minimized interplot to interplot_minimal.py.")
 
@@ -965,7 +964,7 @@ if __name__ == "__main__":
 #       return val
 #   
 #   
-#   def filter_nozip(iterable, no_iter_types=None, recursive=False, length=(2, )):
+#   def filter_nozip(iterable, no_iter_types=None, depth=0, length=(2, )):
 #       """
 #       Prevent certain patterns from being unpacked in `interplot.zip_smart`.
 #   
@@ -991,11 +990,23 @@ if __name__ == "__main__":
 #   
 #       Parameters
 #       ----------
-#       iterable
+#       iterable: Any
+#           The object to potentially iterate.
 #       no_iter_types, tuple, optional
-#           Types which, if found, indicate this iterable should not be unpacked.
+#           If only these types are found in the iterable, it will not be unpacked,
+#           given it has the correct length.
 #   
 #           Default: (`float`, `int`, `datetime`)
+#       depth: int, default: 0
+#           Maximum depth to recurse.
+#   
+#           Depth 0 will only check the first level,
+#           depth 1 will check two levels, ...
+#   
+#           Set to -1 to recurse infinitely.
+#       length: tuple, default: (2, )
+#           If the iterable has one of the lengths in this tuple,
+#           it will not be unpacked.
 #   
 #       Returns
 #       -------
@@ -1025,9 +1036,14 @@ if __name__ == "__main__":
 #               return repeat(iterable)
 #   
 #       # otherwise recursively
-#       if recursive:
+#       if depth != 0:
 #           return [
-#               filter_nozip(i, no_iter_types, length=length)
+#               filter_nozip(
+#                   i,
+#                   no_iter_types=no_iter_types,
+#                   depth=depth - 1,
+#                   length=length,
+#               )
 #               for i
 #               in iterable
 #           ]
@@ -1653,6 +1669,8 @@ if __name__ == "__main__":
 #           ylabel=None,
 #           xlim=None,
 #           ylim=None,
+#           xlog=False,
+#           ylog=False,
 #           shared_xaxes=False,
 #           shared_yaxes=False,
 #           column_widths=None,
@@ -1687,6 +1705,8 @@ if __name__ == "__main__":
 #           self.ylabel = ylabel
 #           self.xlim = xlim
 #           self.ylim = ylim
+#           self.xlog = xlog
+#           self.ylog = ylog
 #           self.dpi = pick_non_none(
 #               dpi,
 #               conf.DPI,
@@ -1749,16 +1769,20 @@ if __name__ == "__main__":
 #                   barmode="group",
 #               )
 #   
-#               # axis limits
-#               for i_row, xlim_row, ylim_row in zip_smart(
+#               # axis limits and log scale
+#               for i_row, xlim_row, ylim_row, xlog_row, ylog_row in zip_smart(
 #                   range(1, self.rows + 1),
 #                   filter_nozip(self.xlim),
 #                   filter_nozip(self.ylim),
+#                   xlog,
+#                   ylog,
 #               ):
-#                   for i_col, xlim_tile, ylim_tile in zip_smart(
+#                   for i_col, xlim_tile, ylim_tile, xlog_tile, ylog_tile in zip_smart(
 #                       range(1, self.cols + 1),
 #                       filter_nozip(xlim_row),
 #                       filter_nozip(ylim_row),
+#                       xlog_row,
+#                       ylog_row,
 #                   ):
 #                       if (
 #                           xlim_tile is not None
@@ -1772,11 +1796,13 @@ if __name__ == "__main__":
 #                           range=xlim_tile,
 #                           row=i_row,
 #                           col=i_col,
+#                           type="log" if xlog_tile else None,
 #                       )
 #                       self.fig.update_yaxes(
 #                           range=ylim_tile,
 #                           row=i_row,
 #                           col=i_col,
+#                           type="log" if ylog_tile else None,
 #                       )
 #   
 #               # axis labels
@@ -1862,8 +1888,18 @@ if __name__ == "__main__":
 #               else:
 #                   self.fig.supylabel(self.ylabel)
 #   
+#               # log scale
+#               for row, xlog_row in zip_smart(range(self.rows), xlog):
+#                   for col, xlog_tile in zip_smart(range(self.cols), xlog_row):
+#                       if xlog_tile:
+#                           self.ax[row, col].set_xscale("log")
+#               for row, ylog_row in zip_smart(range(self.rows), ylog):
+#                   for col, ylog_tile in zip_smart(range(self.cols), ylog_row):
+#                       if ylog_tile:
+#                           self.ax[row, col].set_yscale("log")
+#   
 #       @staticmethod
-#       def init(fig, *args, **kwargs):
+#       def init(fig=None, *args, **kwargs):
 #           """
 #           Initialize a Plot instance, if not already initialized.
 #   
@@ -4334,6 +4370,10 @@ if __name__ == "__main__":
 #               - a tuple
 #               - a tuple for each row
 #               - a tuple for each row containing a tuple for each column.
+#       xlog, ylog: bool or bool tuple, default: False
+#           Logarithmic scale for the axis.
+#   
+#           Either one boolean for the entire axis or one for each row/column.
 #       shared_xaxes, shared_yaxes: str, default: None
 #           Define how multiple subplots share there axes.
 #   
