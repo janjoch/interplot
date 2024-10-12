@@ -209,6 +209,8 @@ def test_complex_plot(interactive):
         xlim=(0, 100),
         shared_xaxes="all",
         shared_yaxes=False,
+        xlog=False,
+        ylog=(False, True),
         rows=2,
         cols=2,
         fig_size=(800, 600),
