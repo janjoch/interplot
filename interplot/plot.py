@@ -916,6 +916,8 @@ class Plot(NotebookInteraction):
             color = self.get_cycle_color(increment)
 
         # get index from COLOR_CYCLE
+        elif isinstance(color, int) or isinstance(color, np.integer):
+            color = self.color_cycle[color % len(self.color_cycle)]
         elif color[0] == "C" or color[0] == "c":
             color = self.color_cycle[int(color[1:]) % len(self.color_cycle)]
 
