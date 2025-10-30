@@ -25,6 +25,7 @@ from pathlib import Path
 from functools import wraps
 from datetime import datetime
 from io import BytesIO
+from PIL import Image
 
 import numpy as np
 
@@ -35,6 +36,7 @@ from xarray.core.dataarray import DataArray as xr_DataArray
 
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
+from matplotlib.offsetbox import OffsetImage, AnnotationBbox
 
 import plotly.graph_objects as go
 import plotly.express as px
@@ -64,6 +66,13 @@ def init_notebook_mode(connected=False):
     plt.plot()
     plt.close()
     plt.ioff()
+
+
+def close():
+    """
+    Close all open matplotlib figures.
+    """
+    plt.close("all")
 
 
 # if imported in notebook, init plotly notebook mode
@@ -658,14 +667,26 @@ class Plot(NotebookInteraction):
             )
 
             # axis limits and log scale
-            for i_row, xlim_row, ylim_row, xlog_row, ylog_row in zip_smart(
+            for (
+                i_row,
+                xlim_row,
+                ylim_row,
+                xlog_row,
+                ylog_row,
+            ) in zip_smart(
                 range(1, self.rows + 1),
                 filter_nozip(self.xlim),
                 filter_nozip(self.ylim),
                 xlog,
                 ylog,
             ):
-                for i_col, xlim_tile, ylim_tile, xlog_tile, ylog_tile in zip_smart(
+                for (
+                    i_col,
+                    xlim_tile,
+                    ylim_tile,
+                    xlog_tile,
+                    ylog_tile,
+                ) in zip_smart(
                     range(1, self.cols + 1),
                     filter_nozip(xlim_row),
                     filter_nozip(ylim_row),
@@ -865,6 +886,28 @@ class Plot(NotebookInteraction):
         if text is None:
             return None
         return re.sub(r"\n", "<br>", text)
+
+    def _mpl_coords_data_to_axes(self, x, y, row, col):
+        """
+        Convert data coordinates to axes coordinates.
+
+        Parameters
+        ----------
+        x, y: float
+            Data coordinates.
+        row, col: int
+            Row and col index in matplotlib manner:
+            STARTING WITH 0.
+
+        Returns
+        -------
+        x_ax, y_ax: float
+            Axes coordinates.
+        """
+        return (
+            self.ax[row, col].transData 
+            + self.ax[row, col].transAxes.inverted()
+        ).transform((x, y))
 
     def get_cycle_color(self, increment=1, i=None):
         """
@@ -2112,6 +2155,186 @@ class Plot(NotebookInteraction):
                 **kwargs,
             )
 
+    def add_image(
+        self,
+        x,
+        y,
+        image,
+        horizontal_alignment="center",
+        vertical_alignment="center",
+        data_coords=None,
+        x_size=1,
+        y_size=1,
+        sizing="contain",
+        opacity=None,
+        row=0,
+        col=0,
+        kwargs_pty=None,
+        kwargs_mpl=None,
+        **kwargs,
+    ):
+        """
+        Draw an image.
+
+        Parameters
+        ----------
+        x, y: float
+            Coordinates of the text.
+        image: Image object or str
+            The image as a PIL Image object.
+
+            For plotly, URLs are also accepted.
+        horizontal_alignment, vertical_alignment: str, default: "center"
+            Where the coordinates of the text box anchor.
+
+            Options for `horizontal_alignment`:
+                - "left"
+                - "center"
+                - "right"
+
+            Options for `vertical_alignment`:
+                - "top"
+                - "center"
+                - "bottom"
+        data_coords: bool, default: True
+            Whether the `x`, `y` coordinates are provided in data coordinates
+            or in relation to the axes.
+
+            If set to `False`, `x`, `y` should be in the range [0, 1].
+        sizing: str, default: "contain"
+            How the image should be sized.
+
+            Options:
+                - "contain": fit the image inside the box. The entire image will be visible, and the aspect ratio will be preserved.
+                - "stretch": stretch the image to fit the box. The image may be distorted.
+                - "fill": fill the box with the image. The image may be cropped, but will keep its aspect ratio. Only available for plotly.
+        opacity: float, optional
+            Opacity (=alpha) of the fill.
+        row, col: int, optional
+            If the plot contains a grid, provide the coordinates.
+
+            Attention: Indexing starts with 0!
+        kwargs_pty, kwargs_mpl, **kwargs: optional
+            Pass specific keyword arguments to the line core method.
+        """
+        # input validation
+        if x_size is None and y_size is None:
+            x_size = 1
+            y_size = 1
+
+        # PLOTLY
+        if self.interactive:
+            if kwargs_pty is None:
+                kwargs_pty = dict()
+            if vertical_alignment == "center":
+                vertical_alignment = "middle"
+            row += 1
+            col += 1
+            x_domain = "" if data_coords else " domain"
+            y_domain = "" if data_coords else " domain"
+
+            self.fig.add_layout_image(
+                dict(
+                    source=image,
+                    x=x,
+                    y=y,
+                    xref=self._get_plotly_anchor(
+                        "x", self.cols, row, col
+                    ) + x_domain,
+                    yref=self._get_plotly_anchor(
+                        "y", self.cols, row, col
+                    ) + y_domain,
+                    xanchor=horizontal_alignment,
+                    yanchor=vertical_alignment,
+                    sizex=x_size,
+                    sizey=y_size,
+                    sizing=sizing,
+                    opacity=opacity,
+                    **kwargs_pty,
+                    **kwargs,
+                )
+            )
+
+        # MATPLOTLIB
+        else:
+            # input validation
+            if kwargs_mpl is None:
+                kwargs_mpl = dict()
+            if not isinstance(image, Image.Image):
+                warn(
+                    "Image must be a PIL Image object for static "
+                    "matplotlib plot."
+                )
+
+            if data_coords or data_coords is None:
+                x1 = x + x_size
+                y1 = y + y_size
+                if horizontal_alignment == "center":
+                    x -= x_size / 2
+                    x1 -= x_size / 2
+                elif horizontal_alignment == "right":
+                    x -= x_size
+                    x1 -= x_size
+                if vertical_alignment == "center":
+                    y -= y_size / 2
+                    y1 -= y_size / 2
+                elif vertical_alignment == "top":
+                    y -= y_size
+                    y1 -= y_size
+
+                x0, y0 = self._mpl_coords_data_to_axes(
+                    x, y, row, col
+                )
+                x1, y1 = self._mpl_coords_data_to_axes(
+                    x1, y1, row, col
+                )
+
+            else:
+                x0 = x
+                x1 = x + x_size
+                y0 = y
+                y1 = y + y_size
+                if horizontal_alignment == "center":
+                    x0 -= x_size / 2
+                    x1 -= x_size / 2
+                elif horizontal_alignment == "right":
+                    x0 -= x_size
+                    x1 -= x_size
+                if vertical_alignment == "center":
+                    y0 -= y_size / 2
+                    y1 -= y_size / 2
+                elif vertical_alignment == "top":
+                    y0 -= y_size
+                    y1 -= y_size
+                
+            aspect = "auto" if sizing == "stretch" else 1.0
+            if sizing == "fill":
+                warn(
+                    "sizing='fill' is not supported for static "
+                    "matplotlib plot. 'contain' behavior is used instead."
+                )
+            if sizing == "contain" and (
+                horizontal_alignment != "center"
+                or vertical_alignment != "center"
+            ):
+                warn(
+                    "When using `sizing='contain'` with `horizontal_alignment`"
+                    " or `vertical_alignment` not set to 'center', the image "
+                    "may not be positioned as expected. "
+                    "The image box is created according to the alignment, "
+                    "but the image itself is always centered inside the box."
+                )
+
+            inset = self.ax[row, col].inset_axes(
+                [x0, y0, x1 - x0, y1 - y0],
+            )
+            inset.set_axis_off()
+            inset.imshow(
+                image,
+                aspect=aspect,
+                alpha=opacity,
+            )
+
     def post_process(
         self,
         global_custom_func=None,
@@ -2679,6 +2902,16 @@ def text(
     **kwargs,
 ):
     fig.add_text(*args, **kwargs)
+
+
+@magic_plot
+@wraps(Plot.add_image)
+def image(
+    *args,
+    fig,
+    **kwargs,
+):
+    fig.add_image(*args, **kwargs)
 
 
 @magic_plot
