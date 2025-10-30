@@ -47,6 +47,8 @@ One-line Plotting
 
 .. autofunction:: interplot.text
 
+.. autofunction:: interplot.image
+
 
 -----------------------
 `magic_plot` decorators
@@ -95,4 +97,8 @@ One-line Plotting
 Helper functions
 ----------------
 
+.. autofunction:: interplot.init_notebook_mode
+
 .. autofunction:: interplot.pick_non_none
+
+.. autofunction:: interplot.close
