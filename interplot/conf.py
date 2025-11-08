@@ -219,6 +219,14 @@ def PTY_CUSTOM_FUNC(fig):
     return fig
 
 
+PTY_LEGEND_TOGGLEGROUP = False
+"""
+PLOTLY ONLY.
+If True, elements with the same legend group will be toggled together
+when clicking on a legend item.
+"""
+
+
 PTY_UPDATE_LAYOUT = dict()
 """
 PLOTLY ONLY.
@@ -426,6 +434,11 @@ _DOCSTRING_DECORATOR = """
         the subplots may be provided.
 
         PTY: Just provide a `str`.
+    legend_togglegroup: bool, default: False
+        PLOTLY ONLY.
+
+        Whether legend items with the same group will be toggled together
+        when clicking on a legend item.
     color_cycle: list, optional
         Cycle through colors in the provided list.
 
