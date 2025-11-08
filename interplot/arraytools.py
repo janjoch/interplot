@@ -282,6 +282,7 @@ class LinearRegression(plot.NotebookInteraction):
         fig=None,  # inserted by plot.magic_plot decorator
         plot_ci=True,
         plot_pi=True,
+        label=None,
         label_data="data",
         label_reg="regression",
         label_ci="confidence interval",
@@ -307,7 +308,8 @@ class LinearRegression(plot.NotebookInteraction):
         plot_ci, plot_pi: bool, optional
             Plot the confidence and prediction intervals.
             Default: True
-        label_data, label_reg, label_ci, label_pi: str
+        label: str or interplot.Labelgroup, optional
+        label_data, label_reg, label_ci, label_pi: str or callable, optional
             Trace labels.
         color_data, color_reg, color_ci, color_pi: str, optional
             Trace color.
@@ -336,11 +338,28 @@ class LinearRegression(plot.NotebookInteraction):
         if color is None:
             color = fig.get_cycle_color()
 
+        if not isinstance(label, plot.LabelGroup):
+            row = kwargs.get("row", 0)
+            col = kwargs.get("col", 0)
+            group_name = "regression_{}_{}_{}".format(
+                row,
+                col,
+                fig.element_count[row, col],
+            )
+            label = plot.LabelGroup(
+                group_name=group_name,
+                group_title="Regression" if label is None else label,
+            )
+
         # data points
         fig.add_scatter(
             self.x,
             self.y,
-            label=label_data,
+            label=(
+                label_data
+                if callable(label_data)
+                else label.element(label_data)
+            ),
             color=color if color_data is None else color_data,
             **kwargs_data,
             **kwargs,
@@ -351,7 +370,11 @@ class LinearRegression(plot.NotebookInteraction):
             self.x2,
             self.y2,
             line_style=line_style_reg,
-            label=label_reg,
+            label=(
+                label_reg
+                if callable(label_reg)
+                else label.element(label_reg)
+            ),
             color=color if color_reg is None else color_reg,
             **kwargs_reg,
             **kwargs,
@@ -362,39 +385,44 @@ class LinearRegression(plot.NotebookInteraction):
                 self.x2,
                 self.y2 - self.ci,
                 self.y2 + self.ci,
-                label=label_ci,
-                color=color if color_ci is None else color_ci,
+                label=(
+                    label_ci
+                    if callable(label_ci)
+                    else plot.LabelGroup(
+                        label.group_name,
+                        default_label=label_ci,
+                    )
+                ),
+            color=color if color_ci is None else color_ci,
                 **kwargs_ci,
                 **kwargs,
             )
 
         if plot_pi:
-            if fig.interactive:
-                legendgroup = "pi_" + str(len(fig.fig.data))
-            else:
-                legendgroup = None
             fig.add_line(
                 self.x2,
                 self.y2 + self.pi,
-                label=label_pi,
+                label=(
+                    label_pi
+                    if callable(label_pi)
+                    else label.element(label_pi)
+                ),
                 line_style=line_style_pi,
                 color=color if color_pi is None else color_pi,
-                kwargs_pty=dict(
-                    legendgroup=legendgroup,
-                ),
                 **kwargs_pi,
                 **kwargs,
             )
             fig.add_line(
                 self.x2,
                 self.y2 - self.pi,
-                label=label_pi,
+                label=(
+                    label_pi
+                    if callable(label_pi)
+                    else label.element(label_pi, show=False)
+                ),
                 line_style=line_style_pi,
                 show_legend=False,
                 color=color if color_pi is None else color_pi,
-                kwargs_pty=dict(
-                    legendgroup=legendgroup,
-                ),
                 **kwargs_pi,
                 **kwargs,
             )

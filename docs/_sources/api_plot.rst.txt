@@ -59,6 +59,18 @@ One-line Plotting
 .. autofunction:: interplot.magic_plot_preset
 
 
+------------------
+`LabelGroup` class
+------------------
+
+.. autoclass:: interplot.LabelGroup
+    :members:
+    :undoc-members:
+    :inherited-members:
+    :show-inheritance:
+    :member-order: bysource
+
+
 ----------------------------------
 `NotebookInteraction` Parent Class
 ----------------------------------

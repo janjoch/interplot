@@ -13,7 +13,7 @@ Currently supported:
 - heatmaps
 - boxplot
 - linear regression
-- text annotations
+- text and image annotations
 - 2D subplots
 - color cycling
 """
@@ -499,6 +499,108 @@ class NotebookInteraction:
                 raise NotImplementedError
 
 
+class LabelGroup:
+    """
+    Grouping Labels in interactive plots.
+
+    Grouping is not supported in matplotlib legends.
+    In matplotlib, only the label and show parameters are used.
+
+    Toggling behavior can be set via `ip.Plot(..., legend_togglegroup=<bool>)`
+    or globally with `conf.PTY_LEGEND_TOGGLEGROUP`.
+
+    Parameters
+    ----------
+    group_name: str
+        Name to display.
+    default_label: str, optional
+        Default label for elements in this group.
+    show: bool, default: True
+        Whether to show the label. Defaults to True.
+    group_title: str, optional
+        Group title for the legend group. Will be shown above the group if
+        specified.
+    legend_only: bool, default: False
+        Whether to show the trace only in the legend.
+    """
+
+    def __init__(
+        self,
+        group_name,
+        group_title=None,
+        default_label=None,
+        show=True,
+        legend_only=False,
+    ):
+        self.group_name = group_name
+        self.group_title = group_title
+        self.default_label = default_label
+        self.show = show
+        self.legend_only = legend_only
+
+    def __call__(self, *args, **kwargs):
+        """
+        Return an element with the default parameters.
+        """
+        return self.element(*args, **kwargs)
+
+    def element(self, label=None, show=None, legend_only=None):
+        """
+        Define a label for an element in this group.
+        
+        Parameters
+        ----------
+        label: str, optional
+            Label for the element.
+
+            If not specified, the default label will be used.
+        show: bool, optional
+            Whether to show the label in the legend.
+            
+            If not specified, the default show value will be used.
+        legend_only: bool, optional
+            Whether to show the trace only in the legend.
+            
+            If not specified, the default legend_only value will be used.
+        """
+        def inner(
+            inst,
+            default_label=None,
+            label=self.default_label if label is None else label,
+            show=self.show if show is None else show,
+            legend_only=(
+                self.legend_only
+                if legend_only is None
+                else legend_only
+            ),
+            group_name=self.group_name,
+            group_title=self.group_title
+        ):
+            if label is None: label = default_label
+
+            # PLOTLY
+            if inst.interactive:
+                legend_kwargs = dict(
+                    legendgroup=group_name,
+                    name=label,
+                    showlegend=show,
+                )
+
+                if legend_only:
+                    legend_kwargs["visible"] = "legendonly"
+                if group_title is not None:
+                    legend_kwargs["legendgrouptitle_text"] = group_title
+
+                return legend_kwargs
+            
+            # MATPLOTLIB
+            if show:
+                return dict(label=label)
+            return dict()
+
+        return inner
+
+
 class Plot(NotebookInteraction):
     """
     Create `matplotlib/plotly` hybrid plots with a few lines of code.
@@ -576,6 +678,7 @@ class Plot(NotebookInteraction):
         dpi=None,
         legend_loc=None,
         legend_title=None,
+        legend_togglegroup=None,
         color_cycle=None,
         save_fig=None,
         save_format=None,
@@ -634,7 +737,7 @@ class Plot(NotebookInteraction):
 
             # init fig
             figure = go.Figure(
-                layout=go.Layout(legend={'traceorder': 'normal'}),
+                # layout=go.Layout(legend={'traceorder': 'normal'}),
             )
             self.fig = sp.make_subplots(
                 rows=rows,
@@ -656,7 +759,7 @@ class Plot(NotebookInteraction):
                 legend_title = legend_title[0]
                 if isinstance(legend_title, ITERABLE_TYPES):
                     legend_title = legend_title[0]
-
+            
             # update layout
             self.fig.update_layout(
                 title=self.title,
@@ -665,6 +768,13 @@ class Plot(NotebookInteraction):
                 width=width,
                 barmode="group",
             )
+            if not pick_non_none(
+                legend_togglegroup,
+                conf.PTY_LEGEND_TOGGLEGROUP,
+            ):
+                self.fig.update_layout(
+                    legend_groupclick="toggleitem",
+                )
 
             # axis limits and log scale
             for (
@@ -823,6 +933,27 @@ class Plot(NotebookInteraction):
         if isinstance(fig, Plot):
             return fig
         return Plot(*args, **kwargs)
+    
+    def _digest_label(self, label, default_label=None, show_legend=None):
+        if callable(label):
+            return label(self, default_label=default_label)
+
+        # PLOTLY
+        if self.interactive:
+            return self._get_plotly_legend_args(
+                label,
+                default_label=default_label,
+                show_legend=show_legend,
+            )
+        
+        # MATPLOTLIB
+        return dict(
+            label=None if show_legend is False else (
+                default_label
+                if label is None
+                else label
+            )
+        )
 
     @staticmethod
     def _get_plotly_legend_args(label, default_label=None, show_legend=None):
@@ -844,6 +975,12 @@ class Plot(NotebookInteraction):
             (in case of label=None, the automatic label will only be displayed
             on hover)
         """
+        if isinstance(label, LabelGroup):
+            return label.get_element()
+        
+        if isinstance(label, dict):
+            return label
+
         legend_kwargs = dict(
             name=pick_non_none(label, default_label),
         )
@@ -1254,7 +1391,7 @@ class Plot(NotebookInteraction):
                         interactive=self.interactive,
                         **pty_marker_kwargs,
                     ),
-                    **self._get_plotly_legend_args(
+                    **self._digest_label(
                         label,
                         show_legend=show_legend,
                     ),
@@ -1279,7 +1416,7 @@ class Plot(NotebookInteraction):
                 y,
                 xerr=x_error,
                 yerr=y_error,
-                label=None if show_legend is False else label,
+                **self._digest_label(label, show_legend=show_legend),
                 color=color,
                 lw=linewidth,
                 linestyle=(
@@ -1424,7 +1561,7 @@ class Plot(NotebookInteraction):
                     x=x,
                     y=y,
                     orientation="h" if horizontal else "v",
-                    **self._get_plotly_legend_args(
+                    **self._digest_label(
                         label,
                         show_legend=show_legend,
                     ),
@@ -1465,7 +1602,7 @@ class Plot(NotebookInteraction):
                     else None
                 ),
                 linewidth=line_width,
-                label=None if show_legend is False else label,
+                **self._digest_label(label, show_legend=show_legend),
                 **kwargs_mpl,
                 **kwargs,
             )
@@ -1550,7 +1687,7 @@ class Plot(NotebookInteraction):
                 go.Histogram(
                     x=x,
                     y=y,
-                    **self._get_plotly_legend_args(
+                    **self._digest_label(
                         label,
                         show_legend=show_legend,
                     ),
@@ -1574,7 +1711,7 @@ class Plot(NotebookInteraction):
                 orientation = "vertical"
             self.ax[row, col].hist(
                 x,
-                label=None if show_legend is False else label,
+                **self._digest_label(label, show_legend=show_legend),
                 bins=bins,
                 density=density,
                 color=self.digest_color(color, opacity),
@@ -1680,7 +1817,7 @@ class Plot(NotebookInteraction):
                 self.fig.add_trace(
                     go.Box(
                         **pty_kwargs,
-                        **self._get_plotly_legend_args(
+                        **self._digest_label(
                             label[0],
                             show_legend=show_legend,
                         ),
@@ -1887,7 +2024,6 @@ class Plot(NotebookInteraction):
         y1,
         y2=None,
         label=None,
-        show_legend=False,
         mode="lines",
         color=None,
         opacity=0.5,
@@ -1910,7 +2046,7 @@ class Plot(NotebookInteraction):
             If only `x` and `y1` is defined,
             it will be assumed as `y1` and `y2`,
             and `x` will be the index, starting from 0.
-        label: str, optional
+        label: str or interplot.LabelGroup, optional
             Trace label for legend.
         color, line_color: str, optional
             Fill and line color.
@@ -1953,11 +2089,16 @@ class Plot(NotebookInteraction):
             line_opacity,
         )
 
+        if not isinstance(label, LabelGroup):
+            label = LabelGroup(
+                "fill_{}_{}_{}".format(row, col, self.element_count[row, col]),
+                default_label="fill" if label is None else label,
+            )
+
         # PLOTLY
         if self.interactive:
             if kwargs_pty is None:
                 kwargs_pty = dict()
-            legendgroup = "fill_{}".format(self.element_count[row, col])
             row += 1
             col += 1
             self.fig.add_trace(
@@ -1965,11 +2106,13 @@ class Plot(NotebookInteraction):
                     x=x,
                     y=y1,
                     mode=mode,
-                    **self._get_plotly_legend_args(
-                        label, "fill border 1", show_legend=show_legend),
+                    **self._digest_label(
+                        label.element(
+                            show=False,
+                        ),
+                    ),
                     line=dict(width=line_width),
                     marker_color=line_color,
-                    legendgroup=legendgroup,
                     **kwargs_pty,
                     **kwargs,
                 ),
@@ -1981,12 +2124,13 @@ class Plot(NotebookInteraction):
                     x=x,
                     y=y2,
                     mode=mode,
-                    **self._get_plotly_legend_args(label, "fill border 1"),
+                    **self._digest_label(
+                        label.element(),
+                    ),
                     fill="tonexty",
                     fillcolor=fill_color,
                     line=dict(width=line_width),
                     marker_color=line_color,
-                    legendgroup=legendgroup,
                     **kwargs_pty,
                     **kwargs,
                 ),
@@ -2002,7 +2146,9 @@ class Plot(NotebookInteraction):
                 x,
                 y1,
                 y2,
-                label=None if show_legend is False else label,
+                **self._digest_label(
+                    label.element(),
+                ),
                 linewidth=line_width,
                 edgecolor=self.digest_color(
                     line_color, line_opacity, increment=0),
@@ -2162,7 +2308,7 @@ class Plot(NotebookInteraction):
         image,
         horizontal_alignment="center",
         vertical_alignment="center",
-        data_coords=None,
+        data_coords=True,
         x_size=1,
         y_size=1,
         sizing="contain",

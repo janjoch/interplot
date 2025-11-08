@@ -219,6 +219,7 @@ def test_complex_plot(interactive):
             ("center right", "best"),
             ("best", False),
         ),
+        legend_togglegroup=True,
         save_fig="tests/temp_exports/fancy_{}.png".format(
             "interactive" if interactive else "static"),
     )
@@ -251,3 +252,43 @@ def test_complex_plot(interactive):
 
     fig.post_process()
     # fig.show()
+
+@test_for_errors
+def test_labeling(interactive):
+    label = ip.LabelGroup(
+        "group_id",
+        group_title="GROUP",
+        default_label="default",
+    )
+
+    fig = ip.Plot(
+        interactive=interactive,
+    )
+    fig.add_line(
+        (1,2,4,3),
+        label=label.element("line visible")
+    )
+    fig.add_line(
+        (1,2,4,3),
+        label=label.element("line invisible", show=False)
+    )
+    fig.add_line(
+        (1,2,4,3),
+        label=label.element("line legendonly", legend_only=False)
+    )
+    fig.add_fill(
+        (0,2,3,5),
+        (2,3,5,4),
+        (1,2,4,3),
+        label=label,
+    )
+    fig.add_regression(
+        np.array([0, 1, 3, 4]),
+        np.array([0, 1, 2, 3]),
+        label="Regression Group",
+        label_data="DATA",
+        label_ci="CONFIDENCE INTERVAL",
+        label_pi="PREDICTION INTERVAL",
+        label_reg="REGRESSION",
+    )
+    fig.post_process()
