@@ -7,6 +7,7 @@ __all__ = [  # noqa F405
     "arraytools",
     "iter",
     "plot",
+    "debug",
 ]
 
 from . import arraytools
