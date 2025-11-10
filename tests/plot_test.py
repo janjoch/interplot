@@ -1,4 +1,5 @@
 from functools import wraps
+import inspect
 
 import interplot as ip
 
@@ -292,3 +293,14 @@ def test_labeling(interactive):
         label_reg="REGRESSION",
     )
     fig.post_process()
+
+def test_magic_plot_kwargs():
+    Plot_args = inspect.getfullargspec(ip.Plot).args[1:]
+    magic_plot_args = inspect.getfullargspec(
+        ip.magic_plot(lambda fig: fig)
+    ).kwonlyargs
+
+    for arg in Plot_args:
+        assert arg in magic_plot_args, (
+            f"the keyword `{arg}` should also be added to ip.magic_plot"
+        )
