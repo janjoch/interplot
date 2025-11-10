@@ -693,6 +693,10 @@ class Plot(NotebookInteraction):
             shared_xaxes = "columns"
         if shared_yaxes == "cols":
             shared_yaxes = "columns"
+        if shared_xaxes is True:
+            shared_xaxes = "all"
+        if shared_yaxes is True:
+            shared_yaxes = "all"
 
         self.interactive = pick_non_none(
             interactive,
