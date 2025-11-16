@@ -714,6 +714,7 @@ class Plot(NotebookInteraction):
         self.ylim = ylim
         self.xlog = xlog
         self.ylog = ylog
+        self.fig_size = fig_size
         self.dpi = pick_non_none(
             dpi,
             conf.DPI,
@@ -737,16 +738,9 @@ class Plot(NotebookInteraction):
 
         # init plotly
         if self.interactive:
-            self.title = self._encode_html(self.title)
-            self.fig_size = pick_non_none(
-                fig_size,
-                conf.PTY_FIG_SIZE,
-            )
 
             # init fig
-            figure = go.Figure(
-                # layout=go.Layout(legend={'traceorder': 'normal'}),
-            )
+            figure = go.Figure()
             self.fig = sp.make_subplots(
                 rows=rows,
                 cols=cols,
@@ -755,6 +749,212 @@ class Plot(NotebookInteraction):
                 row_heights=row_heights,
                 column_widths=column_widths,
                 figure=figure,
+            )
+
+        # init matplotlib
+        else:
+            gridspec_kw = dict(
+                width_ratios=column_widths,
+                height_ratios=row_heights,
+            )
+
+            # convert px to inches
+            self.fig_size = pick_non_none(
+                fig_size,
+                conf.MPL_FIG_SIZE,
+            )
+            px = 1 / self.dpi
+            figsize = (self.fig_size[0] * px, self.fig_size[1] * px)
+
+            # init fig
+            self.fig, self.ax = plt.subplots(
+                rows,
+                cols,
+                figsize=figsize,
+                dpi=self.dpi,
+                squeeze=False,
+                gridspec_kw=gridspec_kw,
+            )
+
+            # shared axes
+            for i_row in range(self.rows):
+                for i_col in range(self.cols):
+
+                    # skip 0/0
+                    if i_col == 0 and i_row == 0:
+                        continue
+
+                    # set shared x axes
+                    if (
+                        shared_xaxes == "all"
+                        or type(shared_xaxes) is bool and shared_xaxes is True
+                    ):
+                        self.ax[i_row, i_col].sharex(self.ax[0, 0])
+                    elif shared_xaxes == "columns":
+                        self.ax[i_row, i_col].sharex(self.ax[0, i_col])
+                    elif shared_xaxes == "rows":
+                        self.ax[i_row, i_col].sharex(self.ax[i_row, 0])
+
+                    # set shared y axes
+                    if (
+                        shared_yaxes == "all"
+                        or type(shared_yaxes) is bool and shared_yaxes is True
+                    ):
+                        self.ax[i_row, i_col].sharey(self.ax[0, 0])
+                    elif shared_yaxes == "columns":
+                        self.ax[i_row, i_col].sharey(self.ax[0, i_col])
+                    elif shared_yaxes == "rows":
+                        self.ax[i_row, i_col].sharey(self.ax[i_row, 0])
+
+        self.update(
+            title=title,
+            xlabel=xlabel,
+            ylabel=ylabel,
+            xlim=xlim,
+            ylim=ylim,
+            xlog=xlog,
+            ylog=ylog,
+            fig_size=fig_size,
+            dpi=dpi,
+            legend_loc=legend_loc,
+            legend_title=legend_title,
+            legend_togglegroup=legend_togglegroup,
+            color_cycle=color_cycle,
+            save_fig=save_fig,
+            save_format=save_format,
+            save_config=save_config,
+            global_custom_func=global_custom_func,
+            mpl_custom_func=mpl_custom_func,
+            pty_custom_func=pty_custom_func,
+            pty_update_layout=pty_update_layout,
+        )
+
+    @staticmethod
+    def init(fig=None, *args, **kwargs):
+        """
+        Initialize a Plot instance, if not already initialized.
+
+        Parameters
+        ----------
+        fig: Plot or any
+            If fig is a Plot instance, return it.
+            Otherwise, create a new Plot instance.
+        *args, **kwargs: any
+            Passed to Plot.__init__.
+        """
+        if isinstance(fig, Plot):
+            return fig
+        return Plot(*args, **kwargs)
+    
+    def _digest_label(self, label, default_label=None, show_legend=None):
+        if isinstance(label, LabelGroup):
+            return label()(self, default_label=default_label)
+
+        if callable(label):
+            return label(self, default_label=default_label)
+
+        # PLOTLY
+        if self.interactive:
+            return self._get_plotly_legend_args(
+                label,
+                default_label=default_label,
+                show_legend=show_legend,
+            )
+
+        # MATPLOTLIB
+        return dict(
+            label=None if show_legend is False else (
+                default_label
+                if label is None
+                else label
+            )
+        )
+    
+    def update(
+        self,
+        title=None,
+        xlabel=None,
+        ylabel=None,
+        xlim=None,
+        ylim=None,
+        xlog=None,
+        ylog=None,
+        fig_size=None,
+        dpi=None,
+        legend_loc=None,
+        legend_title=None,
+        legend_togglegroup=None,
+        color_cycle=None,
+        save_fig=None,
+        save_format=None,
+        save_config=None,
+        global_custom_func=None,
+        mpl_custom_func=None,
+        pty_custom_func=None,
+        pty_update_layout=None,
+    ):
+        """
+        Update plot parameters set during initialisation.
+
+        Parameters
+        ----------
+
+        Examples
+        --------
+        >>> fig = interplot.Plot(fig_size=(600, 400))
+        ... fig.add_line((1,2,4,3))
+        ... fig.save("export_landscape.png")
+        ... fig.save("export_fullsize.html")
+        ... fig.update(fig_size=(400, 600))
+        ... fig.save("export_portrait.png")
+
+        >>> @interplot.magic_plot
+        ... def plot_points(data, fig=None):
+        ...     fig.add_line(data)
+        ...     fig.update(title="SUM: {}".format(sum(data)))
+        ... plot_points([1,2,4,3])
+        """
+        self.title = pick_non_none(title, self.title)
+        self.xlabel = pick_non_none(xlabel, self.xlabel)
+        self.ylabel = pick_non_none(ylabel, self.ylabel)
+        self.xlim = pick_non_none(xlim, self.xlim)
+        self.ylim = pick_non_none(ylim, self.ylim)
+        self.xlog = pick_non_none(xlog, self.xlog)
+        self.ylog = pick_non_none(ylog, self.ylog)
+        self.dpi = pick_non_none(dpi, self.dpi)
+        self.legend_loc = pick_non_none(legend_loc, self.legend_loc)
+        self.legend_title = pick_non_none(legend_title, self.legend_title)
+        self.color_cycle = pick_non_none(
+            color_cycle,
+            self.color_cycle,
+        )
+        self.save_fig = pick_non_none(save_fig, self.save_fig)
+        self.save_format = pick_non_none(save_format, self.save_format)
+        self.save_config = pick_non_none(save_config, self.save_config)
+        self.global_custom_func = pick_non_none(
+            global_custom_func,
+            self.global_custom_func,
+        )
+        self.mpl_custom_func = pick_non_none(
+            mpl_custom_func,
+            self.mpl_custom_func,
+        )
+        self.pty_custom_func = pick_non_none(
+            pty_custom_func,
+            self.pty_custom_func,
+        )
+        self.pty_update_layout = pick_non_none(
+            pty_update_layout,
+            self.pty_update_layout,
+        )
+
+        # PLOTLY
+        if self.interactive:
+            self.title = self._encode_html(self.title)
+            self.fig_size = pick_non_none(
+                fig_size,
+                self.fig_size,
+                conf.PTY_FIG_SIZE,
             )
 
             # unpacking
@@ -833,71 +1033,30 @@ class Plot(NotebookInteraction):
                     )
 
             # axis labels
-            for text, i_col in zip_smart(xlabel, range(1, cols+1)):
-                self.fig.update_xaxes(title_text=text, row=rows, col=i_col)
-            for text, i_row in zip_smart(ylabel, range(1, rows+1)):
+            for text, i_col in zip_smart(xlabel, range(1, self.cols+1)):
+                self.fig.update_xaxes(title_text=text, row=self.rows, col=i_col)
+            for text, i_row in zip_smart(ylabel, range(1, self.rows+1)):
                 self.fig.update_yaxes(title_text=text, row=i_row, col=1)
 
-        # init matplotlib
+        # MATPLOTLIB
         else:
-            gridspec_kw = dict(
-                width_ratios=column_widths,
-                height_ratios=row_heights,
-            )
-
             # convert px to inches
             self.fig_size = pick_non_none(
                 fig_size,
+                self.fig_size,
                 conf.MPL_FIG_SIZE,
             )
+
             px = 1 / self.dpi
             figsize = (self.fig_size[0] * px, self.fig_size[1] * px)
-
-            # init fig
-            self.fig, self.ax = plt.subplots(
-                rows,
-                cols,
-                figsize=figsize,
-                dpi=self.dpi,
-                squeeze=False,
-                gridspec_kw=gridspec_kw,
-            )
+            self.fig.set_figwidth(figsize[0])
+            self.fig.set_figheight(figsize[1])
 
             # title
             if self.cols == 1:
                 self.ax[0, 0].set_title(self.title)
             else:
                 self.fig.suptitle(self.title)
-
-            # shared axes
-            for i_row in range(self.rows):
-                for i_col in range(self.cols):
-
-                    # skip 0/0
-                    if i_col == 0 and i_row == 0:
-                        continue
-
-                    # set shared x axes
-                    if (
-                        shared_xaxes == "all"
-                        or type(shared_xaxes) is bool and shared_xaxes is True
-                    ):
-                        self.ax[i_row, i_col].sharex(self.ax[0, 0])
-                    elif shared_xaxes == "columns":
-                        self.ax[i_row, i_col].sharex(self.ax[0, i_col])
-                    elif shared_xaxes == "rows":
-                        self.ax[i_row, i_col].sharex(self.ax[i_row, 0])
-
-                    # set shared y axes
-                    if (
-                        shared_yaxes == "all"
-                        or type(shared_yaxes) is bool and shared_yaxes is True
-                    ):
-                        self.ax[i_row, i_col].sharey(self.ax[0, 0])
-                    elif shared_yaxes == "columns":
-                        self.ax[i_row, i_col].sharey(self.ax[0, i_col])
-                    elif shared_yaxes == "rows":
-                        self.ax[i_row, i_col].sharey(self.ax[i_row, 0])
 
             # axis labels
             if isinstance(self.xlabel, ITERABLE_TYPES) or (
@@ -925,46 +1084,14 @@ class Plot(NotebookInteraction):
                     if ylog_tile:
                         self.ax[row, col].set_yscale("log")
 
-    @staticmethod
-    def init(fig=None, *args, **kwargs):
-        """
-        Initialize a Plot instance, if not already initialized.
-
-        Parameters
-        ----------
-        fig: Plot or any
-            If fig is a Plot instance, return it.
-            Otherwise, create a new Plot instance.
-        *args, **kwargs: any
-            Passed to Plot.__init__.
-        """
-        if isinstance(fig, Plot):
-            return fig
-        return Plot(*args, **kwargs)
-    
-    def _digest_label(self, label, default_label=None, show_legend=None):
-        if isinstance(label, LabelGroup):
-            return label()(self, default_label=default_label)
-
-        if callable(label):
-            return label(self, default_label=default_label)
-
-        # PLOTLY
-        if self.interactive:
-            return self._get_plotly_legend_args(
-                label,
-                default_label=default_label,
-                show_legend=show_legend,
-            )
-        
-        # MATPLOTLIB
-        return dict(
-            label=None if show_legend is False else (
-                default_label
-                if label is None
-                else label
-            )
-        )
+    update.__doc__ = _rewrite_docstring(
+        update.__doc__,
+        kwargs_remove=(
+            "rows, cols",
+            "shared_xaxes, shared_yaxes",
+            "column_widths, row_heights",
+        ),
+    )
 
     @staticmethod
     def _get_plotly_legend_args(label, default_label=None, show_legend=None):
@@ -2654,7 +2781,14 @@ class Plot(NotebookInteraction):
             self.save(self.save_fig, export_format=self.save_format)
 
     @_serialize_save
-    def save(self, path, export_format=None, print_confirm=True, **kwargs):
+    def save(
+        self,
+        path,
+        export_format=None,
+        html_no_fig_size=True,
+        print_confirm=True,
+        **kwargs,
+    ):
         """
         Save the plot.
 
@@ -2710,6 +2844,10 @@ class Plot(NotebookInteraction):
 
             # HTML
             if str(path)[-5:] == ".html":
+                if html_no_fig_size:
+                    fig_size = self.fig_size
+                    self.update(fig_size=(None, None))
+
                 self.fig.write_html(
                     path,
                     config=(
@@ -2719,6 +2857,9 @@ class Plot(NotebookInteraction):
                     ),
                     **kwargs,
                 )
+
+                if html_no_fig_size:
+                    self.update(fig_size=fig_size)
 
             # image
             else:
@@ -2943,10 +3084,10 @@ def magic_plot_preset(doc_decorator=None, **kwargs_preset):
 
         By default, the global variable `conf._DOCSTRING_DECORATOR`
         will be used.
+    strict_preset: bool, default: False
+        Prevents overriding the preset upon calling the decorated function.
     **kwargs_preset: dict
         Define presets for any keyword arguments accepted by `Plot`.
-
-        Setting `strict_preset=True` prevents overriding the preset.
 
     Examples
     --------
