@@ -26,6 +26,7 @@ from functools import wraps
 from datetime import datetime
 from io import BytesIO
 from PIL import Image
+import uuid
 
 import numpy as np
 
@@ -342,8 +343,6 @@ def _serialize_2d(serialize_pty=True, serialize_mpl=True):
                         label = y.name
                     elif isinstance(label, str) and "{}" in label:
                         label = label.format(y.name)
-                    elif callable(label):
-                        label = label(y.name)
 
                 # pd.DataFrame: split columns to pd.Series and iterate
                 elif isinstance(x, pd_DataFrame):
@@ -511,32 +510,36 @@ class LabelGroup:
 
     Parameters
     ----------
-    group_name: str
-        Name to display.
-    default_label: str, optional
-        Default label for elements in this group.
-    show: bool, default: True
-        Whether to show the label. Defaults to True.
     group_title: str, optional
         Group title for the legend group. Will be shown above the group if
         specified.
-    legend_only: bool, default: False
+    group_id: str, optional
+        Must be unique for each group. If none is provided, 
+        Name to display.
+    default_label: str, optional
+        Default label for elements in this group.
+    default_show: bool or "first", default: True
+        Whether to show the label in the legend.
+
+        If set to "first", the first call to LabelGroup.element will default
+        to `show=True` and all subsequent calls to `show=False`.
+    default_legend_only: bool, default: False
         Whether to show the trace only in the legend.
     """
 
     def __init__(
         self,
-        group_name,
         group_title=None,
+        group_id=None,
+        default_show=True,
         default_label=None,
-        show=True,
-        legend_only=False,
+        default_legend_only=False,
     ):
-        self.group_name = group_name
         self.group_title = group_title
+        self.group_id = pick_non_none(group_id, uuid.uuid1().hex)
         self.default_label = default_label
-        self.show = show
-        self.legend_only = legend_only
+        self.default_show = default_show
+        self.default_legend_only = default_legend_only
 
     def __call__(self, *args, **kwargs):
         """
@@ -566,22 +569,22 @@ class LabelGroup:
         def inner(
             inst,
             default_label=None,
-            label=self.default_label if label is None else label,
-            show=self.show if show is None else show,
-            legend_only=(
-                self.legend_only
-                if legend_only is None
-                else legend_only
-            ),
-            group_name=self.group_name,
-            group_title=self.group_title
+            group_title=self.group_title,
+            group_id=self.group_id,
+            label=pick_non_none(label, self.default_label),
+            show=pick_non_none(show, self.default_show),
+            legend_only=pick_non_none(legend_only, self.default_legend_only),
         ):
             if label is None: label = default_label
+            
+            if show == "first":
+                show = not group_id in inst.legend_ids
+            inst.legend_ids.add(group_id)
 
             # PLOTLY
             if inst.interactive:
                 legend_kwargs = dict(
-                    legendgroup=group_name,
+                    legendgroup=group_id,
                     name=label,
                     showlegend=show,
                 )
@@ -717,6 +720,7 @@ class Plot(NotebookInteraction):
         )
         self.legend_loc = legend_loc
         self.legend_title = legend_title
+        self.legend_ids = set()
         self.color_cycle = pick_non_none(
             color_cycle,
             conf.COLOR_CYCLE,
@@ -939,6 +943,9 @@ class Plot(NotebookInteraction):
         return Plot(*args, **kwargs)
     
     def _digest_label(self, label, default_label=None, show_legend=None):
+        if isinstance(label, LabelGroup):
+            return label()(self, default_label=default_label)
+
         if callable(label):
             return label(self, default_label=default_label)
 

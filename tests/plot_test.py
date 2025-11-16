@@ -257,8 +257,8 @@ def test_complex_plot(interactive):
 @test_for_errors
 def test_labeling(interactive):
     label = ip.LabelGroup(
-        "group_id",
         group_title="GROUP",
+        group_id="group_id",
         default_label="default",
     )
 

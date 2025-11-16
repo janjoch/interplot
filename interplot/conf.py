@@ -219,7 +219,7 @@ def PTY_CUSTOM_FUNC(fig):
     return fig
 
 
-PTY_LEGEND_TOGGLEGROUP = False
+PTY_LEGEND_TOGGLEGROUP = True
 """
 PLOTLY ONLY.
 If True, elements with the same legend group will be toggled together

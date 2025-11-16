@@ -341,13 +341,13 @@ class LinearRegression(plot.NotebookInteraction):
         if not isinstance(label, plot.LabelGroup):
             row = kwargs.get("row", 0)
             col = kwargs.get("col", 0)
-            group_name = "regression_{}_{}_{}".format(
+            group_id = "regression_{}_{}_{}".format(
                 row,
                 col,
                 fig.element_count[row, col],
             )
             label = plot.LabelGroup(
-                group_name=group_name,
+                group_id=group_id,
                 group_title="Regression" if label is None else label,
             )
 
@@ -389,7 +389,7 @@ class LinearRegression(plot.NotebookInteraction):
                     label_ci
                     if callable(label_ci)
                     else plot.LabelGroup(
-                        label.group_name,
+                        group_id=label.group_id,
                         default_label=label_ci,
                     )
                 ),
