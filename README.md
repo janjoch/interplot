@@ -125,8 +125,10 @@ Try on `Binder`:
 ## Install
 ```pip install interplot```
 
+### install development branch
+```pip install git+https://github.com/janjoch/interplot.git@development```
 
-### dev installation
+### active development installation
 1. ```git clone https://github.com/janjoch/interplot```
 2. ```cd interplot```
 2. ```pip install -e .```
