@@ -36,7 +36,7 @@ def test_repeat(input):
         (a, 2),
         (s, 2),
         (df, "B"),
-    )
+    ),
 )
 def test_zip_smart(in_out):
     gen = interplot.zip_smart(
@@ -59,7 +59,7 @@ def test_zip_smart(in_out):
         (range(3), 1),
         (a, 2),
         (df, "B"),
-    )
+    ),
 )
 def test_filter_nozip(in_out):
     gen = interplot.zip_smart(

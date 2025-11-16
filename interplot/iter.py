@@ -9,9 +9,15 @@ from pandas.core.series import Series as pd_Series
 
 
 ITERABLE_TYPES = (
-    tuple, list, dict, np_ndarray, pd_Series, range, GeneratorType,
+    tuple,
+    list,
+    dict,
+    np_ndarray,
+    pd_Series,
+    range,
+    GeneratorType,
 )
-NON_ITERABLE_TYPES = (str, )
+NON_ITERABLE_TYPES = (str,)
 CUSTOM_DIGESTION = ((dict, (lambda dct: [elem for _, elem in dct.items()])),)
 
 MUTE_STRICT_ZIP_WARNING = False
@@ -215,7 +221,7 @@ def sum_nested(
     return val
 
 
-def filter_nozip(iterable, no_iter_types=None, depth=0, length=(2, )):
+def filter_nozip(iterable, no_iter_types=None, depth=0, length=(2,)):
     """
     Prevent certain patterns from being unpacked in `interplot.zip_smart`.
 
@@ -265,12 +271,10 @@ def filter_nozip(iterable, no_iter_types=None, depth=0, length=(2, )):
     """
     # input validation
     no_iter_types = (
-        (float, int, datetime)
-        if no_iter_types is None
-        else no_iter_types
+        (float, int, datetime) if no_iter_types is None else no_iter_types
     )
     if not isinstance(length, ITERABLE_TYPES):
-        length = (length, )
+        length = (length,)
 
     # non-iterable
     if not isinstance(iterable, ITERABLE_TYPES):
@@ -295,8 +299,7 @@ def filter_nozip(iterable, no_iter_types=None, depth=0, length=(2, )):
                 depth=depth - 1,
                 length=length,
             )
-            for i
-            in iterable
+            for i in iterable
         ]
 
     # no hit

@@ -18,7 +18,6 @@ Currently supported:
 - color cycling
 """
 
-
 import re
 from warnings import warn
 from pathlib import Path
@@ -37,7 +36,6 @@ from xarray.core.dataarray import DataArray as xr_DataArray
 
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
-from matplotlib.offsetbox import OffsetImage, AnnotationBbox
 
 import plotly.graph_objects as go
 import plotly.express as px
@@ -80,6 +78,7 @@ def close():
 try:
     __IPYTHON__  # type: ignore
     from IPython.core.display import display_html, display_png
+
     CALLED_FROM_NOTEBOOK = True
 except NameError:
     CALLED_FROM_NOTEBOOK = False
@@ -145,9 +144,7 @@ def _rewrite_docstring(doc_core, doc_decorator=None, kwargs_remove=()):
     # input check
     doc_core = "" if doc_core is None else doc_core
     doc_decorator = (
-        conf._DOCSTRING_DECORATOR
-        if doc_decorator is None
-        else doc_decorator
+        conf._DOCSTRING_DECORATOR if doc_decorator is None else doc_decorator
     )
 
     # find indentation level of doc_core
@@ -183,13 +180,13 @@ def _rewrite_docstring(doc_core, doc_decorator=None, kwargs_remove=()):
                     r"(?:[a-zA-Z_]+)??"  # first arg
                     r"(?:[ ]*,[ ]*[a-zA-Z_]+)??"  # following args
                     r")"  # end named group
-                ) +
-                (  # kwarg_key
+                )
+                + (  # kwarg_key
                     r"(?P<leading_coma>[ ]*,[ ]*)?"  # leading coma
                     r"{1}"  # kwarg_key
                     r"(?(leading_coma)|(?:[ ]*,[ ]*)?)"  # following coma if no leading coma  # noqa: E501
-                ) +
-                r"(?P<back>(?:[ ]*,[ ]*[a-zA-Z_]+)*[ ]*?)"  # following arguments  # noqa: E501
+                )
+                + r"(?P<back>(?:[ ]*,[ ]*[a-zA-Z_]+)*[ ]*?)"  # following arguments  # noqa: E501
             ).format(indent_decorator, kwarg_key),
             r"\g<front>\g<back>",
             doc_decorator,
@@ -347,12 +344,14 @@ def _serialize_2d(serialize_pty=True, serialize_mpl=True):
                 # pd.DataFrame: split columns to pd.Series and iterate
                 elif isinstance(x, pd_DataFrame):
                     if (
-                        self.interactive and serialize_pty
-                        or not self.interactive and serialize_mpl
+                        self.interactive
+                        and serialize_pty
+                        or not self.interactive
+                        and serialize_mpl
                     ):
-                        for (
-                            i, ((_, series), label_)
-                        ) in enumerate(zip_smart(x.items(), label)):
+                        for i, ((_, series), label_) in enumerate(
+                            zip_smart(x.items(), label)
+                        ):
                             _serialize_2d(
                                 serialize_pty=serialize_pty,
                                 serialize_mpl=serialize_mpl,
@@ -367,7 +366,7 @@ def _serialize_2d(serialize_pty=True, serialize_mpl=True):
                         return
 
                 else:
-                    if hasattr(x, 'copy') and callable(getattr(x, 'copy')):
+                    if hasattr(x, "copy") and callable(getattr(x, "copy")):
                         y = x.copy()
                     else:
                         y = x
@@ -376,12 +375,12 @@ def _serialize_2d(serialize_pty=True, serialize_mpl=True):
             # 2D np.array
             if isinstance(y, np.ndarray) and len(y.shape) == 2:
                 if (
-                    self.interactive and serialize_pty
-                    or not self.interactive and serialize_mpl
+                    self.interactive
+                    and serialize_pty
+                    or not self.interactive
+                    and serialize_mpl
                 ):
-                    for (
-                        i, (y_, label_)
-                    ) in enumerate(zip_smart(y.T, label)):
+                    for i, (y_, label_) in enumerate(zip_smart(y.T, label)):
                         _serialize_2d(
                             serialize_pty=serialize_pty,
                             serialize_mpl=serialize_mpl,
@@ -412,9 +411,8 @@ def _serialize_save(core):
         Wrapper function for a method.
 
         """
-        if (
-            isinstance(path, ITERABLE_TYPES)
-            or isinstance(export_format, ITERABLE_TYPES)
+        if isinstance(path, ITERABLE_TYPES) or isinstance(
+            export_format, ITERABLE_TYPES
         ):
             for path_, export_format_ in zip_smart(path, export_format):
                 self.save(path_, export_format_, **kwargs)
@@ -433,7 +431,9 @@ class NotebookInteraction:
     Calls the child's `show()._repr_html_()` for automatic display
     in Jupyter Notebooks.
     """
-    JS_RENDER_WARNING = '''
+
+    JS_RENDER_WARNING = (
+        """
         <div class="alert alert-block alert-warning"
             id="notebook-js-warning">
             <p>
@@ -453,7 +453,10 @@ class NotebookInteraction:
             }
             hide_warning();
         </script>
-    ''' if CALLED_FROM_NOTEBOOK else ""
+    """
+        if CALLED_FROM_NOTEBOOK
+        else ""
+    )
 
     def __call__(self, *args, **kwargs):
         """Calls the `self.show()` or `self.plot()` method."""
@@ -514,17 +517,18 @@ class LabelGroup:
         Group title for the legend group. Will be shown above the group if
         specified.
     group_id: str, optional
-        Must be unique for each group. If none is provided, 
-        Name to display.
-    default_label: str, optional
-        Default label for elements in this group.
+        Must be unique for each group. If none is provided,
+        a UUID will be generated.
     default_show: bool or "first", default: True
         Whether to show the label in the legend.
 
-        If set to "first", the first call to LabelGroup.element will default
-        to `show=True` and all subsequent calls to `show=False`.
+        If set to "first", the element dispatcher will check, whether
+        the figure instance already has an trace of this group_id.
+        If not, the label will be shown in the legend, otherwise it won't.
+    default_label: str, optional
+        Default label for elements in this group.
     default_legend_only: bool, default: False
-        Whether to show the trace only in the legend.
+        Whether to show the trace only in the legend by default.
     """
 
     def __init__(
@@ -550,7 +554,7 @@ class LabelGroup:
     def element(self, label=None, show=None, legend_only=None):
         """
         Define a label for an element in this group.
-        
+
         Parameters
         ----------
         label: str, optional
@@ -559,13 +563,14 @@ class LabelGroup:
             If not specified, the default label will be used.
         show: bool, optional
             Whether to show the label in the legend.
-            
+
             If not specified, the default show value will be used.
         legend_only: bool, optional
             Whether to show the trace only in the legend.
-            
+
             If not specified, the default legend_only value will be used.
         """
+
         def inner(
             inst,
             default_label=None,
@@ -575,10 +580,11 @@ class LabelGroup:
             show=pick_non_none(show, self.default_show),
             legend_only=pick_non_none(legend_only, self.default_legend_only),
         ):
-            if label is None: label = default_label
-            
+            if label is None:
+                label = default_label
+
             if show == "first":
-                show = not group_id in inst.legend_ids
+                show = group_id not in inst.legend_ids
             inst.legend_ids.add(group_id)
 
             # PLOTLY
@@ -595,7 +601,7 @@ class LabelGroup:
                     legend_kwargs["legendgrouptitle_text"] = group_title
 
                 return legend_kwargs
-            
+
             # MATPLOTLIB
             if show:
                 return dict(label=label)
@@ -659,6 +665,7 @@ class Plot(NotebookInteraction):
     .. raw:: html
         :file: ../source/plot_examples/Everything-Under-Control.html
     """
+
     __doc__ = _rewrite_docstring(__doc__)
 
     def __init__(
@@ -787,7 +794,8 @@ class Plot(NotebookInteraction):
                     # set shared x axes
                     if (
                         shared_xaxes == "all"
-                        or type(shared_xaxes) is bool and shared_xaxes is True
+                        or type(shared_xaxes) is bool
+                        and shared_xaxes is True
                     ):
                         self.ax[i_row, i_col].sharex(self.ax[0, 0])
                     elif shared_xaxes == "columns":
@@ -798,7 +806,8 @@ class Plot(NotebookInteraction):
                     # set shared y axes
                     if (
                         shared_yaxes == "all"
-                        or type(shared_yaxes) is bool and shared_yaxes is True
+                        or type(shared_yaxes) is bool
+                        and shared_yaxes is True
                     ):
                         self.ax[i_row, i_col].sharey(self.ax[0, 0])
                     elif shared_yaxes == "columns":
@@ -845,7 +854,7 @@ class Plot(NotebookInteraction):
         if isinstance(fig, Plot):
             return fig
         return Plot(*args, **kwargs)
-    
+
     def _digest_label(self, label, default_label=None, show_legend=None):
         if isinstance(label, LabelGroup):
             return label()(self, default_label=default_label)
@@ -863,13 +872,13 @@ class Plot(NotebookInteraction):
 
         # MATPLOTLIB
         return dict(
-            label=None if show_legend is False else (
-                default_label
-                if label is None
-                else label
+            label=(
+                None
+                if show_legend is False
+                else (default_label if label is None else label)
             )
         )
-    
+
     def update(
         self,
         title=None,
@@ -967,7 +976,7 @@ class Plot(NotebookInteraction):
                 legend_title = legend_title[0]
                 if isinstance(legend_title, ITERABLE_TYPES):
                     legend_title = legend_title[0]
-            
+
             # update layout
             self.fig.update_layout(
                 title=self.title,
@@ -1011,13 +1020,12 @@ class Plot(NotebookInteraction):
                     xlog_row,
                     ylog_row,
                 ):
-                    if (
-                        xlim_tile is not None
-                        and isinstance(xlim_tile[0], datetime)
+                    if xlim_tile is not None and isinstance(
+                        xlim_tile[0], datetime
                     ):
                         xlim_tile = (
-                            xlim_tile[0].timestamp()*1000,
-                            xlim_tile[1].timestamp()*1000,
+                            xlim_tile[0].timestamp() * 1000,
+                            xlim_tile[1].timestamp() * 1000,
                         )
                     self.fig.update_xaxes(
                         range=xlim_tile,
@@ -1033,9 +1041,11 @@ class Plot(NotebookInteraction):
                     )
 
             # axis labels
-            for text, i_col in zip_smart(xlabel, range(1, self.cols+1)):
-                self.fig.update_xaxes(title_text=text, row=self.rows, col=i_col)
-            for text, i_row in zip_smart(ylabel, range(1, self.rows+1)):
+            for text, i_col in zip_smart(xlabel, range(1, self.cols + 1)):
+                self.fig.update_xaxes(
+                    title_text=text, row=self.rows, col=i_col
+                )
+            for text, i_row in zip_smart(ylabel, range(1, self.rows + 1)):
                 self.fig.update_yaxes(title_text=text, row=i_row, col=1)
 
         # MATPLOTLIB
@@ -1115,7 +1125,7 @@ class Plot(NotebookInteraction):
         """
         if isinstance(label, LabelGroup):
             return label.get_element()
-        
+
         if isinstance(label, dict):
             return label
 
@@ -1180,7 +1190,7 @@ class Plot(NotebookInteraction):
             Axes coordinates.
         """
         return (
-            self.ax[row, col].transData 
+            self.ax[row, col].transData
             + self.ax[row, col].transAxes.inverted()
         ).transform((x, y))
 
@@ -1291,8 +1301,7 @@ class Plot(NotebookInteraction):
                             interactive=interactive,
                             recursive=True,
                         )
-                        for m
-                        in marker
+                        for m in marker
                     ],
                     **pty_marker_kwargs,
                 )
@@ -1487,7 +1496,7 @@ class Plot(NotebookInteraction):
             )
             if x_error is not None:
                 if not isinstance(x_error, ITERABLE_TYPES):
-                    x_error = np.array((x_error, ) * len(x))
+                    x_error = np.array((x_error,) * len(x))
                 if isinstance(x_error[0], ITERABLE_TYPES):
                     x_error = dict(
                         type="data",
@@ -1501,7 +1510,7 @@ class Plot(NotebookInteraction):
                     )
             if y_error is not None:
                 if not isinstance(y_error, ITERABLE_TYPES):
-                    y_error = np.array((y_error, ) * len(y))
+                    y_error = np.array((y_error,) * len(y))
                 if isinstance(y_error[0], ITERABLE_TYPES):
                     y_error = dict(
                         type="data",
@@ -1724,12 +1733,8 @@ class Plot(NotebookInteraction):
         else:
             if kwargs_mpl is None:
                 kwargs_mpl = dict()
-            offset = ((2*_serial_i + 1) / 2 / _serial_n - 0.5) * width
-            (
-                self.ax[row, col].barh
-                if horizontal
-                else self.ax[row, col].bar
-            )(
+            offset = ((2 * _serial_i + 1) / 2 / _serial_n - 0.5) * width
+            (self.ax[row, col].barh if horizontal else self.ax[row, col].bar)(
                 np.arange(len(x)) + offset,
                 y,
                 (width / _serial_n),
@@ -1818,7 +1823,7 @@ class Plot(NotebookInteraction):
             if kwargs_pty is None:
                 kwargs_pty = dict()
             if density:
-                kwargs_pty.update(dict(histnorm='probability'))
+                kwargs_pty.update(dict(histnorm="probability"))
             row += 1
             col += 1
             self.fig.add_trace(
@@ -1917,9 +1922,9 @@ class Plot(NotebookInteraction):
             n = len(x)
         # input validation
         if not isinstance(label, ITERABLE_TYPES):
-            label = (label, ) * n
+            label = (label,) * n
         if not isinstance(color, ITERABLE_TYPES):
-            color = (color, ) * n
+            color = (color,) * n
 
         # PLOTLY
         if self.interactive:
@@ -1929,7 +1934,11 @@ class Plot(NotebookInteraction):
             # if x contains multiple datasets, iterate add_boxplot
             if not n == 1:
                 for x_i, label_, show_legend_, color_, opacity_ in zip_smart(
-                    x, label, show_legend, color, opacity,
+                    x,
+                    label,
+                    show_legend,
+                    color,
+                    opacity,
                 ):
                     self.add_boxplot(
                         x_i,
@@ -2143,9 +2152,8 @@ class Plot(NotebookInteraction):
         kwargs:
             Keyword arguments for `interplot.arraytools.LinearRegression.plot`.
         """
-        if (
-            isinstance(x, arraytools.LinearRegression)
-            or hasattr(x, "is_linreg")
+        if isinstance(x, arraytools.LinearRegression) or hasattr(
+            x, "is_linreg"
         ):
             x.plot(fig=self, **kwargs)
         else:
@@ -2165,8 +2173,8 @@ class Plot(NotebookInteraction):
         mode="lines",
         color=None,
         opacity=0.5,
-        line_width=0.,
-        line_opacity=1.,
+        line_width=0.0,
+        line_opacity=1.0,
         line_color=None,
         row=0,
         col=0,
@@ -2289,7 +2297,8 @@ class Plot(NotebookInteraction):
                 ),
                 linewidth=line_width,
                 edgecolor=self.digest_color(
-                    line_color, line_opacity, increment=0),
+                    line_color, line_opacity, increment=0
+                ),
                 facecolor=self.digest_color(color, opacity),
                 **kwargs_mpl,
                 **kwargs,
@@ -2376,9 +2385,7 @@ class Plot(NotebookInteraction):
             x_data_coords = data_coords
             y_data_coords = data_coords
         text_alignment = (
-            horizontal_alignment
-            if text_alignment is None
-            else text_alignment
+            horizontal_alignment if text_alignment is None else text_alignment
         )
 
         # PLOTLY
@@ -2398,12 +2405,10 @@ class Plot(NotebookInteraction):
                 align=text_alignment,
                 xanchor=horizontal_alignment,
                 yanchor=vertical_alignment,
-                xref=self._get_plotly_anchor(
-                    "x", self.cols, row, col
-                ) + x_domain,
-                yref=self._get_plotly_anchor(
-                    "y", self.cols, row, col
-                ) + y_domain,
+                xref=self._get_plotly_anchor("x", self.cols, row, col)
+                + x_domain,
+                yref=self._get_plotly_anchor("y", self.cols, row, col)
+                + y_domain,
                 font=dict(color=self.digest_color(color, opacity)),
                 row=row,
                 col=col,
@@ -2489,9 +2494,13 @@ class Plot(NotebookInteraction):
             How the image should be sized.
 
             Options:
-                - "contain": fit the image inside the box. The entire image will be visible, and the aspect ratio will be preserved.
-                - "stretch": stretch the image to fit the box. The image may be distorted.
-                - "fill": fill the box with the image. The image may be cropped, but will keep its aspect ratio. Only available for plotly.
+                - "contain": fit the image inside the box. The entire image
+                will be visible, and the aspect ratio will be preserved.
+                - "stretch": stretch the image to fit the box. The image
+                may be distorted.
+                - "fill": fill the box with the image. The image may be
+                cropped, but will keep its aspect ratio. Only available
+                for plotly.
         opacity: float, optional
             Opacity (=alpha) of the fill.
         row, col: int, optional
@@ -2522,12 +2531,10 @@ class Plot(NotebookInteraction):
                     source=image,
                     x=x,
                     y=y,
-                    xref=self._get_plotly_anchor(
-                        "x", self.cols, row, col
-                    ) + x_domain,
-                    yref=self._get_plotly_anchor(
-                        "y", self.cols, row, col
-                    ) + y_domain,
+                    xref=self._get_plotly_anchor("x", self.cols, row, col)
+                    + x_domain,
+                    yref=self._get_plotly_anchor("y", self.cols, row, col)
+                    + y_domain,
                     xanchor=horizontal_alignment,
                     yanchor=vertical_alignment,
                     sizex=x_size,
@@ -2566,12 +2573,8 @@ class Plot(NotebookInteraction):
                     y -= y_size
                     y1 -= y_size
 
-                x0, y0 = self._mpl_coords_data_to_axes(
-                    x, y, row, col
-                )
-                x1, y1 = self._mpl_coords_data_to_axes(
-                    x1, y1, row, col
-                )
+                x0, y0 = self._mpl_coords_data_to_axes(x, y, row, col)
+                x1, y1 = self._mpl_coords_data_to_axes(x1, y1, row, col)
 
             else:
                 x0 = x
@@ -2590,7 +2593,7 @@ class Plot(NotebookInteraction):
                 elif vertical_alignment == "top":
                     y0 -= y_size
                     y1 -= y_size
-                
+
             aspect = "auto" if sizing == "stretch" else 1.0
             if sizing == "fill":
                 warn(
@@ -2757,9 +2760,10 @@ class Plot(NotebookInteraction):
                 ):
                     # don't show legend
                     if (
-                        type(loc_tile) is bool and loc_tile is False
+                        type(loc_tile) is bool
+                        and loc_tile is False
                         or loc_tile is None
-                            and self.element_count[i_row, i_col] < 2
+                        and self.element_count[i_row, i_col] < 2
                     ):
                         pass
 
@@ -2863,7 +2867,7 @@ class Plot(NotebookInteraction):
 
             # image
             else:
-                scale = self.dpi / 100.
+                scale = self.dpi / 100.0
                 self.fig.write_image(
                     path,
                     scale=scale,
@@ -2981,9 +2985,7 @@ def magic_plot(core, doc_decorator=None):
         :alt: [matplotlib plot "Normally distributed Noise]
     """
     doc_decorator = (
-        conf._DOCSTRING_DECORATOR
-        if doc_decorator is None
-        else doc_decorator
+        conf._DOCSTRING_DECORATOR if doc_decorator is None else doc_decorator
     )
 
     def wrapper(
@@ -3062,10 +3064,13 @@ def magic_plot(core, doc_decorator=None):
         return fig
 
     # rewrite _DOCSTRING_DECORATOR
-    wrapper.__doc__ = _rewrite_docstring(
-        core.__doc__,
-        doc_decorator,
-    ) + "\n"
+    wrapper.__doc__ = (
+        _rewrite_docstring(
+            core.__doc__,
+            doc_decorator,
+        )
+        + "\n"
+    )
 
     return wrapper
 
