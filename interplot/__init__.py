@@ -1,7 +1,5 @@
 """Create matplotlib/plotly hybrid plots with a few lines of code."""
 
-import pkg_resources
-
 __all__ = [  # noqa F405
     "conf",
     "arraytools",
