@@ -1,3 +1,6 @@
+"""A small tool to eavesdrop on function calls and print or log them."""
+
+
 from functools import wraps
 
 import datetime as dt
@@ -5,30 +8,65 @@ import datetime as dt
 import json
 
 
-PRINT = False
-logging = False
+_active = False
+"""Whether to watch for events."""
+_save_to_log = True
+"""Whether to log the events."""
+_verbose = True
+"""Whether to print the events to the output."""
 
 
 log = []
+"""The logged events."""
 
 
-def start_logging(verbose=True):
-    """Start logging function calls."""
-    global logging
-    logging = True
-    if verbose:
-        global PRINT
-        PRINT = True
+def start_logging(save_to_log=None, verbose=None):
+    """
+    Start logging function calls.
+
+    Parameters
+    ----------
+    save_to_log: bool, optional
+        Data will be accessible at `interplot.debug.log`.
+        
+        If undefined, the last setting will be used.
+
+        By default, save_to_log is turned on once logging is activated.
+    verbose: bool, optional
+        Print payload to output on every call.
+
+        By default, verbose is turned on once logging is activated.
+    """
+    global _active
+    _active = True
+
+    if save_to_log is not None:
+        global _save_to_log
+        _save_to_log = save_to_log
+
+    if verbose is not None:
+        global _verbose
+        _verbose = verbose
 
 
 def stop_logging():
     """Stop logging function calls."""
-    global logging
-    logging = False
+    global _active
+    _active = False
 
 
-def reset_log():
-    """Reset the log."""
+def get_log(index=None):
+    """Get the logged events."""
+    global log
+
+    if index is None:
+        return log
+    
+    return log[index]
+
+
+def clear_log():
+    """Clear the log."""
     global log
     log = []
 
@@ -38,28 +76,26 @@ def wiretap(core):
 
     @wraps(core)
     def wrapper(*args, core=core, **kwargs):
-        """
-        Wrapper function for a method.
+        global _active, _save_to_log, _verbose
 
-        """
-        if not logging and not PRINT:
+        if not _active:
             return core(*args, **kwargs)
+
+        res = core(*args, **kwargs)
 
         entry = dict(
             time=dt.datetime.now(),
             function=str(core),
             args=args,
             kwargs=kwargs,
+            result=res,
         )
 
-        res = core(*args, **kwargs)
-
-        if PRINT:
-            print(json.dumps(entry, default=str, indent=4))
-        if logging:
+        if _verbose:
+            print("Wiretap log:", json.dumps(entry, default=str, indent=4))
+        if _save_to_log:
             log.append(entry)
 
         return res
-    
-    return wrapper
 
+    return wrapper

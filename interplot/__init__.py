@@ -11,8 +11,10 @@ __all__ = [  # noqa F405
 ]
 
 from . import arraytools
+from . import debug
 from .iter import *  # noqa F403
 from .plot import *  # noqa F403
+
 
 try:  # try except because of sphinx build --> DistributionNotFound Error
     __version__ = pkg_resources.get_distribution("interplot").version
