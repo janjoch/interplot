@@ -13,8 +13,22 @@ from . import arraytools
 from .iter import *  # noqa F403
 from .plot import *  # noqa F403
 
-try:  # try except because of sphinx build --> DistributionNotFound Error
-    __version__ = pkg_resources.get_distribution("interplot").version
+import sys
 
-except Exception:
-    __version__ = "not detected!"
+if sys.version_info >= (3, 8):
+    import importlib.metadata
+
+    try:
+        __version__ = importlib.metadata.version(__name__)
+
+    except importlib.metadata.PackageNotFoundError:
+        pass
+
+else:
+    import pkg_resources
+
+    try:
+        __version__ = pkg_resources.get_distribution(__name__).version
+
+    except pkg_resources.DistributionNotFound:
+        pass
