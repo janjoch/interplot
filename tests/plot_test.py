@@ -309,9 +309,7 @@ def test_labeling(interactive):
         interactive=interactive,
     )
     fig.add_line((1, 2, 4, 3), label=label.element("line visible"))
-    fig.add_line(
-        (1, 2, 4, 3), label=label.element("line invisible", show=False)
-    )
+    fig.add_line((1, 2, 4, 3), label=label.element("line invisible", show=False))
     fig.add_line(
         (1, 2, 4, 3), label=label.element("line legendonly", legend_only=False)
     )
@@ -335,9 +333,7 @@ def test_labeling(interactive):
 
 def test_magic_plot_kwargs():
     Plot_args = inspect.getfullargspec(ip.Plot).args[1:]
-    magic_plot_args = inspect.getfullargspec(
-        ip.magic_plot(lambda fig: fig)
-    ).kwonlyargs
+    magic_plot_args = inspect.getfullargspec(ip.magic_plot(lambda fig: fig)).kwonlyargs
 
     for arg in Plot_args:
         assert (

@@ -354,11 +354,7 @@ class LinearRegression(plot.NotebookInteraction):
         fig.add_scatter(
             self.x,
             self.y,
-            label=(
-                label_data
-                if callable(label_data)
-                else label.element(label_data)
-            ),
+            label=(label_data if callable(label_data) else label.element(label_data)),
             color=color if color_data is None else color_data,
             **kwargs_data,
             **kwargs,
@@ -369,9 +365,7 @@ class LinearRegression(plot.NotebookInteraction):
             self.x2,
             self.y2,
             line_style=line_style_reg,
-            label=(
-                label_reg if callable(label_reg) else label.element(label_reg)
-            ),
+            label=(label_reg if callable(label_reg) else label.element(label_reg)),
             color=color if color_reg is None else color_reg,
             **kwargs_reg,
             **kwargs,
@@ -399,9 +393,7 @@ class LinearRegression(plot.NotebookInteraction):
             fig.add_line(
                 self.x2,
                 self.y2 + self.pi,
-                label=(
-                    label_pi if callable(label_pi) else label.element(label_pi)
-                ),
+                label=(label_pi if callable(label_pi) else label.element(label_pi)),
                 line_style=line_style_pi,
                 color=color if color_pi is None else color_pi,
                 **kwargs_pi,

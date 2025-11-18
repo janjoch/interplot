@@ -328,8 +328,10 @@ if __name__ == "__main__":
 #   ## Install
 #   ```pip install interplot```
 #   
+#   ### install development branch
+#   ```pip install git+https://github.com/janjoch/interplot.git@development```
 #   
-#   ### dev installation
+#   ### active development installation
 #   1. ```git clone https://github.com/janjoch/interplot```
 #   2. ```cd interplot```
 #   2. ```pip install -e .```
@@ -845,11 +847,7 @@ if __name__ == "__main__":
 #           fig.add_scatter(
 #               self.x,
 #               self.y,
-#               label=(
-#                   label_data
-#                   if callable(label_data)
-#                   else label.element(label_data)
-#               ),
+#               label=(label_data if callable(label_data) else label.element(label_data)),
 #               color=color if color_data is None else color_data,
 #               **kwargs_data,
 #               **kwargs,
@@ -860,9 +858,7 @@ if __name__ == "__main__":
 #               self.x2,
 #               self.y2,
 #               line_style=line_style_reg,
-#               label=(
-#                   label_reg if callable(label_reg) else label.element(label_reg)
-#               ),
+#               label=(label_reg if callable(label_reg) else label.element(label_reg)),
 #               color=color if color_reg is None else color_reg,
 #               **kwargs_reg,
 #               **kwargs,
@@ -890,9 +886,7 @@ if __name__ == "__main__":
 #               fig.add_line(
 #                   self.x2,
 #                   self.y2 + self.pi,
-#                   label=(
-#                       label_pi if callable(label_pi) else label.element(label_pi)
-#                   ),
+#                   label=(label_pi if callable(label_pi) else label.element(label_pi)),
 #                   line_style=line_style_pi,
 #                   color=color if color_pi is None else color_pi,
 #                   **kwargs_pi,
@@ -1188,9 +1182,7 @@ if __name__ == "__main__":
 #       either `iterable` or `repeat(iterable)`
 #       """
 #       # input validation
-#       no_iter_types = (
-#           (float, int, datetime) if no_iter_types is None else no_iter_types
-#       )
+#       no_iter_types = (float, int, datetime) if no_iter_types is None else no_iter_types
 #       if not isinstance(length, ITERABLE_TYPES):
 #           length = (length,)
 #   
@@ -2304,9 +2296,7 @@ if __name__ == "__main__":
 #                       xlog_row,
 #                       ylog_row,
 #                   ):
-#                       if xlim_tile is not None and isinstance(
-#                           xlim_tile[0], datetime
-#                       ):
+#                       if xlim_tile is not None and isinstance(xlim_tile[0], datetime):
 #                           xlim_tile = (
 #                               xlim_tile[0].timestamp() * 1000,
 #                               xlim_tile[1].timestamp() * 1000,
@@ -2326,9 +2316,7 @@ if __name__ == "__main__":
 #   
 #               # axis labels
 #               for text, i_col in zip_smart(xlabel, range(1, self.cols + 1)):
-#                   self.fig.update_xaxes(
-#                       title_text=text, row=self.rows, col=i_col
-#                   )
+#                   self.fig.update_xaxes(title_text=text, row=self.rows, col=i_col)
 #               for text, i_row in zip_smart(ylabel, range(1, self.rows + 1)):
 #                   self.fig.update_yaxes(title_text=text, row=i_row, col=1)
 #   
@@ -2474,8 +2462,7 @@ if __name__ == "__main__":
 #               Axes coordinates.
 #           """
 #           return (
-#               self.ax[row, col].transData
-#               + self.ax[row, col].transAxes.inverted()
+#               self.ax[row, col].transData + self.ax[row, col].transAxes.inverted()
 #           ).transform((x, y))
 #   
 #       def get_cycle_color(self, increment=1, i=None):
@@ -3024,9 +3011,7 @@ if __name__ == "__main__":
 #                   (width / _serial_n),
 #                   color=self.digest_color(color, opacity),
 #                   edgecolor=(
-#                       self.digest_color(line_color, 1)
-#                       if line_color is not None
-#                       else None
+#                       self.digest_color(line_color, 1) if line_color is not None else None
 #                   ),
 #                   linewidth=line_width,
 #                   **self._digest_label(label, show_legend=show_legend),
@@ -3436,9 +3421,7 @@ if __name__ == "__main__":
 #           kwargs:
 #               Keyword arguments for `interplot.arraytools.LinearRegression.plot`.
 #           """
-#           if isinstance(x, arraytools.LinearRegression) or hasattr(
-#               x, "is_linreg"
-#           ):
+#           if isinstance(x, arraytools.LinearRegression) or hasattr(x, "is_linreg"):
 #               x.plot(fig=self, **kwargs)
 #           else:
 #               arraytools.LinearRegression(
@@ -3580,9 +3563,7 @@ if __name__ == "__main__":
 #                       label.element(),
 #                   ),
 #                   linewidth=line_width,
-#                   edgecolor=self.digest_color(
-#                       line_color, line_opacity, increment=0
-#                   ),
+#                   edgecolor=self.digest_color(line_color, line_opacity, increment=0),
 #                   facecolor=self.digest_color(color, opacity),
 #                   **kwargs_mpl,
 #                   **kwargs,
@@ -3689,10 +3670,8 @@ if __name__ == "__main__":
 #                   align=text_alignment,
 #                   xanchor=horizontal_alignment,
 #                   yanchor=vertical_alignment,
-#                   xref=self._get_plotly_anchor("x", self.cols, row, col)
-#                   + x_domain,
-#                   yref=self._get_plotly_anchor("y", self.cols, row, col)
-#                   + y_domain,
+#                   xref=self._get_plotly_anchor("x", self.cols, row, col) + x_domain,
+#                   yref=self._get_plotly_anchor("y", self.cols, row, col) + y_domain,
 #                   font=dict(color=self.digest_color(color, opacity)),
 #                   row=row,
 #                   col=col,
@@ -3711,9 +3690,7 @@ if __name__ == "__main__":
 #                       "for static matplotlib plot. x_data_coords was used."
 #                   )
 #               transform = (
-#                   dict()
-#                   if x_data_coords
-#                   else dict(transform=self.ax[row, col].transAxes)
+#                   dict() if x_data_coords else dict(transform=self.ax[row, col].transAxes)
 #               )
 #               self.ax[row, col].text(
 #                   x,
@@ -3815,10 +3792,8 @@ if __name__ == "__main__":
 #                       source=image,
 #                       x=x,
 #                       y=y,
-#                       xref=self._get_plotly_anchor("x", self.cols, row, col)
-#                       + x_domain,
-#                       yref=self._get_plotly_anchor("y", self.cols, row, col)
-#                       + y_domain,
+#                       xref=self._get_plotly_anchor("x", self.cols, row, col) + x_domain,
+#                       yref=self._get_plotly_anchor("y", self.cols, row, col) + y_domain,
 #                       xanchor=horizontal_alignment,
 #                       yanchor=vertical_alignment,
 #                       sizex=x_size,
@@ -3836,10 +3811,7 @@ if __name__ == "__main__":
 #               if kwargs_mpl is None:
 #                   kwargs_mpl = dict()
 #               if not isinstance(image, Image.Image):
-#                   warn(
-#                       "Image must be a PIL Image object for static "
-#                       "matplotlib plot."
-#                   )
+#                   warn("Image must be a PIL Image object for static " "matplotlib plot.")
 #   
 #               if data_coords or data_coords is None:
 #                   x1 = x + x_size
@@ -3885,8 +3857,7 @@ if __name__ == "__main__":
 #                       "matplotlib plot. 'contain' behavior is used instead."
 #                   )
 #               if sizing == "contain" and (
-#                   horizontal_alignment != "center"
-#                   or vertical_alignment != "center"
+#                   horizontal_alignment != "center" or vertical_alignment != "center"
 #               ):
 #                   warn(
 #                       "When using `sizing='contain'` with `horizontal_alignment`"
@@ -4191,9 +4162,7 @@ if __name__ == "__main__":
 #           if self.interactive:
 #               return self.fig.show(
 #                   config=(
-#                       conf.PTY_CONFIG
-#                       if self.save_config is None
-#                       else self.save_config
+#                       conf.PTY_CONFIG if self.save_config is None else self.save_config
 #                   )
 #               )
 #           return self.fig.show()
@@ -4685,9 +4654,7 @@ if __name__ == "__main__":
 #           var = self.default_var if var is None else var
 #           sel = self.default_sel if sel is None else sel
 #           isel = self.default_isel if isel is None else isel
-#           return super()._plot_core(
-#               self.data[var], *args, sel=sel, isel=isel, **kwargs
-#           )
+#           return super()._plot_core(self.data[var], *args, sel=sel, isel=isel, **kwargs)
 #   
 ###########################
 #### interplot/conf.py ####
@@ -5248,24 +5215,172 @@ if __name__ == "__main__":
 ###############################
 #   """Create matplotlib/plotly hybrid plots with a few lines of code."""
 #   
-#   import pkg_resources
-#   
 #   __all__ = [  # noqa F405
 #       "conf",
 #       "arraytools",
 #       "iter",
 #       "plot",
+#       "debug",
 #   ]
 #   
 #   from . import arraytools
+#   from . import debug
 #   from .iter import *  # noqa F403
 #   from .plot import *  # noqa F403
 #   
-#   try:  # try except because of sphinx build --> DistributionNotFound Error
-#       __version__ = pkg_resources.get_distribution("interplot").version
+#   import sys
 #   
-#   except Exception:
-#       __version__ = "not detected!"
+#   if sys.version_info >= (3, 8):
+#       import importlib.metadata
+#   
+#       try:
+#           __version__ = importlib.metadata.version(__name__)
+#   
+#       except importlib.metadata.PackageNotFoundError:
+#           pass
+#   
+#   else:
+#       import pkg_resources
+#   
+#       try:
+#           __version__ = pkg_resources.get_distribution(__name__).version
+#   
+#       except pkg_resources.DistributionNotFound:
+#           pass
+#   
+############################
+#### interplot/debug.py ####
+############################
+#   """
+#   A small tool to eavesdrop on function calls and print or log them.
+#   
+#   Examples
+#   --------
+#   >>> @interplot.debug.wiretap
+#   ... def func(foo):
+#   ...     return foo + foo
+#   ... interplot.debug.start_logging(save_to_log=True, verbose=True)
+#   ... func("bar")
+#   Wiretap log: {
+#       "time": "2025-11-18 09:13:17.387600",
+#       "function": "<function func at 0x323088680>",
+#       "args": [
+#           "bar"
+#       ],
+#       "kwargs": {},
+#       "result": "barbar"
+#   }
+#   'barbar'
+#   >>> interplot.debug.get_log(-1)["args"]  # get the last log entry
+#   ('bar',)
+#   """
+#   
+#   from functools import wraps
+#   
+#   import datetime as dt
+#   
+#   import json
+#   
+#   
+#   _active = False
+#   """Whether to watch for events."""
+#   _save_to_log = True
+#   """Whether to log the events."""
+#   _verbose = True
+#   """Whether to print the events to the output."""
+#   
+#   
+#   log = []
+#   """The logged events."""
+#   
+#   
+#   def start_logging(save_to_log=None, verbose=None):
+#       """
+#       Start logging function calls.
+#   
+#       Parameters
+#       ----------
+#       save_to_log: bool, optional
+#           Data will be accessible at `interplot.debug.log`.
+#   
+#           If undefined, the last setting will be used.
+#   
+#           By default, save_to_log is turned on once logging is activated.
+#       verbose: bool, optional
+#           Print payload to output on every call.
+#   
+#           By default, verbose is turned on once logging is activated.
+#       """
+#       global _active
+#       _active = True
+#   
+#       if save_to_log is not None:
+#           global _save_to_log
+#           _save_to_log = save_to_log
+#   
+#       if verbose is not None:
+#           global _verbose
+#           _verbose = verbose
+#   
+#   
+#   def stop_logging():
+#       """Stop logging function calls."""
+#       global _active
+#       _active = False
+#   
+#   
+#   def get_log(index=None):
+#       """Get the logged events."""
+#       global log
+#   
+#       if index is None:
+#           return log
+#   
+#       return log[index]
+#   
+#   
+#   def clear_log():
+#       """Clear the log."""
+#       global log
+#       log = []
+#   
+#   
+#   def wiretap(core):
+#       """
+#       Decorator to log input and output of the decorated function.
+#   
+#       Examples
+#       --------
+#       >>> @interplot.debug.wiretap
+#       ... def func(foo):
+#       ...     return foo + foo
+#       """
+#   
+#       @wraps(core)
+#       def inner(*args, core=core, **kwargs):
+#           global _active, _save_to_log, _verbose
+#   
+#           if not _active:
+#               return core(*args, **kwargs)
+#   
+#           res = core(*args, **kwargs)
+#   
+#           entry = dict(
+#               time=dt.datetime.now(),
+#               function=str(core),
+#               args=args,
+#               kwargs=kwargs,
+#               result=res,
+#           )
+#   
+#           if _verbose:
+#               print("Wiretap log:", json.dumps(entry, default=str, indent=4))
+#           if _save_to_log:
+#               log.append(entry)
+#   
+#           return res
+#   
+#       return inner
 #   
 #############
 #### END ####
