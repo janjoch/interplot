@@ -4,3 +4,5 @@ build-backend = "setuptools.build_meta"
 
 [tools.setuptools]
 
+[tool.black]
+line-length = 79
