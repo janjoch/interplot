@@ -1,6 +1,9 @@
 # interplot
 
-[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0) [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/janjoch/interplot/HEAD) [![NBViewer](https://raw.githubusercontent.com/jupyter/design/master/logos/Badges/nbviewer_badge.svg)](https://nbviewer.org/github/janjoch/interplot/tree/main/demo/)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+[![PyPI version](https://img.shields.io/pypi/v/interplot)](https://pypi.org/project/interplot/)
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/janjoch/interplot/HEAD)
+[![NBViewer](https://raw.githubusercontent.com/jupyter/design/master/logos/Badges/nbviewer_badge.svg)](https://nbviewer.org/github/janjoch/interplot/tree/main/demo/)
 
 Create `matplotlib` and `plotly` charts with the same few lines of code.
 
@@ -35,36 +38,34 @@ Supported
         [matplotlib hist figure]
 
         >>> interplot.boxplot(
-        >>>     [
-        >>>         np.random.normal(20, 5, 1000),
-        >>>         np.random.normal(40, 8, 1000),
-        >>>         np.random.normal(60, 5, 1000),
-        >>>     ],
-        >>> )
+        ...     [
+        ...         np.random.normal(20, 5, 1000),
+        ...         np.random.normal(40, 8, 1000),
+        ...         np.random.normal(60, 5, 1000),
+        ...     ],
+        ... )
         [plotly boxplots]
         ```
 
     - Decorator to auto-initialize plots to use in your methods
         ```python
         >>> @interplot.magic_plot
-        >>> def plot_my_data(fig=None):
-        >>>     # import and process your data...
-        >>>     data = np.random.normal(2, 3, 1000)
-        >>>     # draw with the fig instance obtained from the decorator function
-        >>>     fig.add_line(data, label="my data")
-        >>>     fig.add_fill((0, 999), (-1, -1), (5, 5), label="sigma")
-
+        ... def plot_my_data(fig=None):
+        ...     # import and process your data...
+        ...     data = np.random.normal(2, 3, 1000)
+        ...     # draw with the fig instance obtained from the decorator function
+        ...     fig.add_line(data, label="my data")
+        ...     fig.add_fill((0, 999), (-1, -1), (5, 5), label="sigma")
         >>> plot_my_data(title="My Recording")
         [plotly figure "My Recording"]
 
         >>> @interplot.magic_plot_preset(interactive=False, title="Preset Title")
         >>> def plot_my_data_preconfigured(fig=None):
-        >>>     # import and process your data...
-        >>>     data = np.random.normal(2, 3, 1000)
-        >>>     # draw with the fig instance obtained from the decorator function
-        >>>     fig.add_line(data, label="my data")
-        >>>     fig.add_fill((0, 999), (-1, -1), (5, 5), label="sigma")
-
+        ...     # import and process your data...
+        ...     data = np.random.normal(2, 3, 1000)
+        ...     # draw with the fig instance obtained from the decorator function
+        ...     fig.add_line(data, label="my data")
+        ...     fig.add_fill((0, 999), (-1, -1), (5, 5), label="sigma")
         >>> plot_my_data_preconfigured()
         [matplotlib figure "Preset Title"]
         ```
@@ -72,25 +73,25 @@ Supported
     - The `interplot.Plot` class for full control
         ```python
         >>> fig = interplot.Plot(
-        >>>     interactive=True,
-        >>>     title="Everything Under Control",
-        >>>     fig_size=(800, 500),
-        >>>     rows=1,
-        >>>     cols=2,
-        >>>     shared_yaxes=True,
-        >>>     # ...
-        >>> )
+        ...     interactive=True,
+        ...     title="Everything Under Control",
+        ...     fig_size=(800, 500),
+        ...     rows=1,
+        ...     cols=2,
+        ...     shared_yaxes=True,
+        ...     # ...
+        ... )
         >>> fig.add_hist(np.random.normal(1, 0.5, 1000), row=0, col=0)
         >>> fig.add_boxplot(
-        >>>     [
-        >>>         np.random.normal(20, 5, 1000),
-        >>>         np.random.normal(40, 8, 1000),
-        >>>         np.random.normal(60, 5, 1000),
-        >>>     ],
-        >>>     row=0,
-        >>>     col=1,
-        >>> )
-        >>> # ...
+        ...     [
+        ...         np.random.normal(20, 5, 1000),
+        ...         np.random.normal(40, 8, 1000),
+        ...         np.random.normal(60, 5, 1000),
+        ...     ],
+        ...     row=0,
+        ...     col=1,
+        ... )
+        ... # ...
         >>> fig.post_process()
         >>> fig.show()
         [plotly figure "Everything Under Control"]
