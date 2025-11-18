@@ -29,6 +29,11 @@ Quick Start
 
     api_iter
 
+.. toctree::
+    :maxdepth: 2
+
+    api_debug
+
 
 .. contents:: On this page
     :depth: 3

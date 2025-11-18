@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>interplot.debug: Debugging Tool &#8212; interplot  documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="_static/classic.css?v=d534aad8" />
+    <link rel="stylesheet" type="text/css" href="_static/mobile.css?v=ab6fdb28" />
+    
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=b3ba4146"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="_static/mobile.js?v=ebcc83c9"></script>
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="interplot.iter: Iteration Tools Documentation and API reference" href="api_iter.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="api_iter.html" title="interplot.iter: Iteration Tools Documentation and API reference"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">interplot  documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href=""><cite>interplot.debug</cite>: Debugging Tool</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="interplot-debug-debugging-tool">
+<h1><a class="toc-backref" href="#id1" role="doc-backlink"><cite>interplot.debug</cite>: Debugging Tool</a><a class="headerlink" href="#interplot-debug-debugging-tool" title="Permalink to this heading">¶</a></h1>
+<nav class="contents" id="on-this-page">
+<p class="topic-title">On this page</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#interplot-debug-debugging-tool" id="id1"><cite>interplot.debug</cite>: Debugging Tool</a></p>
+<ul>
+<li><p><a class="reference internal" href="#examples" id="id2">Examples</a></p></li>
+<li><p><a class="reference internal" href="#interplot-debug-wiretap" id="id3"><cite>interplot.debug.wiretap</cite></a></p></li>
+</ul>
+</li>
+</ul>
+</nav>
+<span class="target" id="module-interplot.debug"></span><p>A small tool to eavesdrop on function calls and print or log them.</p>
+<section id="examples">
+<h2><a class="toc-backref" href="#id2" role="doc-backlink">Examples</a><a class="headerlink" href="#examples" title="Permalink to this heading">¶</a></h2>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nd">@interplot</span><span class="o">.</span><span class="n">debug</span><span class="o">.</span><span class="n">wiretap</span>
+<span class="gp">... </span><span class="k">def</span> <span class="nf">func</span><span class="p">(</span><span class="n">foo</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="k">return</span> <span class="n">foo</span> <span class="o">+</span> <span class="n">foo</span>
+<span class="gp">... </span><span class="n">interplot</span><span class="o">.</span><span class="n">debug</span><span class="o">.</span><span class="n">start_logging</span><span class="p">(</span><span class="n">save_to_log</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">... </span><span class="n">func</span><span class="p">(</span><span class="s2">&quot;bar&quot;</span><span class="p">)</span>
+<span class="go">Wiretap log: {</span>
+<span class="go">    &quot;time&quot;: &quot;2025-11-18 09:13:17.387600&quot;,</span>
+<span class="go">    &quot;function&quot;: &quot;&lt;function func at 0x323088680&gt;&quot;,</span>
+<span class="go">    &quot;args&quot;: [</span>
+<span class="go">        &quot;bar&quot;</span>
+<span class="go">    ],</span>
+<span class="go">    &quot;kwargs&quot;: {},</span>
+<span class="go">    &quot;result&quot;: &quot;barbar&quot;</span>
+<span class="go">}</span>
+<span class="go">&#39;barbar&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">interplot</span><span class="o">.</span><span class="n">debug</span><span class="o">.</span><span class="n">get_log</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)[</span><span class="s2">&quot;args&quot;</span><span class="p">]</span>  <span class="c1"># get the last log entry</span>
+<span class="go">(&#39;bar&#39;,)</span>
+</pre></div>
+</div>
+</section>
+<section id="interplot-debug-wiretap">
+<h2><a class="toc-backref" href="#id3" role="doc-backlink"><cite>interplot.debug.wiretap</cite></a><a class="headerlink" href="#interplot-debug-wiretap" title="Permalink to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="interplot.debug.wiretap">
+<span class="sig-prename descclassname"><span class="pre">interplot.debug.</span></span><span class="sig-name descname"><span class="pre">wiretap</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">core</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#interplot.debug.wiretap" title="Permalink to this definition">¶</a></dt>
+<dd><p>Decorator to log input and output of the decorated function.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nd">@interplot</span><span class="o">.</span><span class="n">debug</span><span class="o">.</span><span class="n">wiretap</span>
+<span class="gp">... </span><span class="k">def</span> <span class="nf">func</span><span class="p">(</span><span class="n">foo</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="k">return</span> <span class="n">foo</span> <span class="o">+</span> <span class="n">foo</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="interplot.debug.start_logging">
+<span class="sig-prename descclassname"><span class="pre">interplot.debug.</span></span><span class="sig-name descname"><span class="pre">start_logging</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">save_to_log</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#interplot.debug.start_logging" title="Permalink to this definition">¶</a></dt>
+<dd><p>Start logging function calls.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>save_to_log: bool, optional</strong></dt><dd><p>Data will be accessible at <cite>interplot.debug.log</cite>.</p>
+<p>If undefined, the last setting will be used.</p>
+<p>By default, save_to_log is turned on once logging is activated.</p>
+</dd>
+<dt><strong>verbose: bool, optional</strong></dt><dd><p>Print payload to output on every call.</p>
+<p>By default, verbose is turned on once logging is activated.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="interplot.debug.stop_logging">
+<span class="sig-prename descclassname"><span class="pre">interplot.debug.</span></span><span class="sig-name descname"><span class="pre">stop_logging</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#interplot.debug.stop_logging" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stop logging function calls.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="interplot.debug.get_log">
+<span class="sig-prename descclassname"><span class="pre">interplot.debug.</span></span><span class="sig-name descname"><span class="pre">get_log</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#interplot.debug.get_log" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the logged events.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="interplot.debug.clear_log">
+<span class="sig-prename descclassname"><span class="pre">interplot.debug.</span></span><span class="sig-name descname"><span class="pre">clear_log</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#interplot.debug.clear_log" title="Permalink to this definition">¶</a></dt>
+<dd><p>Clear the log.</p>
+</dd></dl>
+
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="index.html">Table of Contents</a></h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api_plot.html"><cite>interplot</cite> Documentation and API reference</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api_conf.html"><cite>interplot.conf</cite>: Module Defaults Configuration</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api_iter.html"><cite>interplot.iter</cite>: Iteration Tools Documentation and API reference</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#"><cite>interplot.debug</cite>: Debugging Tool</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#examples">Examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#interplot-debug-wiretap"><cite>interplot.debug.wiretap</cite></a></li>
+</ul>
+</li>
+</ul>
+
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#"><cite>interplot.debug</cite>: Debugging Tool</a><ul>
+<li><a class="reference internal" href="#examples">Examples</a></li>
+<li><a class="reference internal" href="#interplot-debug-wiretap"><cite>interplot.debug.wiretap</cite></a><ul>
+<li><a class="reference internal" href="#interplot.debug.wiretap"><code class="docutils literal notranslate"><span class="pre">wiretap()</span></code></a></li>
+<li><a class="reference internal" href="#interplot.debug.start_logging"><code class="docutils literal notranslate"><span class="pre">start_logging()</span></code></a></li>
+<li><a class="reference internal" href="#interplot.debug.stop_logging"><code class="docutils literal notranslate"><span class="pre">stop_logging()</span></code></a></li>
+<li><a class="reference internal" href="#interplot.debug.get_log"><code class="docutils literal notranslate"><span class="pre">get_log()</span></code></a></li>
+<li><a class="reference internal" href="#interplot.debug.clear_log"><code class="docutils literal notranslate"><span class="pre">clear_log()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="api_iter.html"
+                          title="previous chapter"><cite>interplot.iter</cite>: Iteration Tools Documentation and API reference</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/api_debug.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="api_iter.html" title="interplot.iter: Iteration Tools Documentation and API reference"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">interplot  documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href=""><cite>interplot.debug</cite>: Debugging Tool</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2023, Janosch Jörg.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.2.
+    </div>
+  </body>
+</html>
