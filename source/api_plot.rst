@@ -47,6 +47,8 @@ One-line Plotting
 
 .. autofunction:: interplot.text
 
+.. autofunction:: interplot.image
+
 
 -----------------------
 `magic_plot` decorators
@@ -55,6 +57,18 @@ One-line Plotting
 .. autofunction:: interplot.magic_plot
 
 .. autofunction:: interplot.magic_plot_preset
+
+
+------------------
+`LabelGroup` class
+------------------
+
+.. autoclass:: interplot.LabelGroup
+    :members:
+    :undoc-members:
+    :inherited-members:
+    :show-inheritance:
+    :member-order: bysource
 
 
 ----------------------------------
@@ -90,3 +104,13 @@ One-line Plotting
     :private-members: _repr_html_, _repr_mimebundle_
     :member-order: bysource
 
+
+----------------
+Helper functions
+----------------
+
+.. autofunction:: interplot.init_notebook_mode
+
+.. autofunction:: interplot.pick_non_none
+
+.. autofunction:: interplot.close

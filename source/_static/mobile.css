@@ -1,0 +1,70 @@
+@media (max-width: 800px) {
+	.document {
+		width: 100% !important;
+		display: block !important;
+	}
+
+	.sphinxsidebar {
+		position: sticky !important;
+		top: 0 !important;
+
+		width: 100% !important;
+		height: auto !important;
+		max-height: 100vh !important;
+		overflow: hidden !important;
+		float: left !important;
+	}
+
+	.sphinxsidebar::before {
+		content: "";
+		background-repeat: no-repeat;
+		background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-menu"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>');
+		background-position: center;
+		display: block;
+		cursor: pointer;
+
+		height: 50px;
+		background-color: #143f52 !important;
+		color: white;
+	}
+
+	.sphinxsidebar.opened::before {
+		background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIgY2xhc3M9Imx1Y2lkZSBsdWNpZGUtY2hldnJvbi1kb3duIj48cGF0aCBkPSJtNiA5IDYgNiA2LTYiLz48L3N2Zz4=");
+	}
+
+	.sphinxsidebarwrapper {
+		width: 100% !important;
+		display: none !important;
+		background-color: #143f52 !important;
+		padding: 10px !important;
+		box-sizing: border-box !important;
+		height: auto !important;
+		max-height: 100vh !important;
+		overflow-y: auto !important;
+	}
+	.sphinxsidebar.opened .sphinxsidebarwrapper {
+		display: block !important;
+	}
+
+	.bodywrapper {
+		margin: 0 !important;
+	}
+
+	.body {
+		min-width: 100% !important;
+		margin: 0 !important;
+		padding: 20px !important;
+		box-sizing: border-box !important;
+		overflow-x: auto !important;
+	}
+}
+
+.plotly-graph-div {
+	max-width: 100% !important;
+}
+
+.svg-container {
+	overflow-x: auto !important;
+	max-width: 100% !important;
+	overflow-y: hidden !important;
+}

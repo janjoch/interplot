@@ -28,15 +28,22 @@ Example:
     :alt: [matplotlib plot of a sinus curve]
 """
 
-
 INTERACTIVE = True
 """
 Generate a `plotly` figure by default.
 """
 
 COLOR_CYCLE = [  # optimised for color vision deficiencies
-    '#006BA4', '#FF800E', '#ABABAB', '#595959', '#5F9ED1',
-    '#C85200', '#898989', '#A2C8EC', '#FFBC79', '#CFCFCF',
+    "#006BA4",
+    "#FF800E",
+    "#ABABAB",
+    "#595959",
+    "#5F9ED1",
+    "#C85200",
+    "#898989",
+    "#A2C8EC",
+    "#FFBC79",
+    "#CFCFCF",
 ]
 """
 Colors to be cycled through by default.
@@ -100,6 +107,144 @@ Optional
 """
 
 
+def GLOBAL_CUSTOM_FUNC(fig):
+    """
+    Apply a custom function on figures on finishing the plot.
+
+    Will be called in `interplot.Plot.post_process()`.
+
+    When overriding this function, make sure it accepts `fig`.
+    There is no need to return `fig`.
+
+    Parameters
+    ----------
+    fig: interplot.Plot instance
+
+    Examples
+    --------
+    >>> def global_custom_func(fig):
+    ...     # do your customisations
+    ...     fig.add_text(0, 0, "watermark", color="gray")
+    ...
+    ...     # also include default function
+    ...     conf.GLOBAL_CUSTOM_FUNC(fig)
+    ...
+    ... fig = interplot.Plot(
+    ...     global_custom_func=global_custom_func
+    ... )
+    ... fig.add_line(x, y)
+    ... fig.post_process()  # global_custom_func will be executed here
+    ... fig.show()
+    """
+    pass
+
+
+def MPL_CUSTOM_FUNC(fig, ax):
+    """
+    Apply a custom function on matplotlib figures on finishing the plot.
+
+    Will be called in `interplot.Plot.post_process()`.
+
+    When overriding this function, make sure it accepts `fig` and `ax`
+    and returns `fig` and `ax`.
+
+    Parameters
+    ----------
+    fig : matplotlib.figure.Figure
+        The figure object.
+    ax : matplotlib.axes.Axes
+        The axes object.
+
+    Returns
+    -------
+    fig : matplotlib.figure.Figure
+        The modified figure object.
+    ax : matplotlib.axes.Axes
+        The modified axes object.
+
+    Examples
+    --------
+    >>> def mpl_custom_func(fig, ax):
+    ...     # do your customisations
+    ...     fig.do_stuff()
+    ...     ax[0, 0].do_more()
+    ...
+    ...     # also include default function
+    ...     fig, ax = conf.MPL_CUSTOM_FUNC(fig, ax)
+    ...
+    ...     return fig, ax
+    ...
+    ... fig = interplot.Plot(
+    ...     interactive=False,
+    ...     mpl_custom_func=mpl_custom_func
+    ... )
+    ... fig.add_line(x, y)
+    ... fig.post_process()  # mpl_custom_func will be executed here
+    ... fig.show()
+    """
+    return fig, ax
+
+
+def PTY_CUSTOM_FUNC(fig):
+    """
+    Apply a custom function on plotly figures on finishing the plot.
+
+    Will be called in `interplot.Plot.post_process()`.
+
+    When overriding this function, make sure it accepts `fig`
+    and returns `fig`.
+
+    Parameters
+    ----------
+    fig : plotly.graph_objects.Figure
+        The figure object.
+
+    Returns
+    -------
+    fig : plotly.graph_objects.Figure
+        The modified figure object.
+
+    Examples
+    --------
+    >>> def pty_custom_func(fig):
+    ...     # do your customisations
+    ...     fig.do_stuff()
+    ...
+    ...     # also include default function
+    ...     fig = conf.PTY_CUSTOM_FUNC(fig)
+    ...
+    ...     return fig
+    ...
+    ... fig = interplot.Plot(
+    ...     interactive=True,
+    ...     pty_custom_func=pty_custom_func
+    ... )
+    ... fig.add_line(x, y)
+    ... fig.post_process()  # pty_custom_func will be executed here
+    ... fig.show()
+    """
+    return fig
+
+
+PTY_LEGEND_TOGGLEGROUP = True
+"""
+PLOTLY ONLY.
+If True, elements with the same legend group will be toggled together
+when clicking on a legend item.
+"""
+
+
+PTY_UPDATE_LAYOUT = dict()
+"""
+PLOTLY ONLY.
+
+Pass keyword arguments to plotly's
+`plotly.graph_objects.Figure.update_layout(**pty_update_layout)`
+
+Default: None
+"""
+
+
 PTY_CONFIG = dict(
     displayModeBar=True,
     displaylogo=False,
@@ -125,9 +270,7 @@ PTY_LINE_STYLES = {
 Mapping for line styles for `plotly`.
 """
 
-MPL_LINE_STYLES = {
-    value: key for key, value in PTY_LINE_STYLES.items()
-}
+MPL_LINE_STYLES = {value: key for key, value in PTY_LINE_STYLES.items()}
 """
 Mapping for line styles for `matplotlib`.
 """
@@ -198,44 +341,44 @@ PTY_MARKERS_LIST = list(PTY_MARKERS.values())
 Possible line styles for `plotly`.
 """
 
-MPL_MARKERS = {
-    value: key for key, value in PTY_MARKERS.items()
-}
+MPL_MARKERS = {value: key for key, value in PTY_MARKERS.items()}
 """
 Mapping for marker styles for `matplotlib`.
 """
-MPL_MARKERS.update({  # next best matches
-    "triangle-nw": "^",
-    "triangle-ne": ">",
-    "triangle-se": "v",
-    "triangle-sw": "<",
-    "hexagram": "*",
-    "star-triangle-up": "^",
-    "star-triangle-down": "v",
-    "star-square": "s",
-    "star-diamond": "D",
-    "diamond-wide": "D",
-    "hourglass": "d",
-    "bowtie": "D",
-    "circle-cross": "+",
-    "circle-x": "x",
-    "cross-thin": "+",
-    "square-cross": "s",
-    "square-x": "s",
-    "diamond-cross": "D",
-    "diamond-x": "D",
-    "x-thin": "x",
-    "hash": "*",
-    "asterisk": "*",
-    "line-ne": "|",
-    "line-nw": "_",
-    "arrow-bar-up": 6,
-    "arrow-bar-down": 7,
-    "arrow-bar-left": 4,
-    "arrow-bar-right": 5,
-    "arrow": 6,
-    "arrow-wide": 6,
-})
+MPL_MARKERS.update(
+    {  # next best matches
+        "triangle-nw": "^",
+        "triangle-ne": ">",
+        "triangle-se": "v",
+        "triangle-sw": "<",
+        "hexagram": "*",
+        "star-triangle-up": "^",
+        "star-triangle-down": "v",
+        "star-square": "s",
+        "star-diamond": "D",
+        "diamond-wide": "D",
+        "hourglass": "d",
+        "bowtie": "D",
+        "circle-cross": "+",
+        "circle-x": "x",
+        "cross-thin": "+",
+        "square-cross": "s",
+        "square-x": "s",
+        "diamond-cross": "D",
+        "diamond-x": "D",
+        "x-thin": "x",
+        "hash": "*",
+        "asterisk": "*",
+        "line-ne": "|",
+        "line-nw": "_",
+        "arrow-bar-up": 6,
+        "arrow-bar-down": 7,
+        "arrow-bar-left": 4,
+        "arrow-bar-right": 5,
+        "arrow": 6,
+        "arrow-wide": 6,
+    }
+)
 MPL_MARKERS_LIST = list(MPL_MARKERS.values())
 """
 Possible line styles for `matplotlib`.
@@ -248,7 +391,7 @@ _DOCSTRING_DECORATOR = """
         Display an interactive plotly line plot
         instead of the default matplotlib figure.
     rows, cols: int, default: 1
-        Create a grid with x rows and y columns.
+        Create a grid with `n` rows and `m` columns.
     title: str, default: None
         Plot title.
     xlabel, ylabel: str or str tuple, default: None
@@ -261,7 +404,11 @@ _DOCSTRING_DECORATOR = """
         In case of multiple rows/cols provide either:
             - a tuple
             - a tuple for each row
-            - a tuple for each row containing tuple for each column.
+            - a tuple for each row containing a tuple for each column.
+    xlog, ylog: bool or bool tuple, default: False
+        Logarithmic scale for the axis.
+
+        Either one boolean for the entire axis or one for each row/column.
     shared_xaxes, shared_yaxes: str, default: None
         Define how multiple subplots share there axes.
 
@@ -274,11 +421,11 @@ _DOCSTRING_DECORATOR = """
         Ratios of the width/height dimensions in each column/row.
         Will be normalised to a sum of 1.
     fig_size: tuple of 2x float, optional
-        Figure size in pixels.
+        Width, height in pixels.
 
-        Default behavior:
-            - MPL: Default figure size.
-            - PLT: Responsive sizing.
+        Default behavior defined by `conf.MPL_FIG_SIZE`
+        and `conf.PTY_FIG_SIZE`.
+        Plotly allows None for responsive size adapting to viewport.
     dpi: int, default: 100
         Plot resolution.
     legend_loc: str, optional
@@ -292,6 +439,16 @@ _DOCSTRING_DECORATOR = """
         the subplots may be provided.
 
         PTY: Just provide a `str`.
+    legend_togglegroup: bool, default: False
+        PLOTLY ONLY.
+
+        Whether legend items with the same group will be toggled together
+        when clicking on a legend item.
+    color_cycle: list, optional
+        Cycle through colors in the provided list.
+
+        If left `None`, the default color cycle
+        `conf.COLOR_CYCLE` will be used.
     save_fig: str or pathlib.Path, default: None
         Provide a path to export the plot.
 
@@ -310,31 +467,82 @@ _DOCSTRING_DECORATOR = """
 
         An iterable of multiple formats may be provided. In this case
         the save command will be repeated for each element.
-    pty_update_layout: dict, default: None
-        PLOTLY ONLY.
-        Pass keyword arguments to plotly's
-        `fig.update_layout(**pty_update_layout)`
-        Thus, take full control over
+    save_config: dict, default: None
+        Plotly only.
+
+        Pass config options to
+        `plotly.graph_objects.Figure.write_html(config=save_config)`.
+    global_custom_func: function, default: None
+        Pass a function reference to further style the figures.
+
+        >>> def global_custom_func(fig):
+        ...     # do your customisations
+        ...     fig.add_text(0, 0, "watermark", color="gray")
+        ...
+        ...     # also include default function
+        ...     conf.GLOBAL_CUSTOM_FUNC(fig)
+        ...
+        ... fig = interplot.Plot(
+        ...     global_custom_func=global_custom_func
+        ... )
+        ... fig.add_line(x, y)
+        ... fig.post_process()  # global_custom_func will be executed here
+        ... fig.show()
+    mpl_custom_func: function, default: None
+        MATPLOTLIB ONLY.
+
+        Pass a function reference to further style the matplotlib graphs.
+        Function must accept `fig, ax` and return `fig, ax`.
+
+        Note: `ax` always has `row` and `col` coordinates, even if the
+        plot is just 1x1.
+
+        >>> def mpl_custom_func(fig, ax):
+        ...     # do your customisations
+        ...     fig.do_stuff()
+        ...     ax[0, 0].do_more()
+        ...
+        ...     # also include default function
+        ...     fig, ax = conf.MPL_CUSTOM_FUNC(fig, ax)
+        ...
+        ...     return fig, ax
+        ...
+        ... fig = interplot.Plot(
+        ...     interactive=False,
+        ...     mpl_custom_func=mpl_custom_func
+        ... )
+        ... fig.add_line(x, y)
+        ... fig.post_process()  # mpl_custom_func will be executed here
+        ... fig.show()
     pty_custom_func: function, default: None
         PLOTLY ONLY.
+
         Pass a function reference to further style the plotly graphs.
         Function must accept `fig` and return `fig`.
 
         >>> def pty_custom_func(fig):
+        ...     # do your customisations
         ...     fig.do_stuff()
+        ...
+        ...     # also include default function
+        ...     fig = conf.PTY_CUSTOM_FUNC(fig)
+        ...
         ...     return fig
-    mpl_custom_func: function, default: None
-        MATPLOTLIB ONLY.
-        Pass a function reference to further style the matplotlib graphs.
-        Function must accept `fig, ax` and return `fig, ax`.
+        ...
+        ... fig = interplot.Plot(
+        ...     interactive=True,
+        ...     pty_custom_func=pty_custom_func
+        ... )
+        ... fig.add_line(x, y)
+        ... fig.post_process()  # pty_custom_func will be executed here
+        ... fig.show()
+    pty_update_layout: dict, default: None
+        PLOTLY ONLY.
 
-        Note: `ax` always has `row` and `col` coordinates, even if the plot is
-        just 1x1.
+        Pass keyword arguments to plotly's
+        `plotly.graph_objects.Figure.update_layout(**pty_update_layout)`
 
-        >>> def mpl_custom_func(fig, ax):
-        ...     fig.do_stuff()
-        ...     ax[0, 0].do_more()
-        ...     return fig, ax
+        Default: None
 
     Returns
     -------

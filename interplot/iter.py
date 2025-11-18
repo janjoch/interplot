@@ -9,9 +9,15 @@ from pandas.core.series import Series as pd_Series
 
 
 ITERABLE_TYPES = (
-    tuple, list, dict, np_ndarray, pd_Series, range, GeneratorType,
+    tuple,
+    list,
+    dict,
+    np_ndarray,
+    pd_Series,
+    range,
+    GeneratorType,
 )
-NON_ITERABLE_TYPES = (str, )
+NON_ITERABLE_TYPES = (str,)
 CUSTOM_DIGESTION = ((dict, (lambda dct: [elem for _, elem in dct.items()])),)
 
 MUTE_STRICT_ZIP_WARNING = False
@@ -215,7 +221,7 @@ def sum_nested(
     return val
 
 
-def filter_nozip(iterable, no_iter_types=None, recursive=False, length=(2, )):
+def filter_nozip(iterable, no_iter_types=None, depth=0, length=(2,)):
     """
     Prevent certain patterns from being unpacked in `interplot.zip_smart`.
 
@@ -241,11 +247,23 @@ def filter_nozip(iterable, no_iter_types=None, recursive=False, length=(2, )):
 
     Parameters
     ----------
-    iterable
+    iterable: Any
+        The object to potentially iterate.
     no_iter_types, tuple, optional
-        Types which, if found, indicate this iterable should not be unpacked.
+        If only these types are found in the iterable, it will not be unpacked,
+        given it has the correct length.
 
         Default: (`float`, `int`, `datetime`)
+    depth: int, default: 0
+        Maximum depth to recurse.
+
+        Depth 0 will only check the first level,
+        depth 1 will check two levels, ...
+
+        Set to -1 to recurse infinitely.
+    length: tuple, default: (2, )
+        If the iterable has one of the lengths in this tuple,
+        it will not be unpacked.
 
     Returns
     -------
@@ -253,12 +271,10 @@ def filter_nozip(iterable, no_iter_types=None, recursive=False, length=(2, )):
     """
     # input validation
     no_iter_types = (
-        (float, int, datetime)
-        if no_iter_types is None
-        else no_iter_types
+        (float, int, datetime) if no_iter_types is None else no_iter_types
     )
     if not isinstance(length, ITERABLE_TYPES):
-        length = (length, )
+        length = (length,)
 
     # non-iterable
     if not isinstance(iterable, ITERABLE_TYPES):
@@ -275,11 +291,15 @@ def filter_nozip(iterable, no_iter_types=None, recursive=False, length=(2, )):
             return repeat(iterable)
 
     # otherwise recursively
-    if recursive:
+    if depth != 0:
         return [
-            filter_nozip(i, no_iter_types, length=length)
-            for i
-            in iterable
+            filter_nozip(
+                i,
+                no_iter_types=no_iter_types,
+                depth=depth - 1,
+                length=length,
+            )
+            for i in iterable
         ]
 
     # no hit
