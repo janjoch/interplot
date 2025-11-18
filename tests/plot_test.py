@@ -1,4 +1,5 @@
 from functools import wraps
+import inspect
 
 import interplot as ip
 
@@ -26,9 +27,9 @@ def test_for_errors(f=lambda: None):
 
     @wraps(f)
     @pytest.mark.parametrize(
-            "interactive",
-            (True, False),
-        )
+        "interactive",
+        (True, False),
+    )
     def inner(interactive, *args, **kwargs):
         no_error = True
 
@@ -75,8 +76,18 @@ def test_line_adv(interactive):
 
 @pytest.mark.parametrize(
     "line_style",
-    ("solid", "dashed", "dash", "dotted", "dot", "dashdot",
-     "-", "-.", ":", "--"),
+    (
+        "solid",
+        "dashed",
+        "dash",
+        "dotted",
+        "dot",
+        "dashdot",
+        "-",
+        "-.",
+        ":",
+        "--",
+    ),
 )
 @test_for_errors
 def test_line_line_style(line_style, interactive):
@@ -95,7 +106,8 @@ def test_line_line_style(line_style, interactive):
 @test_for_errors
 def test_line_markers(marker, interactive):
     ip.linescatter(
-        [1, 2, 3], [4, 5, 6],
+        [1, 2, 3],
+        [4, 5, 6],
         marker=marker,
         interactive=interactive,
     )
@@ -221,65 +233,92 @@ def test_complex_plot(interactive):
         ),
         legend_togglegroup=True,
         save_fig="tests/temp_exports/fancy_{}.png".format(
-            "interactive" if interactive else "static"),
+            "interactive" if interactive else "static"
+        ),
     )
 
-    fig.add_line((20, 50, 80), (30, 20, 10), y_error=((4, 2, 6), (3, 12, 9)),
-                 line_style="dashdot", label="line 1")
+    fig.add_line(
+        (20, 50, 80),
+        (30, 20, 10),
+        y_error=((4, 2, 6), (3, 12, 9)),
+        line_style="dashdot",
+        label="line 1",
+    )
     fig.add_linescatter((20, 50, 80), (0, 20, 40), marker="*", label="line 2")
     fig.add_text(50, 10, "some\nannotation", color="red")
 
     fig.add_bar(
-        ("f", "g", "h", "a"), (1, 2, 5, 2), horizontal=True, col=1,
-        label="secondary", color="black")
+        ("f", "g", "h", "a"),
+        (1, 2, 5, 2),
+        horizontal=True,
+        col=1,
+        label="secondary",
+        color="black",
+    )
     fig.add_bar(
-        ("f", "g", "h", "a"), (1, 2, 5, 2), label="styling", color=None,
-        line_width=10, line_color="blue")
+        ("f", "g", "h", "a"),
+        (1, 2, 5, 2),
+        label="styling",
+        color=None,
+        line_width=10,
+        line_color="blue",
+    )
 
-    fig.add_hist(y=np.random.normal(0, 10, 1000), row=0, col=1,
-                 label="hist 1, horizontal", bins=40)
+    fig.add_hist(
+        y=np.random.normal(0, 10, 1000),
+        row=0,
+        col=1,
+        label="hist 1, horizontal",
+        bins=40,
+    )
 
-    fig.add_boxplot([np.random.normal(30, 6, 1000),
-                     np.random.normal(70, 5, 1000)],
-                    horizontal=True, row=1, col=1,
-                    label=("boxplot 1", "boxplot 2"))
+    fig.add_boxplot(
+        [np.random.normal(30, 6, 1000), np.random.normal(70, 5, 1000)],
+        horizontal=True,
+        row=1,
+        col=1,
+        label=("boxplot 1", "boxplot 2"),
+    )
 
-    fig.add_fill((0, 100), (30, 60), (70, 100), row=1, col=0, color="blue",
-                 label="fill")
+    fig.add_fill(
+        (0, 100), (30, 60), (70, 100), row=1, col=0, color="blue", label="fill"
+    )
     x = np.random.normal(50, 15, 50)
     y = -x + np.random.normal(120, 5, 50)
-    fig.add_regression(x, y, row=1, col=0, color="purple", )
+    fig.add_regression(
+        x,
+        y,
+        row=1,
+        col=0,
+        color="purple",
+    )
 
     fig.post_process()
     # fig.show()
 
+
 @test_for_errors
 def test_labeling(interactive):
     label = ip.LabelGroup(
-        "group_id",
         group_title="GROUP",
+        group_id="group_id",
         default_label="default",
     )
 
     fig = ip.Plot(
         interactive=interactive,
     )
+    fig.add_line((1, 2, 4, 3), label=label.element("line visible"))
     fig.add_line(
-        (1,2,4,3),
-        label=label.element("line visible")
+        (1, 2, 4, 3), label=label.element("line invisible", show=False)
     )
     fig.add_line(
-        (1,2,4,3),
-        label=label.element("line invisible", show=False)
-    )
-    fig.add_line(
-        (1,2,4,3),
-        label=label.element("line legendonly", legend_only=False)
+        (1, 2, 4, 3), label=label.element("line legendonly", legend_only=False)
     )
     fig.add_fill(
-        (0,2,3,5),
-        (2,3,5,4),
-        (1,2,4,3),
+        (0, 2, 3, 5),
+        (2, 3, 5, 4),
+        (1, 2, 4, 3),
         label=label,
     )
     fig.add_regression(
@@ -292,3 +331,15 @@ def test_labeling(interactive):
         label_reg="REGRESSION",
     )
     fig.post_process()
+
+
+def test_magic_plot_kwargs():
+    Plot_args = inspect.getfullargspec(ip.Plot).args[1:]
+    magic_plot_args = inspect.getfullargspec(
+        ip.magic_plot(lambda fig: fig)
+    ).kwonlyargs
+
+    for arg in Plot_args:
+        assert (
+            arg in magic_plot_args
+        ), f"the keyword `{arg}` should also be added to ip.magic_plot"

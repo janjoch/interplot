@@ -1,7 +1,5 @@
 """Create matplotlib/plotly hybrid plots with a few lines of code."""
 
-import pkg_resources
-
 __all__ = [  # noqa F405
     "conf",
     "arraytools",
@@ -15,9 +13,22 @@ from . import debug
 from .iter import *  # noqa F403
 from .plot import *  # noqa F403
 
+import sys
 
-try:  # try except because of sphinx build --> DistributionNotFound Error
-    __version__ = pkg_resources.get_distribution("interplot").version
+if sys.version_info >= (3, 8):
+    import importlib.metadata
 
-except Exception:
-    __version__ = "not detected!"
+    try:
+        __version__ = importlib.metadata.version(__name__)
+
+    except importlib.metadata.PackageNotFoundError:
+        pass
+
+else:
+    import pkg_resources
+
+    try:
+        __version__ = pkg_resources.get_distribution(__name__).version
+
+    except pkg_resources.DistributionNotFound:
+        pass

@@ -28,15 +28,22 @@ Example:
     :alt: [matplotlib plot of a sinus curve]
 """
 
-
 INTERACTIVE = True
 """
 Generate a `plotly` figure by default.
 """
 
 COLOR_CYCLE = [  # optimised for color vision deficiencies
-    '#006BA4', '#FF800E', '#ABABAB', '#595959', '#5F9ED1',
-    '#C85200', '#898989', '#A2C8EC', '#FFBC79', '#CFCFCF',
+    "#006BA4",
+    "#FF800E",
+    "#ABABAB",
+    "#595959",
+    "#5F9ED1",
+    "#C85200",
+    "#898989",
+    "#A2C8EC",
+    "#FFBC79",
+    "#CFCFCF",
 ]
 """
 Colors to be cycled through by default.
@@ -219,7 +226,7 @@ def PTY_CUSTOM_FUNC(fig):
     return fig
 
 
-PTY_LEGEND_TOGGLEGROUP = False
+PTY_LEGEND_TOGGLEGROUP = True
 """
 PLOTLY ONLY.
 If True, elements with the same legend group will be toggled together
@@ -263,9 +270,7 @@ PTY_LINE_STYLES = {
 Mapping for line styles for `plotly`.
 """
 
-MPL_LINE_STYLES = {
-    value: key for key, value in PTY_LINE_STYLES.items()
-}
+MPL_LINE_STYLES = {value: key for key, value in PTY_LINE_STYLES.items()}
 """
 Mapping for line styles for `matplotlib`.
 """
@@ -336,44 +341,44 @@ PTY_MARKERS_LIST = list(PTY_MARKERS.values())
 Possible line styles for `plotly`.
 """
 
-MPL_MARKERS = {
-    value: key for key, value in PTY_MARKERS.items()
-}
+MPL_MARKERS = {value: key for key, value in PTY_MARKERS.items()}
 """
 Mapping for marker styles for `matplotlib`.
 """
-MPL_MARKERS.update({  # next best matches
-    "triangle-nw": "^",
-    "triangle-ne": ">",
-    "triangle-se": "v",
-    "triangle-sw": "<",
-    "hexagram": "*",
-    "star-triangle-up": "^",
-    "star-triangle-down": "v",
-    "star-square": "s",
-    "star-diamond": "D",
-    "diamond-wide": "D",
-    "hourglass": "d",
-    "bowtie": "D",
-    "circle-cross": "+",
-    "circle-x": "x",
-    "cross-thin": "+",
-    "square-cross": "s",
-    "square-x": "s",
-    "diamond-cross": "D",
-    "diamond-x": "D",
-    "x-thin": "x",
-    "hash": "*",
-    "asterisk": "*",
-    "line-ne": "|",
-    "line-nw": "_",
-    "arrow-bar-up": 6,
-    "arrow-bar-down": 7,
-    "arrow-bar-left": 4,
-    "arrow-bar-right": 5,
-    "arrow": 6,
-    "arrow-wide": 6,
-})
+MPL_MARKERS.update(
+    {  # next best matches
+        "triangle-nw": "^",
+        "triangle-ne": ">",
+        "triangle-se": "v",
+        "triangle-sw": "<",
+        "hexagram": "*",
+        "star-triangle-up": "^",
+        "star-triangle-down": "v",
+        "star-square": "s",
+        "star-diamond": "D",
+        "diamond-wide": "D",
+        "hourglass": "d",
+        "bowtie": "D",
+        "circle-cross": "+",
+        "circle-x": "x",
+        "cross-thin": "+",
+        "square-cross": "s",
+        "square-x": "s",
+        "diamond-cross": "D",
+        "diamond-x": "D",
+        "x-thin": "x",
+        "hash": "*",
+        "asterisk": "*",
+        "line-ne": "|",
+        "line-nw": "_",
+        "arrow-bar-up": 6,
+        "arrow-bar-down": 7,
+        "arrow-bar-left": 4,
+        "arrow-bar-right": 5,
+        "arrow": 6,
+        "arrow-wide": 6,
+    }
+)
 MPL_MARKERS_LIST = list(MPL_MARKERS.values())
 """
 Possible line styles for `matplotlib`.

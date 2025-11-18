@@ -26,7 +26,6 @@ to use it:
 >>> import interplot as ip
 """
 
-
 import re
 import io
 from pathlib import Path
@@ -36,6 +35,7 @@ files_to_minimize = [
     "setup.py",
     "requirements.txt",
     "README.md",
+    "minimize.py",
     "interplot",
 ]
 
@@ -54,11 +54,7 @@ def minimize(files: None):
         for file in files:
             minimize_path_object(file, f)
 
-        f.write(
-            "\n#############\n"
-            "#### END ####\n"
-            "#############\n"
-        )
+        f.write("\n#############\n" "#### END ####\n" "#############\n")
 
 
 def minimize_path_object(path, f):
@@ -79,8 +75,11 @@ def minimize_file(file, f):
 
     f.write(
         "\n"
-        + ("#" * (len(path_str) + 10)) + "\n"
-        + "#### " + path_str + " ####\n"
+        + ("#" * (len(path_str) + 10))
+        + "\n"
+        + "#### "
+        + path_str
+        + " ####\n"
         + ("#" * (len(path_str) + 10))
     )
 
@@ -111,7 +110,7 @@ def unpack(dir="interplot_module"):
             r"####+?\n"  # next file flag
         ),
         content,
-        re.DOTALL | re.MULTILINE
+        re.DOTALL | re.MULTILINE,
     ):
         path = dir / match.group(1).strip()
         filecontent = re.sub(

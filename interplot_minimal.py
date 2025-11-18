@@ -26,7 +26,6 @@ to use it:
 >>> import interplot as ip
 """
 
-
 import re
 import io
 from pathlib import Path
@@ -36,6 +35,7 @@ files_to_minimize = [
     "setup.py",
     "requirements.txt",
     "README.md",
+    "minimize.py",
     "interplot",
 ]
 
@@ -54,11 +54,7 @@ def minimize(files: None):
         for file in files:
             minimize_path_object(file, f)
 
-        f.write(
-            "\n#############\n"
-            "#### END ####\n"
-            "#############\n"
-        )
+        f.write("\n#############\n" "#### END ####\n" "#############\n")
 
 
 def minimize_path_object(path, f):
@@ -79,8 +75,11 @@ def minimize_file(file, f):
 
     f.write(
         "\n"
-        + ("#" * (len(path_str) + 10)) + "\n"
-        + "#### " + path_str + " ####\n"
+        + ("#" * (len(path_str) + 10))
+        + "\n"
+        + "#### "
+        + path_str
+        + " ####\n"
         + ("#" * (len(path_str) + 10))
     )
 
@@ -111,7 +110,7 @@ def unpack(dir="interplot_module"):
             r"####+?\n"  # next file flag
         ),
         content,
-        re.DOTALL | re.MULTILINE
+        re.DOTALL | re.MULTILINE,
     ):
         path = dir / match.group(1).strip()
         filecontent = re.sub(
@@ -153,37 +152,37 @@ if __name__ == "__main__":
 #   
 #   # read the contents of your README file
 #   from pathlib import Path
+#   
 #   this_directory = Path(__file__).parent
 #   long_description = (this_directory / "README.md").read_text()
 #   
 #   setup(
-#       name='interplot',
-#       version='1.0.1',
+#       name="interplot",
+#       version="1.1.0",
 #       description=(
 #           "Create matplotlib and plotly charts with the same few lines of code."
 #       ),
 #       long_description=long_description,
-#       long_description_content_type='text/markdown',
-#       url='https://github.com/janjoch/interplot',
-#       author='Janosch Jörg',
-#       author_email='janjo@duck.com',
-#       license='GPL v3',
-#       packages=['interplot'],
+#       long_description_content_type="text/markdown",
+#       url="https://github.com/janjoch/interplot",
+#       author="Janosch Jörg",
+#       author_email="janjo@duck.com",
+#       license="GPL v3",
+#       packages=["interplot"],
 #       install_requires=requirements,
-#   
 #       classifiers=[
-#           'Development Status :: 5 - Production/Stable',
-#           'Intended Audience :: Science/Research',
-#           'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
-#           'Operating System :: MacOS :: MacOS X',
-#           'Operating System :: Microsoft :: Windows',
-#           'Programming Language :: Python :: 3',
-#           'Programming Language :: Python :: 3.6',
-#           'Programming Language :: Python :: 3.7',
-#           'Programming Language :: Python :: 3.8',
-#           'Framework :: Jupyter :: JupyterLab :: 4',
-#           'Framework :: Matplotlib',
-#           'Topic :: Scientific/Engineering :: Visualization',
+#           "Development Status :: 5 - Production/Stable",
+#           "Intended Audience :: Science/Research",
+#           "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+#           "Operating System :: MacOS :: MacOS X",
+#           "Operating System :: Microsoft :: Windows",
+#           "Programming Language :: Python :: 3",
+#           "Programming Language :: Python :: 3.6",
+#           "Programming Language :: Python :: 3.7",
+#           "Programming Language :: Python :: 3.8",
+#           "Framework :: Jupyter :: JupyterLab :: 4",
+#           "Framework :: Matplotlib",
+#           "Topic :: Scientific/Engineering :: Visualization",
 #       ],
 #   )
 #   
@@ -340,11 +339,157 @@ if __name__ == "__main__":
 #   
 #   Ideas, bug reports/fixes, feature requests and code submissions are very welcome! Please write to [janjo@duck.com](mailto:janjo@duck.com) or directly into a pull request.
 #   
+#####################
+#### minimize.py ####
+#####################
+#   """
+#   This is the compressed version of interplot.
+#   
+#   Unpacking:
+#   
+#   >>> from interplot_minimal import unpack
+#   ... unpack()
+#   
+#   Then either:
+#   ```bash
+#   cd interplot_module
+#   pip install -e .
+#   ```
+#   
+#   or
+#   1. move to the directory interplot_module
+#   2. create a new notebook
+#   3. >>> pip install -e .
+#   4. if no imports possible: >>> pip install --no-dependencies -e .
+#   
+#   or
+#   1. move the inner `interplot` folder to the directory where you want to use it.
+#   
+#   
+#   to use it:
+#   >>> import interplot as ip
+#   """
+#   
+#   import re
+#   import io
+#   from pathlib import Path
+#   
+#   
+#   files_to_minimize = [
+#       "setup.py",
+#       "requirements.txt",
+#       "README.md",
+#       "minimize.py",
+#       "interplot",
+#   ]
+#   
+#   
+#   def minimize(files: None):
+#       if files is None:
+#           files = files_to_minimize
+#   
+#       with io.open(Path(__file__), "r", encoding="utf-8") as f:
+#           minimizer = f.read()
+#   
+#       with io.open(Path("interplot_minimal.py"), "w+", encoding="utf-8") as f:
+#   
+#           f.write(minimizer)
+#   
+#           for file in files:
+#               minimize_path_object(file, f)
+#   
+#           f.write("\n#############\n" "#### END ####\n" "#############\n")
+#   
+#   
+#   def minimize_path_object(path, f):
+#       if isinstance(path, str):
+#           path = Path(path)
+#       if path.is_dir():
+#           for path_ in path.iterdir():
+#               minimize_path_object(path_, f)
+#       else:
+#           if re.search(r"\.(py|txt|md)$", path.name):
+#               minimize_file(path, f)
+#   
+#   
+#   def minimize_file(file, f):
+#       print("WRITING", file)
+#   
+#       path_str = str(file)
+#   
+#       f.write(
+#           "\n"
+#           + ("#" * (len(path_str) + 10))
+#           + "\n"
+#           + "#### "
+#           + path_str
+#           + " ####\n"
+#           + ("#" * (len(path_str) + 10))
+#       )
+#   
+#       with io.open(file, "r", encoding="utf-8") as f_:
+#           content = f_.read()
+#           content = re.sub(
+#               r"\n",
+#               r"\n#   ",
+#               content,
+#           )
+#           f.write("\n#   ")
+#           f.write(content)
+#   
+#   
+#   def unpack(dir="interplot_module"):
+#       """Unpack the module to the current directory."""
+#       this_file = Path(__file__)
+#       with io.open(this_file, "r", encoding="utf-8") as file:
+#           content = file.read()
+#       dir = this_file.parent / dir
+#       dir.mkdir(parents=True, exist_ok=True)
+#       (dir / "interplot").mkdir(parents=True, exist_ok=True)
+#   
+#       for match in re.finditer(
+#           (
+#               r"^#### ([a-zA-Z0-9._/-]*?) ####\n####+?\n"  # file flag
+#               r"(.*?)"  # file content
+#               r"####+?\n"  # next file flag
+#           ),
+#           content,
+#           re.DOTALL | re.MULTILINE,
+#       ):
+#           path = dir / match.group(1).strip()
+#           filecontent = re.sub(
+#               r"\n#[ ]{0,3}",
+#               r"\n",
+#               match.group(2),
+#           )[4:]
+#           print("unpacking:", path)
+#           # print(filecontent[:100])
+#           with io.open(path, "w+", encoding="utf-8") as file:
+#               file.write(filecontent)
+#   
+#       print("Successfully unpacked interplot to current directory.\n")
+#       print("Now call:")
+#       print("cd interplot_module")
+#       print("pip install -e .")
+#       print("or")
+#       print("pip install --no-dependencies -e .")
+#       print("")
+#       print("If pip installs are not possible,")
+#       print("just move the inner `interplot` folder")
+#       print("to the directory where you want to use it.")
+#   
+#   
+#   if __name__ == "__main__":
+#       minimize(None)
+#   
+#       print("Successfully minimized interplot to interplot_minimal.py.")
+#   
+#       # unpack()
+#   
 #################################
 #### interplot/arraytools.py ####
 #################################
 #   """Work with 1D arrays."""
-#   
 #   
 #   import math
 #   
@@ -363,7 +508,7 @@ if __name__ == "__main__":
 #   
 #   
 #   def _new_pd_index(series, n):
-#       return series.index[(n - 1) // 2: -(n // 2)]
+#       return series.index[(n - 1) // 2 : -(n // 2)]
 #   
 #   
 #   def lowpass(data, n=101, new_index=None):
@@ -426,7 +571,7 @@ if __name__ == "__main__":
 #   
 #       array = np.empty(size, dtype=data.dtype)
 #       for i in nb.prange(size):
-#           array[i] = np.mean(data[i: i + n])
+#           array[i] = np.mean(data[i : i + n])
 #   
 #       return array
 #   
@@ -465,13 +610,13 @@ if __name__ == "__main__":
 #       # pandas Series
 #       if isinstance(data, pd.core.series.Series):
 #           new_index = _new_pd_index(data, n) if new_index is None else new_index
-#           return data[((n - 1) // 2): -((n - 1) // 2)] - lowpass(
+#           return data[((n - 1) // 2) : -((n - 1) // 2)] - lowpass(
 #               np.array(data), n, new_index=new_index
 #           )
 #   
 #       # np.array, list or tuple
 #       if isinstance(data, LISTLIKE_TYPES):
-#           return np.array(data[((n - 1) // 2): -((n - 1) // 2)]) - lowpass_core(
+#           return np.array(data[((n - 1) // 2) : -((n - 1) // 2)]) - lowpass_core(
 #               np.array(data), n
 #           )
 #   
@@ -627,6 +772,7 @@ if __name__ == "__main__":
 #           fig=None,  # inserted by plot.magic_plot decorator
 #           plot_ci=True,
 #           plot_pi=True,
+#           label=None,
 #           label_data="data",
 #           label_reg="regression",
 #           label_ci="confidence interval",
@@ -652,7 +798,8 @@ if __name__ == "__main__":
 #           plot_ci, plot_pi: bool, optional
 #               Plot the confidence and prediction intervals.
 #               Default: True
-#           label_data, label_reg, label_ci, label_pi: str
+#           label: str or interplot.Labelgroup, optional
+#           label_data, label_reg, label_ci, label_pi: str or callable, optional
 #               Trace labels.
 #           color_data, color_reg, color_ci, color_pi: str, optional
 #               Trace color.
@@ -681,11 +828,28 @@ if __name__ == "__main__":
 #           if color is None:
 #               color = fig.get_cycle_color()
 #   
+#           if not isinstance(label, plot.LabelGroup):
+#               row = kwargs.get("row", 0)
+#               col = kwargs.get("col", 0)
+#               group_id = "regression_{}_{}_{}".format(
+#                   row,
+#                   col,
+#                   fig.element_count[row, col],
+#               )
+#               label = plot.LabelGroup(
+#                   group_id=group_id,
+#                   group_title="Regression" if label is None else label,
+#               )
+#   
 #           # data points
 #           fig.add_scatter(
 #               self.x,
 #               self.y,
-#               label=label_data,
+#               label=(
+#                   label_data
+#                   if callable(label_data)
+#                   else label.element(label_data)
+#               ),
 #               color=color if color_data is None else color_data,
 #               **kwargs_data,
 #               **kwargs,
@@ -696,7 +860,9 @@ if __name__ == "__main__":
 #               self.x2,
 #               self.y2,
 #               line_style=line_style_reg,
-#               label=label_reg,
+#               label=(
+#                   label_reg if callable(label_reg) else label.element(label_reg)
+#               ),
 #               color=color if color_reg is None else color_reg,
 #               **kwargs_reg,
 #               **kwargs,
@@ -707,39 +873,42 @@ if __name__ == "__main__":
 #                   self.x2,
 #                   self.y2 - self.ci,
 #                   self.y2 + self.ci,
-#                   label=label_ci,
+#                   label=(
+#                       label_ci
+#                       if callable(label_ci)
+#                       else plot.LabelGroup(
+#                           group_id=label.group_id,
+#                           default_label=label_ci,
+#                       )
+#                   ),
 #                   color=color if color_ci is None else color_ci,
 #                   **kwargs_ci,
 #                   **kwargs,
 #               )
 #   
 #           if plot_pi:
-#               if fig.interactive:
-#                   legendgroup = "pi_" + str(len(fig.fig.data))
-#               else:
-#                   legendgroup = None
 #               fig.add_line(
 #                   self.x2,
 #                   self.y2 + self.pi,
-#                   label=label_pi,
+#                   label=(
+#                       label_pi if callable(label_pi) else label.element(label_pi)
+#                   ),
 #                   line_style=line_style_pi,
 #                   color=color if color_pi is None else color_pi,
-#                   kwargs_pty=dict(
-#                       legendgroup=legendgroup,
-#                   ),
 #                   **kwargs_pi,
 #                   **kwargs,
 #               )
 #               fig.add_line(
 #                   self.x2,
 #                   self.y2 - self.pi,
-#                   label=label_pi,
+#                   label=(
+#                       label_pi
+#                       if callable(label_pi)
+#                       else label.element(label_pi, show=False)
+#                   ),
 #                   line_style=line_style_pi,
 #                   show_legend=False,
 #                   color=color if color_pi is None else color_pi,
-#                   kwargs_pty=dict(
-#                       legendgroup=legendgroup,
-#                   ),
 #                   **kwargs_pi,
 #                   **kwargs,
 #               )
@@ -758,9 +927,15 @@ if __name__ == "__main__":
 #   
 #   
 #   ITERABLE_TYPES = (
-#       tuple, list, dict, np_ndarray, pd_Series, range, GeneratorType,
+#       tuple,
+#       list,
+#       dict,
+#       np_ndarray,
+#       pd_Series,
+#       range,
+#       GeneratorType,
 #   )
-#   NON_ITERABLE_TYPES = (str, )
+#   NON_ITERABLE_TYPES = (str,)
 #   CUSTOM_DIGESTION = ((dict, (lambda dct: [elem for _, elem in dct.items()])),)
 #   
 #   MUTE_STRICT_ZIP_WARNING = False
@@ -964,7 +1139,7 @@ if __name__ == "__main__":
 #       return val
 #   
 #   
-#   def filter_nozip(iterable, no_iter_types=None, depth=0, length=(2, )):
+#   def filter_nozip(iterable, no_iter_types=None, depth=0, length=(2,)):
 #       """
 #       Prevent certain patterns from being unpacked in `interplot.zip_smart`.
 #   
@@ -1014,12 +1189,10 @@ if __name__ == "__main__":
 #       """
 #       # input validation
 #       no_iter_types = (
-#           (float, int, datetime)
-#           if no_iter_types is None
-#           else no_iter_types
+#           (float, int, datetime) if no_iter_types is None else no_iter_types
 #       )
 #       if not isinstance(length, ITERABLE_TYPES):
-#           length = (length, )
+#           length = (length,)
 #   
 #       # non-iterable
 #       if not isinstance(iterable, ITERABLE_TYPES):
@@ -1044,8 +1217,7 @@ if __name__ == "__main__":
 #                   depth=depth - 1,
 #                   length=length,
 #               )
-#               for i
-#               in iterable
+#               for i in iterable
 #           ]
 #   
 #       # no hit
@@ -1125,11 +1297,10 @@ if __name__ == "__main__":
 #   - heatmaps
 #   - boxplot
 #   - linear regression
-#   - text annotations
+#   - text and image annotations
 #   - 2D subplots
 #   - color cycling
 #   """
-#   
 #   
 #   import re
 #   from warnings import warn
@@ -1137,6 +1308,8 @@ if __name__ == "__main__":
 #   from functools import wraps
 #   from datetime import datetime
 #   from io import BytesIO
+#   from PIL import Image
+#   import uuid
 #   
 #   import numpy as np
 #   
@@ -1178,10 +1351,18 @@ if __name__ == "__main__":
 #       plt.ioff()
 #   
 #   
+#   def close():
+#       """
+#       Close all open matplotlib figures.
+#       """
+#       plt.close("all")
+#   
+#   
 #   # if imported in notebook, init plotly notebook mode
 #   try:
 #       __IPYTHON__  # type: ignore
 #       from IPython.core.display import display_html, display_png
+#   
 #       CALLED_FROM_NOTEBOOK = True
 #   except NameError:
 #       CALLED_FROM_NOTEBOOK = False
@@ -1247,9 +1428,7 @@ if __name__ == "__main__":
 #       # input check
 #       doc_core = "" if doc_core is None else doc_core
 #       doc_decorator = (
-#           conf._DOCSTRING_DECORATOR
-#           if doc_decorator is None
-#           else doc_decorator
+#           conf._DOCSTRING_DECORATOR if doc_decorator is None else doc_decorator
 #       )
 #   
 #       # find indentation level of doc_core
@@ -1285,13 +1464,13 @@ if __name__ == "__main__":
 #                       r"(?:[a-zA-Z_]+)??"  # first arg
 #                       r"(?:[ ]*,[ ]*[a-zA-Z_]+)??"  # following args
 #                       r")"  # end named group
-#                   ) +
-#                   (  # kwarg_key
+#                   )
+#                   + (  # kwarg_key
 #                       r"(?P<leading_coma>[ ]*,[ ]*)?"  # leading coma
 #                       r"{1}"  # kwarg_key
 #                       r"(?(leading_coma)|(?:[ ]*,[ ]*)?)"  # following coma if no leading coma  # noqa: E501
-#                   ) +
-#                   r"(?P<back>(?:[ ]*,[ ]*[a-zA-Z_]+)*[ ]*?)"  # following arguments  # noqa: E501
+#                   )
+#                   + r"(?P<back>(?:[ ]*,[ ]*[a-zA-Z_]+)*[ ]*?)"  # following arguments  # noqa: E501
 #               ).format(indent_decorator, kwarg_key),
 #               r"\g<front>\g<back>",
 #               doc_decorator,
@@ -1445,18 +1624,18 @@ if __name__ == "__main__":
 #                           label = y.name
 #                       elif isinstance(label, str) and "{}" in label:
 #                           label = label.format(y.name)
-#                       elif callable(label):
-#                           label = label(y.name)
 #   
 #                   # pd.DataFrame: split columns to pd.Series and iterate
 #                   elif isinstance(x, pd_DataFrame):
 #                       if (
-#                           self.interactive and serialize_pty
-#                           or not self.interactive and serialize_mpl
+#                           self.interactive
+#                           and serialize_pty
+#                           or not self.interactive
+#                           and serialize_mpl
 #                       ):
-#                           for (
-#                               i, ((_, series), label_)
-#                           ) in enumerate(zip_smart(x.items(), label)):
+#                           for i, ((_, series), label_) in enumerate(
+#                               zip_smart(x.items(), label)
+#                           ):
 #                               _serialize_2d(
 #                                   serialize_pty=serialize_pty,
 #                                   serialize_mpl=serialize_mpl,
@@ -1471,7 +1650,7 @@ if __name__ == "__main__":
 #                           return
 #   
 #                   else:
-#                       if hasattr(x, 'copy') and callable(getattr(x, 'copy')):
+#                       if hasattr(x, "copy") and callable(getattr(x, "copy")):
 #                           y = x.copy()
 #                       else:
 #                           y = x
@@ -1480,12 +1659,12 @@ if __name__ == "__main__":
 #               # 2D np.array
 #               if isinstance(y, np.ndarray) and len(y.shape) == 2:
 #                   if (
-#                       self.interactive and serialize_pty
-#                       or not self.interactive and serialize_mpl
+#                       self.interactive
+#                       and serialize_pty
+#                       or not self.interactive
+#                       and serialize_mpl
 #                   ):
-#                       for (
-#                           i, (y_, label_)
-#                       ) in enumerate(zip_smart(y.T, label)):
+#                       for i, (y_, label_) in enumerate(zip_smart(y.T, label)):
 #                           _serialize_2d(
 #                               serialize_pty=serialize_pty,
 #                               serialize_mpl=serialize_mpl,
@@ -1516,9 +1695,8 @@ if __name__ == "__main__":
 #           Wrapper function for a method.
 #   
 #           """
-#           if (
-#               isinstance(path, ITERABLE_TYPES)
-#               or isinstance(export_format, ITERABLE_TYPES)
+#           if isinstance(path, ITERABLE_TYPES) or isinstance(
+#               export_format, ITERABLE_TYPES
 #           ):
 #               for path_, export_format_ in zip_smart(path, export_format):
 #                   self.save(path_, export_format_, **kwargs)
@@ -1537,7 +1715,9 @@ if __name__ == "__main__":
 #       Calls the child's `show()._repr_html_()` for automatic display
 #       in Jupyter Notebooks.
 #       """
-#       JS_RENDER_WARNING = '''
+#   
+#       JS_RENDER_WARNING = (
+#           """
 #           <div class="alert alert-block alert-warning"
 #               id="notebook-js-warning">
 #               <p>
@@ -1557,7 +1737,10 @@ if __name__ == "__main__":
 #               }
 #               hide_warning();
 #           </script>
-#       ''' if CALLED_FROM_NOTEBOOK else ""
+#       """
+#           if CALLED_FROM_NOTEBOOK
+#           else ""
+#       )
 #   
 #       def __call__(self, *args, **kwargs):
 #           """Calls the `self.show()` or `self.plot()` method."""
@@ -1600,6 +1783,115 @@ if __name__ == "__main__":
 #               # not implemented
 #               except AttributeError:
 #                   raise NotImplementedError
+#   
+#   
+#   class LabelGroup:
+#       """
+#       Grouping Labels in interactive plots.
+#   
+#       Grouping is not supported in matplotlib legends.
+#       In matplotlib, only the label and show parameters are used.
+#   
+#       Toggling behavior can be set via `ip.Plot(..., legend_togglegroup=<bool>)`
+#       or globally with `conf.PTY_LEGEND_TOGGLEGROUP`.
+#   
+#       Parameters
+#       ----------
+#       group_title: str, optional
+#           Group title for the legend group. Will be shown above the group if
+#           specified.
+#       group_id: str, optional
+#           Must be unique for each group. If none is provided,
+#           a UUID will be generated.
+#       default_show: bool or "first", default: True
+#           Whether to show the label in the legend.
+#   
+#           If set to "first", the element dispatcher will check, whether
+#           the figure instance already has an trace of this group_id.
+#           If not, the label will be shown in the legend, otherwise it won't.
+#       default_label: str, optional
+#           Default label for elements in this group.
+#       default_legend_only: bool, default: False
+#           Whether to show the trace only in the legend by default.
+#       """
+#   
+#       def __init__(
+#           self,
+#           group_title=None,
+#           group_id=None,
+#           default_show=True,
+#           default_label=None,
+#           default_legend_only=False,
+#       ):
+#           self.group_title = group_title
+#           self.group_id = pick_non_none(group_id, uuid.uuid1().hex)
+#           self.default_label = default_label
+#           self.default_show = default_show
+#           self.default_legend_only = default_legend_only
+#   
+#       def __call__(self, *args, **kwargs):
+#           """
+#           Return an element with the default parameters.
+#           """
+#           return self.element(*args, **kwargs)
+#   
+#       def element(self, label=None, show=None, legend_only=None):
+#           """
+#           Define a label for an element in this group.
+#   
+#           Parameters
+#           ----------
+#           label: str, optional
+#               Label for the element.
+#   
+#               If not specified, the default label will be used.
+#           show: bool, optional
+#               Whether to show the label in the legend.
+#   
+#               If not specified, the default show value will be used.
+#           legend_only: bool, optional
+#               Whether to show the trace only in the legend.
+#   
+#               If not specified, the default legend_only value will be used.
+#           """
+#   
+#           def inner(
+#               inst,
+#               default_label=None,
+#               group_title=self.group_title,
+#               group_id=self.group_id,
+#               label=pick_non_none(label, self.default_label),
+#               show=pick_non_none(show, self.default_show),
+#               legend_only=pick_non_none(legend_only, self.default_legend_only),
+#           ):
+#               if label is None:
+#                   label = default_label
+#   
+#               if show == "first":
+#                   show = group_id not in inst.legend_ids
+#               inst.legend_ids.add(group_id)
+#   
+#               # PLOTLY
+#               if inst.interactive:
+#                   legend_kwargs = dict(
+#                       legendgroup=group_id,
+#                       name=label,
+#                       showlegend=show,
+#                   )
+#   
+#                   if legend_only:
+#                       legend_kwargs["visible"] = "legendonly"
+#                   if group_title is not None:
+#                       legend_kwargs["legendgrouptitle_text"] = group_title
+#   
+#                   return legend_kwargs
+#   
+#               # MATPLOTLIB
+#               if show:
+#                   return dict(label=label)
+#               return dict()
+#   
+#           return inner
 #   
 #   
 #   class Plot(NotebookInteraction):
@@ -1657,6 +1949,7 @@ if __name__ == "__main__":
 #       .. raw:: html
 #           :file: ../source/plot_examples/Everything-Under-Control.html
 #       """
+#   
 #       __doc__ = _rewrite_docstring(__doc__)
 #   
 #       def __init__(
@@ -1679,6 +1972,7 @@ if __name__ == "__main__":
 #           dpi=None,
 #           legend_loc=None,
 #           legend_title=None,
+#           legend_togglegroup=None,
 #           color_cycle=None,
 #           save_fig=None,
 #           save_format=None,
@@ -1693,6 +1987,10 @@ if __name__ == "__main__":
 #               shared_xaxes = "columns"
 #           if shared_yaxes == "cols":
 #               shared_yaxes = "columns"
+#           if shared_xaxes is True:
+#               shared_xaxes = "all"
+#           if shared_yaxes is True:
+#               shared_yaxes = "all"
 #   
 #           self.interactive = pick_non_none(
 #               interactive,
@@ -1707,12 +2005,14 @@ if __name__ == "__main__":
 #           self.ylim = ylim
 #           self.xlog = xlog
 #           self.ylog = ylog
+#           self.fig_size = fig_size
 #           self.dpi = pick_non_none(
 #               dpi,
 #               conf.DPI,
 #           )
 #           self.legend_loc = legend_loc
 #           self.legend_title = legend_title
+#           self.legend_ids = set()
 #           self.color_cycle = pick_non_none(
 #               color_cycle,
 #               conf.COLOR_CYCLE,
@@ -1729,16 +2029,9 @@ if __name__ == "__main__":
 #   
 #           # init plotly
 #           if self.interactive:
-#               self.title = self._encode_html(self.title)
-#               self.fig_size = pick_non_none(
-#                   fig_size,
-#                   conf.PTY_FIG_SIZE,
-#               )
 #   
 #               # init fig
-#               figure = go.Figure(
-#                   layout=go.Layout(legend={'traceorder': 'normal'}),
-#               )
+#               figure = go.Figure()
 #               self.fig = sp.make_subplots(
 #                   rows=rows,
 #                   cols=cols,
@@ -1748,68 +2041,6 @@ if __name__ == "__main__":
 #                   column_widths=column_widths,
 #                   figure=figure,
 #               )
-#   
-#               # unpacking
-#               width, height = self.fig_size
-#               if isinstance(legend_title, ITERABLE_TYPES):
-#                   warn(
-#                       "Plotly only has one legend, however multiple legend_"
-#                       "titles were provided. Only the first one will be used!"
-#                   )
-#                   legend_title = legend_title[0]
-#                   if isinstance(legend_title, ITERABLE_TYPES):
-#                       legend_title = legend_title[0]
-#   
-#               # update layout
-#               self.fig.update_layout(
-#                   title=self.title,
-#                   legend_title=legend_title,
-#                   height=height,
-#                   width=width,
-#                   barmode="group",
-#               )
-#   
-#               # axis limits and log scale
-#               for i_row, xlim_row, ylim_row, xlog_row, ylog_row in zip_smart(
-#                   range(1, self.rows + 1),
-#                   filter_nozip(self.xlim),
-#                   filter_nozip(self.ylim),
-#                   xlog,
-#                   ylog,
-#               ):
-#                   for i_col, xlim_tile, ylim_tile, xlog_tile, ylog_tile in zip_smart(
-#                       range(1, self.cols + 1),
-#                       filter_nozip(xlim_row),
-#                       filter_nozip(ylim_row),
-#                       xlog_row,
-#                       ylog_row,
-#                   ):
-#                       if (
-#                           xlim_tile is not None
-#                           and isinstance(xlim_tile[0], datetime)
-#                       ):
-#                           xlim_tile = (
-#                               xlim_tile[0].timestamp()*1000,
-#                               xlim_tile[1].timestamp()*1000,
-#                           )
-#                       self.fig.update_xaxes(
-#                           range=xlim_tile,
-#                           row=i_row,
-#                           col=i_col,
-#                           type="log" if xlog_tile else None,
-#                       )
-#                       self.fig.update_yaxes(
-#                           range=ylim_tile,
-#                           row=i_row,
-#                           col=i_col,
-#                           type="log" if ylog_tile else None,
-#                       )
-#   
-#               # axis labels
-#               for text, i_col in zip_smart(xlabel, range(1, cols+1)):
-#                   self.fig.update_xaxes(title_text=text, row=rows, col=i_col)
-#               for text, i_row in zip_smart(ylabel, range(1, rows+1)):
-#                   self.fig.update_yaxes(title_text=text, row=i_row, col=1)
 #   
 #           # init matplotlib
 #           else:
@@ -1836,12 +2067,6 @@ if __name__ == "__main__":
 #                   gridspec_kw=gridspec_kw,
 #               )
 #   
-#               # title
-#               if self.cols == 1:
-#                   self.ax[0, 0].set_title(self.title)
-#               else:
-#                   self.fig.suptitle(self.title)
-#   
 #               # shared axes
 #               for i_row in range(self.rows):
 #                   for i_col in range(self.cols):
@@ -1853,7 +2078,8 @@ if __name__ == "__main__":
 #                       # set shared x axes
 #                       if (
 #                           shared_xaxes == "all"
-#                           or type(shared_xaxes) is bool and shared_xaxes is True
+#                           or type(shared_xaxes) is bool
+#                           and shared_xaxes is True
 #                       ):
 #                           self.ax[i_row, i_col].sharex(self.ax[0, 0])
 #                       elif shared_xaxes == "columns":
@@ -1864,13 +2090,267 @@ if __name__ == "__main__":
 #                       # set shared y axes
 #                       if (
 #                           shared_yaxes == "all"
-#                           or type(shared_yaxes) is bool and shared_yaxes is True
+#                           or type(shared_yaxes) is bool
+#                           and shared_yaxes is True
 #                       ):
 #                           self.ax[i_row, i_col].sharey(self.ax[0, 0])
 #                       elif shared_yaxes == "columns":
 #                           self.ax[i_row, i_col].sharey(self.ax[0, i_col])
 #                       elif shared_yaxes == "rows":
 #                           self.ax[i_row, i_col].sharey(self.ax[i_row, 0])
+#   
+#           self.update(
+#               title=title,
+#               xlabel=xlabel,
+#               ylabel=ylabel,
+#               xlim=xlim,
+#               ylim=ylim,
+#               xlog=xlog,
+#               ylog=ylog,
+#               fig_size=fig_size,
+#               dpi=dpi,
+#               legend_loc=legend_loc,
+#               legend_title=legend_title,
+#               legend_togglegroup=legend_togglegroup,
+#               color_cycle=color_cycle,
+#               save_fig=save_fig,
+#               save_format=save_format,
+#               save_config=save_config,
+#               global_custom_func=global_custom_func,
+#               mpl_custom_func=mpl_custom_func,
+#               pty_custom_func=pty_custom_func,
+#               pty_update_layout=pty_update_layout,
+#           )
+#   
+#       @staticmethod
+#       def init(fig=None, *args, **kwargs):
+#           """
+#           Initialize a Plot instance, if not already initialized.
+#   
+#           Parameters
+#           ----------
+#           fig: Plot or any
+#               If fig is a Plot instance, return it.
+#               Otherwise, create a new Plot instance.
+#           *args, **kwargs: any
+#               Passed to Plot.__init__.
+#           """
+#           if isinstance(fig, Plot):
+#               return fig
+#           return Plot(*args, **kwargs)
+#   
+#       def _digest_label(self, label, default_label=None, show_legend=None):
+#           if isinstance(label, LabelGroup):
+#               return label()(self, default_label=default_label)
+#   
+#           if callable(label):
+#               return label(self, default_label=default_label)
+#   
+#           # PLOTLY
+#           if self.interactive:
+#               return self._get_plotly_legend_args(
+#                   label,
+#                   default_label=default_label,
+#                   show_legend=show_legend,
+#               )
+#   
+#           # MATPLOTLIB
+#           return dict(
+#               label=(
+#                   None
+#                   if show_legend is False
+#                   else (default_label if label is None else label)
+#               )
+#           )
+#   
+#       def update(
+#           self,
+#           title=None,
+#           xlabel=None,
+#           ylabel=None,
+#           xlim=None,
+#           ylim=None,
+#           xlog=None,
+#           ylog=None,
+#           fig_size=None,
+#           dpi=None,
+#           legend_loc=None,
+#           legend_title=None,
+#           legend_togglegroup=None,
+#           color_cycle=None,
+#           save_fig=None,
+#           save_format=None,
+#           save_config=None,
+#           global_custom_func=None,
+#           mpl_custom_func=None,
+#           pty_custom_func=None,
+#           pty_update_layout=None,
+#       ):
+#           """
+#           Update plot parameters set during initialisation.
+#   
+#           Parameters
+#           ----------
+#   
+#           Examples
+#           --------
+#           >>> fig = interplot.Plot(fig_size=(600, 400))
+#           ... fig.add_line((1,2,4,3))
+#           ... fig.save("export_landscape.png")
+#           ... fig.save("export_fullsize.html")
+#           ... fig.update(fig_size=(400, 600))
+#           ... fig.save("export_portrait.png")
+#   
+#           >>> @interplot.magic_plot
+#           ... def plot_points(data, fig=None):
+#           ...     fig.add_line(data)
+#           ...     fig.update(title="SUM: {}".format(sum(data)))
+#           ... plot_points([1,2,4,3])
+#           """
+#           self.title = pick_non_none(title, self.title)
+#           self.xlabel = pick_non_none(xlabel, self.xlabel)
+#           self.ylabel = pick_non_none(ylabel, self.ylabel)
+#           self.xlim = pick_non_none(xlim, self.xlim)
+#           self.ylim = pick_non_none(ylim, self.ylim)
+#           self.xlog = pick_non_none(xlog, self.xlog)
+#           self.ylog = pick_non_none(ylog, self.ylog)
+#           self.dpi = pick_non_none(dpi, self.dpi)
+#           self.legend_loc = pick_non_none(legend_loc, self.legend_loc)
+#           self.legend_title = pick_non_none(legend_title, self.legend_title)
+#           self.color_cycle = pick_non_none(
+#               color_cycle,
+#               self.color_cycle,
+#           )
+#           self.save_fig = pick_non_none(save_fig, self.save_fig)
+#           self.save_format = pick_non_none(save_format, self.save_format)
+#           self.save_config = pick_non_none(save_config, self.save_config)
+#           self.global_custom_func = pick_non_none(
+#               global_custom_func,
+#               self.global_custom_func,
+#           )
+#           self.mpl_custom_func = pick_non_none(
+#               mpl_custom_func,
+#               self.mpl_custom_func,
+#           )
+#           self.pty_custom_func = pick_non_none(
+#               pty_custom_func,
+#               self.pty_custom_func,
+#           )
+#           self.pty_update_layout = pick_non_none(
+#               pty_update_layout,
+#               self.pty_update_layout,
+#           )
+#   
+#           # PLOTLY
+#           if self.interactive:
+#               self.title = self._encode_html(self.title)
+#               self.fig_size = pick_non_none(
+#                   fig_size,
+#                   self.fig_size,
+#                   conf.PTY_FIG_SIZE,
+#               )
+#   
+#               # unpacking
+#               width, height = self.fig_size
+#               if isinstance(legend_title, ITERABLE_TYPES):
+#                   warn(
+#                       "Plotly only has one legend, however multiple legend_"
+#                       "titles were provided. Only the first one will be used!"
+#                   )
+#                   legend_title = legend_title[0]
+#                   if isinstance(legend_title, ITERABLE_TYPES):
+#                       legend_title = legend_title[0]
+#   
+#               # update layout
+#               self.fig.update_layout(
+#                   title=self.title,
+#                   legend_title=legend_title,
+#                   height=height,
+#                   width=width,
+#                   barmode="group",
+#               )
+#               if not pick_non_none(
+#                   legend_togglegroup,
+#                   conf.PTY_LEGEND_TOGGLEGROUP,
+#               ):
+#                   self.fig.update_layout(
+#                       legend_groupclick="toggleitem",
+#                   )
+#   
+#               # axis limits and log scale
+#               for (
+#                   i_row,
+#                   xlim_row,
+#                   ylim_row,
+#                   xlog_row,
+#                   ylog_row,
+#               ) in zip_smart(
+#                   range(1, self.rows + 1),
+#                   filter_nozip(self.xlim),
+#                   filter_nozip(self.ylim),
+#                   xlog,
+#                   ylog,
+#               ):
+#                   for (
+#                       i_col,
+#                       xlim_tile,
+#                       ylim_tile,
+#                       xlog_tile,
+#                       ylog_tile,
+#                   ) in zip_smart(
+#                       range(1, self.cols + 1),
+#                       filter_nozip(xlim_row),
+#                       filter_nozip(ylim_row),
+#                       xlog_row,
+#                       ylog_row,
+#                   ):
+#                       if xlim_tile is not None and isinstance(
+#                           xlim_tile[0], datetime
+#                       ):
+#                           xlim_tile = (
+#                               xlim_tile[0].timestamp() * 1000,
+#                               xlim_tile[1].timestamp() * 1000,
+#                           )
+#                       self.fig.update_xaxes(
+#                           range=xlim_tile,
+#                           row=i_row,
+#                           col=i_col,
+#                           type="log" if xlog_tile else None,
+#                       )
+#                       self.fig.update_yaxes(
+#                           range=ylim_tile,
+#                           row=i_row,
+#                           col=i_col,
+#                           type="log" if ylog_tile else None,
+#                       )
+#   
+#               # axis labels
+#               for text, i_col in zip_smart(xlabel, range(1, self.cols + 1)):
+#                   self.fig.update_xaxes(
+#                       title_text=text, row=self.rows, col=i_col
+#                   )
+#               for text, i_row in zip_smart(ylabel, range(1, self.rows + 1)):
+#                   self.fig.update_yaxes(title_text=text, row=i_row, col=1)
+#   
+#           # MATPLOTLIB
+#           else:
+#               # convert px to inches
+#               self.fig_size = pick_non_none(
+#                   fig_size,
+#                   self.fig_size,
+#                   conf.MPL_FIG_SIZE,
+#               )
+#   
+#               px = 1 / self.dpi
+#               figsize = (self.fig_size[0] * px, self.fig_size[1] * px)
+#               self.fig.set_figwidth(figsize[0])
+#               self.fig.set_figheight(figsize[1])
+#   
+#               # title
+#               if self.cols == 1:
+#                   self.ax[0, 0].set_title(self.title)
+#               else:
+#                   self.fig.suptitle(self.title)
 #   
 #               # axis labels
 #               if isinstance(self.xlabel, ITERABLE_TYPES) or (
@@ -1898,22 +2378,14 @@ if __name__ == "__main__":
 #                       if ylog_tile:
 #                           self.ax[row, col].set_yscale("log")
 #   
-#       @staticmethod
-#       def init(fig=None, *args, **kwargs):
-#           """
-#           Initialize a Plot instance, if not already initialized.
-#   
-#           Parameters
-#           ----------
-#           fig: Plot or any
-#               If fig is a Plot instance, return it.
-#               Otherwise, create a new Plot instance.
-#           *args, **kwargs: any
-#               Passed to Plot.__init__.
-#           """
-#           if isinstance(fig, Plot):
-#               return fig
-#           return Plot(*args, **kwargs)
+#       update.__doc__ = _rewrite_docstring(
+#           update.__doc__,
+#           kwargs_remove=(
+#               "rows, cols",
+#               "shared_xaxes, shared_yaxes",
+#               "column_widths, row_heights",
+#           ),
+#       )
 #   
 #       @staticmethod
 #       def _get_plotly_legend_args(label, default_label=None, show_legend=None):
@@ -1935,6 +2407,12 @@ if __name__ == "__main__":
 #               (in case of label=None, the automatic label will only be displayed
 #               on hover)
 #           """
+#           if isinstance(label, LabelGroup):
+#               return label.get_element()
+#   
+#           if isinstance(label, dict):
+#               return label
+#   
 #           legend_kwargs = dict(
 #               name=pick_non_none(label, default_label),
 #           )
@@ -1977,6 +2455,28 @@ if __name__ == "__main__":
 #           if text is None:
 #               return None
 #           return re.sub(r"\n", "<br>", text)
+#   
+#       def _mpl_coords_data_to_axes(self, x, y, row, col):
+#           """
+#           Convert data coordinates to axes coordinates.
+#   
+#           Parameters
+#           ----------
+#           x, y: float
+#               Data coordinates.
+#           row, col: int
+#               Row and col index in matplotlib manner:
+#               STARTING WITH 0.
+#   
+#           Returns
+#           -------
+#           x_ax, y_ax: float
+#               Axes coordinates.
+#           """
+#           return (
+#               self.ax[row, col].transData
+#               + self.ax[row, col].transAxes.inverted()
+#           ).transform((x, y))
 #   
 #       def get_cycle_color(self, increment=1, i=None):
 #           """
@@ -2028,6 +2528,8 @@ if __name__ == "__main__":
 #               color = self.get_cycle_color(increment)
 #   
 #           # get index from COLOR_CYCLE
+#           elif isinstance(color, int) or isinstance(color, np.integer):
+#               color = self.color_cycle[color % len(self.color_cycle)]
 #           elif color[0] == "C" or color[0] == "c":
 #               color = self.color_cycle[int(color[1:]) % len(self.color_cycle)]
 #   
@@ -2083,8 +2585,7 @@ if __name__ == "__main__":
 #                               interactive=interactive,
 #                               recursive=True,
 #                           )
-#                           for m
-#                           in marker
+#                           for m in marker
 #                       ],
 #                       **pty_marker_kwargs,
 #                   )
@@ -2279,7 +2780,7 @@ if __name__ == "__main__":
 #               )
 #               if x_error is not None:
 #                   if not isinstance(x_error, ITERABLE_TYPES):
-#                       x_error = np.array((x_error, ) * len(x))
+#                       x_error = np.array((x_error,) * len(x))
 #                   if isinstance(x_error[0], ITERABLE_TYPES):
 #                       x_error = dict(
 #                           type="data",
@@ -2293,7 +2794,7 @@ if __name__ == "__main__":
 #                       )
 #               if y_error is not None:
 #                   if not isinstance(y_error, ITERABLE_TYPES):
-#                       y_error = np.array((y_error, ) * len(y))
+#                       y_error = np.array((y_error,) * len(y))
 #                   if isinstance(y_error[0], ITERABLE_TYPES):
 #                       y_error = dict(
 #                           type="data",
@@ -2321,7 +2822,7 @@ if __name__ == "__main__":
 #                           interactive=self.interactive,
 #                           **pty_marker_kwargs,
 #                       ),
-#                       **self._get_plotly_legend_args(
+#                       **self._digest_label(
 #                           label,
 #                           show_legend=show_legend,
 #                       ),
@@ -2346,7 +2847,7 @@ if __name__ == "__main__":
 #                   y,
 #                   xerr=x_error,
 #                   yerr=y_error,
-#                   label=None if show_legend is False else label,
+#                   **self._digest_label(label, show_legend=show_legend),
 #                   color=color,
 #                   lw=linewidth,
 #                   linestyle=(
@@ -2491,7 +2992,7 @@ if __name__ == "__main__":
 #                       x=x,
 #                       y=y,
 #                       orientation="h" if horizontal else "v",
-#                       **self._get_plotly_legend_args(
+#                       **self._digest_label(
 #                           label,
 #                           show_legend=show_legend,
 #                       ),
@@ -2516,12 +3017,8 @@ if __name__ == "__main__":
 #           else:
 #               if kwargs_mpl is None:
 #                   kwargs_mpl = dict()
-#               offset = ((2*_serial_i + 1) / 2 / _serial_n - 0.5) * width
-#               (
-#                   self.ax[row, col].barh
-#                   if horizontal
-#                   else self.ax[row, col].bar
-#               )(
+#               offset = ((2 * _serial_i + 1) / 2 / _serial_n - 0.5) * width
+#               (self.ax[row, col].barh if horizontal else self.ax[row, col].bar)(
 #                   np.arange(len(x)) + offset,
 #                   y,
 #                   (width / _serial_n),
@@ -2532,7 +3029,7 @@ if __name__ == "__main__":
 #                       else None
 #                   ),
 #                   linewidth=line_width,
-#                   label=None if show_legend is False else label,
+#                   **self._digest_label(label, show_legend=show_legend),
 #                   **kwargs_mpl,
 #                   **kwargs,
 #               )
@@ -2610,14 +3107,14 @@ if __name__ == "__main__":
 #               if kwargs_pty is None:
 #                   kwargs_pty = dict()
 #               if density:
-#                   kwargs_pty.update(dict(histnorm='probability'))
+#                   kwargs_pty.update(dict(histnorm="probability"))
 #               row += 1
 #               col += 1
 #               self.fig.add_trace(
 #                   go.Histogram(
 #                       x=x,
 #                       y=y,
-#                       **self._get_plotly_legend_args(
+#                       **self._digest_label(
 #                           label,
 #                           show_legend=show_legend,
 #                       ),
@@ -2641,7 +3138,7 @@ if __name__ == "__main__":
 #                   orientation = "vertical"
 #               self.ax[row, col].hist(
 #                   x,
-#                   label=None if show_legend is False else label,
+#                   **self._digest_label(label, show_legend=show_legend),
 #                   bins=bins,
 #                   density=density,
 #                   color=self.digest_color(color, opacity),
@@ -2709,9 +3206,9 @@ if __name__ == "__main__":
 #               n = len(x)
 #           # input validation
 #           if not isinstance(label, ITERABLE_TYPES):
-#               label = (label, ) * n
+#               label = (label,) * n
 #           if not isinstance(color, ITERABLE_TYPES):
-#               color = (color, ) * n
+#               color = (color,) * n
 #   
 #           # PLOTLY
 #           if self.interactive:
@@ -2721,7 +3218,11 @@ if __name__ == "__main__":
 #               # if x contains multiple datasets, iterate add_boxplot
 #               if not n == 1:
 #                   for x_i, label_, show_legend_, color_, opacity_ in zip_smart(
-#                       x, label, show_legend, color, opacity,
+#                       x,
+#                       label,
+#                       show_legend,
+#                       color,
+#                       opacity,
 #                   ):
 #                       self.add_boxplot(
 #                           x_i,
@@ -2747,7 +3248,7 @@ if __name__ == "__main__":
 #                   self.fig.add_trace(
 #                       go.Box(
 #                           **pty_kwargs,
-#                           **self._get_plotly_legend_args(
+#                           **self._digest_label(
 #                               label[0],
 #                               show_legend=show_legend,
 #                           ),
@@ -2935,9 +3436,8 @@ if __name__ == "__main__":
 #           kwargs:
 #               Keyword arguments for `interplot.arraytools.LinearRegression.plot`.
 #           """
-#           if (
-#               isinstance(x, arraytools.LinearRegression)
-#               or hasattr(x, "is_linreg")
+#           if isinstance(x, arraytools.LinearRegression) or hasattr(
+#               x, "is_linreg"
 #           ):
 #               x.plot(fig=self, **kwargs)
 #           else:
@@ -2954,12 +3454,11 @@ if __name__ == "__main__":
 #           y1,
 #           y2=None,
 #           label=None,
-#           show_legend=False,
 #           mode="lines",
 #           color=None,
 #           opacity=0.5,
-#           line_width=0.,
-#           line_opacity=1.,
+#           line_width=0.0,
+#           line_opacity=1.0,
 #           line_color=None,
 #           row=0,
 #           col=0,
@@ -2977,7 +3476,7 @@ if __name__ == "__main__":
 #               If only `x` and `y1` is defined,
 #               it will be assumed as `y1` and `y2`,
 #               and `x` will be the index, starting from 0.
-#           label: str, optional
+#           label: str or interplot.LabelGroup, optional
 #               Trace label for legend.
 #           color, line_color: str, optional
 #               Fill and line color.
@@ -3020,11 +3519,16 @@ if __name__ == "__main__":
 #               line_opacity,
 #           )
 #   
+#           if not isinstance(label, LabelGroup):
+#               label = LabelGroup(
+#                   "fill_{}_{}_{}".format(row, col, self.element_count[row, col]),
+#                   default_label="fill" if label is None else label,
+#               )
+#   
 #           # PLOTLY
 #           if self.interactive:
 #               if kwargs_pty is None:
 #                   kwargs_pty = dict()
-#               legendgroup = "fill_{}".format(self.element_count[row, col])
 #               row += 1
 #               col += 1
 #               self.fig.add_trace(
@@ -3032,11 +3536,13 @@ if __name__ == "__main__":
 #                       x=x,
 #                       y=y1,
 #                       mode=mode,
-#                       **self._get_plotly_legend_args(
-#                           label, "fill border 1", show_legend=show_legend),
+#                       **self._digest_label(
+#                           label.element(
+#                               show=False,
+#                           ),
+#                       ),
 #                       line=dict(width=line_width),
 #                       marker_color=line_color,
-#                       legendgroup=legendgroup,
 #                       **kwargs_pty,
 #                       **kwargs,
 #                   ),
@@ -3048,12 +3554,13 @@ if __name__ == "__main__":
 #                       x=x,
 #                       y=y2,
 #                       mode=mode,
-#                       **self._get_plotly_legend_args(label, "fill border 1"),
+#                       **self._digest_label(
+#                           label.element(),
+#                       ),
 #                       fill="tonexty",
 #                       fillcolor=fill_color,
 #                       line=dict(width=line_width),
 #                       marker_color=line_color,
-#                       legendgroup=legendgroup,
 #                       **kwargs_pty,
 #                       **kwargs,
 #                   ),
@@ -3069,10 +3576,13 @@ if __name__ == "__main__":
 #                   x,
 #                   y1,
 #                   y2,
-#                   label=None if show_legend is False else label,
+#                   **self._digest_label(
+#                       label.element(),
+#                   ),
 #                   linewidth=line_width,
 #                   edgecolor=self.digest_color(
-#                       line_color, line_opacity, increment=0),
+#                       line_color, line_opacity, increment=0
+#                   ),
 #                   facecolor=self.digest_color(color, opacity),
 #                   **kwargs_mpl,
 #                   **kwargs,
@@ -3159,9 +3669,7 @@ if __name__ == "__main__":
 #               x_data_coords = data_coords
 #               y_data_coords = data_coords
 #           text_alignment = (
-#               horizontal_alignment
-#               if text_alignment is None
-#               else text_alignment
+#               horizontal_alignment if text_alignment is None else text_alignment
 #           )
 #   
 #           # PLOTLY
@@ -3181,12 +3689,10 @@ if __name__ == "__main__":
 #                   align=text_alignment,
 #                   xanchor=horizontal_alignment,
 #                   yanchor=vertical_alignment,
-#                   xref=self._get_plotly_anchor(
-#                       "x", self.cols, row, col
-#                   ) + x_domain,
-#                   yref=self._get_plotly_anchor(
-#                       "y", self.cols, row, col
-#                   ) + y_domain,
+#                   xref=self._get_plotly_anchor("x", self.cols, row, col)
+#                   + x_domain,
+#                   yref=self._get_plotly_anchor("y", self.cols, row, col)
+#                   + y_domain,
 #                   font=dict(color=self.digest_color(color, opacity)),
 #                   row=row,
 #                   col=col,
@@ -3220,6 +3726,184 @@ if __name__ == "__main__":
 #                   **transform,
 #                   **kwargs_mpl,
 #                   **kwargs,
+#               )
+#   
+#       def add_image(
+#           self,
+#           x,
+#           y,
+#           image,
+#           horizontal_alignment="center",
+#           vertical_alignment="center",
+#           data_coords=True,
+#           x_size=1,
+#           y_size=1,
+#           sizing="contain",
+#           opacity=None,
+#           row=0,
+#           col=0,
+#           kwargs_pty=None,
+#           kwargs_mpl=None,
+#           **kwargs,
+#       ):
+#           """
+#           Draw an image.
+#   
+#           Parameters
+#           ----------
+#           x, y: float
+#               Coordinates of the text.
+#           image: Image object or str
+#               The image as a PIL Image object.
+#   
+#               For plotly, URLs are also accepted.
+#           horizontal_alignment, vertical_alignment: str, default: "center"
+#               Where the coordinates of the text box anchor.
+#   
+#               Options for `horizontal_alignment`:
+#                   - "left"
+#                   - "center"
+#                   - "right"
+#   
+#               Options for `vertical_alignment`:
+#                   - "top"
+#                   - "center"
+#                   - "bottom"
+#           data_coords: bool, default: True
+#               Whether the `x`, `y` coordinates are provided in data coordinates
+#               or in relation to the axes.
+#   
+#               If set to `False`, `x`, `y` should be in the range [0, 1].
+#           sizing: str, default: "contain"
+#               How the image should be sized.
+#   
+#               Options:
+#                   - "contain": fit the image inside the box. The entire image
+#                   will be visible, and the aspect ratio will be preserved.
+#                   - "stretch": stretch the image to fit the box. The image
+#                   may be distorted.
+#                   - "fill": fill the box with the image. The image may be
+#                   cropped, but will keep its aspect ratio. Only available
+#                   for plotly.
+#           opacity: float, optional
+#               Opacity (=alpha) of the fill.
+#           row, col: int, optional
+#               If the plot contains a grid, provide the coordinates.
+#   
+#               Attention: Indexing starts with 0!
+#           kwargs_pty, kwargs_mpl, **kwargs: optional
+#               Pass specific keyword arguments to the line core method.
+#           """
+#           # input validation
+#           if x_size is None and y_size is None:
+#               x_size = 1
+#               y_size = 1
+#   
+#           # PLOTLY
+#           if self.interactive:
+#               if kwargs_pty is None:
+#                   kwargs_pty = dict()
+#               if vertical_alignment == "center":
+#                   vertical_alignment = "middle"
+#               row += 1
+#               col += 1
+#               x_domain = "" if data_coords else " domain"
+#               y_domain = "" if data_coords else " domain"
+#   
+#               self.fig.add_layout_image(
+#                   dict(
+#                       source=image,
+#                       x=x,
+#                       y=y,
+#                       xref=self._get_plotly_anchor("x", self.cols, row, col)
+#                       + x_domain,
+#                       yref=self._get_plotly_anchor("y", self.cols, row, col)
+#                       + y_domain,
+#                       xanchor=horizontal_alignment,
+#                       yanchor=vertical_alignment,
+#                       sizex=x_size,
+#                       sizey=y_size,
+#                       sizing=sizing,
+#                       opacity=opacity,
+#                       **kwargs_pty,
+#                       **kwargs,
+#                   )
+#               )
+#   
+#           # MATPLOTLIB
+#           else:
+#               # input validation
+#               if kwargs_mpl is None:
+#                   kwargs_mpl = dict()
+#               if not isinstance(image, Image.Image):
+#                   warn(
+#                       "Image must be a PIL Image object for static "
+#                       "matplotlib plot."
+#                   )
+#   
+#               if data_coords or data_coords is None:
+#                   x1 = x + x_size
+#                   y1 = y + y_size
+#                   if horizontal_alignment == "center":
+#                       x -= x_size / 2
+#                       x1 -= x_size / 2
+#                   elif horizontal_alignment == "right":
+#                       x -= x_size
+#                       x1 -= x_size
+#                   if vertical_alignment == "center":
+#                       y -= y_size / 2
+#                       y1 -= y_size / 2
+#                   elif vertical_alignment == "top":
+#                       y -= y_size
+#                       y1 -= y_size
+#   
+#                   x0, y0 = self._mpl_coords_data_to_axes(x, y, row, col)
+#                   x1, y1 = self._mpl_coords_data_to_axes(x1, y1, row, col)
+#   
+#               else:
+#                   x0 = x
+#                   x1 = x + x_size
+#                   y0 = y
+#                   y1 = y + y_size
+#                   if horizontal_alignment == "center":
+#                       x0 -= x_size / 2
+#                       x1 -= x_size / 2
+#                   elif horizontal_alignment == "right":
+#                       x0 -= x_size
+#                       x1 -= x_size
+#                   if vertical_alignment == "center":
+#                       y0 -= y_size / 2
+#                       y1 -= y_size / 2
+#                   elif vertical_alignment == "top":
+#                       y0 -= y_size
+#                       y1 -= y_size
+#   
+#               aspect = "auto" if sizing == "stretch" else 1.0
+#               if sizing == "fill":
+#                   warn(
+#                       "sizing='fill' is not supported for static "
+#                       "matplotlib plot. 'contain' behavior is used instead."
+#                   )
+#               if sizing == "contain" and (
+#                   horizontal_alignment != "center"
+#                   or vertical_alignment != "center"
+#               ):
+#                   warn(
+#                       "When using `sizing='contain'` with `horizontal_alignment`"
+#                       " or `vertical_alignment` not set to 'center', the image "
+#                       "may not be positioned as expected. "
+#                       "The image box is created according to the alignment, "
+#                       "but the image itself is always centered inside the box."
+#                   )
+#   
+#               inset = self.ax[row, col].inset_axes(
+#                   [x0, y0, x1 - x0, y1 - y0],
+#               )
+#               inset.set_axis_off()
+#               inset.imshow(
+#                   image,
+#                   aspect=aspect,
+#                   alpha=opacity,
 #               )
 #   
 #       def post_process(
@@ -3360,9 +4044,10 @@ if __name__ == "__main__":
 #                   ):
 #                       # don't show legend
 #                       if (
-#                           type(loc_tile) is bool and loc_tile is False
+#                           type(loc_tile) is bool
+#                           and loc_tile is False
 #                           or loc_tile is None
-#                               and self.element_count[i_row, i_col] < 2
+#                           and self.element_count[i_row, i_col] < 2
 #                       ):
 #                           pass
 #   
@@ -3384,7 +4069,14 @@ if __name__ == "__main__":
 #               self.save(self.save_fig, export_format=self.save_format)
 #   
 #       @_serialize_save
-#       def save(self, path, export_format=None, print_confirm=True, **kwargs):
+#       def save(
+#           self,
+#           path,
+#           export_format=None,
+#           html_no_fig_size=True,
+#           print_confirm=True,
+#           **kwargs,
+#       ):
 #           """
 #           Save the plot.
 #   
@@ -3440,6 +4132,10 @@ if __name__ == "__main__":
 #   
 #               # HTML
 #               if str(path)[-5:] == ".html":
+#                   if html_no_fig_size:
+#                       fig_size = self.fig_size
+#                       self.update(fig_size=(None, None))
+#   
 #                   self.fig.write_html(
 #                       path,
 #                       config=(
@@ -3450,9 +4146,12 @@ if __name__ == "__main__":
 #                       **kwargs,
 #                   )
 #   
+#                   if html_no_fig_size:
+#                       self.update(fig_size=fig_size)
+#   
 #               # image
 #               else:
-#                   scale = self.dpi / 100.
+#                   scale = self.dpi / 100.0
 #                   self.fig.write_image(
 #                       path,
 #                       scale=scale,
@@ -3570,9 +4269,7 @@ if __name__ == "__main__":
 #           :alt: [matplotlib plot "Normally distributed Noise]
 #       """
 #       doc_decorator = (
-#           conf._DOCSTRING_DECORATOR
-#           if doc_decorator is None
-#           else doc_decorator
+#           conf._DOCSTRING_DECORATOR if doc_decorator is None else doc_decorator
 #       )
 #   
 #       def wrapper(
@@ -3587,6 +4284,8 @@ if __name__ == "__main__":
 #           ylabel=None,
 #           xlim=None,
 #           ylim=None,
+#           xlog=False,
+#           ylog=False,
 #           shared_xaxes=False,
 #           shared_yaxes=False,
 #           column_widths=None,
@@ -3595,6 +4294,7 @@ if __name__ == "__main__":
 #           dpi=None,
 #           legend_loc=None,
 #           legend_title=None,
+#           legend_togglegroup=None,
 #           color_cycle=None,
 #           save_fig=None,
 #           save_format=None,
@@ -3616,6 +4316,8 @@ if __name__ == "__main__":
 #               ylabel=ylabel,
 #               xlim=xlim,
 #               ylim=ylim,
+#               xlog=xlog,
+#               ylog=ylog,
 #               shared_xaxes=shared_xaxes,
 #               shared_yaxes=shared_yaxes,
 #               column_widths=column_widths,
@@ -3624,6 +4326,7 @@ if __name__ == "__main__":
 #               dpi=dpi,
 #               legend_loc=legend_loc,
 #               legend_title=legend_title,
+#               legend_togglegroup=legend_togglegroup,
 #               color_cycle=color_cycle,
 #               save_fig=save_fig,
 #               save_format=save_format,
@@ -3645,10 +4348,13 @@ if __name__ == "__main__":
 #           return fig
 #   
 #       # rewrite _DOCSTRING_DECORATOR
-#       wrapper.__doc__ = _rewrite_docstring(
-#           core.__doc__,
-#           doc_decorator,
-#       ) + "\n"
+#       wrapper.__doc__ = (
+#           _rewrite_docstring(
+#               core.__doc__,
+#               doc_decorator,
+#           )
+#           + "\n"
+#       )
 #   
 #       return wrapper
 #   
@@ -3667,10 +4373,10 @@ if __name__ == "__main__":
 #   
 #           By default, the global variable `conf._DOCSTRING_DECORATOR`
 #           will be used.
+#       strict_preset: bool, default: False
+#           Prevents overriding the preset upon calling the decorated function.
 #       **kwargs_preset: dict
 #           Define presets for any keyword arguments accepted by `Plot`.
-#   
-#           Setting `strict_preset=True` prevents overriding the preset.
 #   
 #       Examples
 #       --------
@@ -3789,6 +4495,16 @@ if __name__ == "__main__":
 #       **kwargs,
 #   ):
 #       fig.add_text(*args, **kwargs)
+#   
+#   
+#   @magic_plot
+#   @wraps(Plot.add_image)
+#   def image(
+#       *args,
+#       fig,
+#       **kwargs,
+#   ):
+#       fig.add_image(*args, **kwargs)
 #   
 #   
 #   @magic_plot
@@ -4006,15 +4722,22 @@ if __name__ == "__main__":
 #       :alt: [matplotlib plot of a sinus curve]
 #   """
 #   
-#   
 #   INTERACTIVE = True
 #   """
 #   Generate a `plotly` figure by default.
 #   """
 #   
 #   COLOR_CYCLE = [  # optimised for color vision deficiencies
-#       '#006BA4', '#FF800E', '#ABABAB', '#595959', '#5F9ED1',
-#       '#C85200', '#898989', '#A2C8EC', '#FFBC79', '#CFCFCF',
+#       "#006BA4",
+#       "#FF800E",
+#       "#ABABAB",
+#       "#595959",
+#       "#5F9ED1",
+#       "#C85200",
+#       "#898989",
+#       "#A2C8EC",
+#       "#FFBC79",
+#       "#CFCFCF",
 #   ]
 #   """
 #   Colors to be cycled through by default.
@@ -4197,6 +4920,14 @@ if __name__ == "__main__":
 #       return fig
 #   
 #   
+#   PTY_LEGEND_TOGGLEGROUP = True
+#   """
+#   PLOTLY ONLY.
+#   If True, elements with the same legend group will be toggled together
+#   when clicking on a legend item.
+#   """
+#   
+#   
 #   PTY_UPDATE_LAYOUT = dict()
 #   """
 #   PLOTLY ONLY.
@@ -4233,9 +4964,7 @@ if __name__ == "__main__":
 #   Mapping for line styles for `plotly`.
 #   """
 #   
-#   MPL_LINE_STYLES = {
-#       value: key for key, value in PTY_LINE_STYLES.items()
-#   }
+#   MPL_LINE_STYLES = {value: key for key, value in PTY_LINE_STYLES.items()}
 #   """
 #   Mapping for line styles for `matplotlib`.
 #   """
@@ -4306,44 +5035,44 @@ if __name__ == "__main__":
 #   Possible line styles for `plotly`.
 #   """
 #   
-#   MPL_MARKERS = {
-#       value: key for key, value in PTY_MARKERS.items()
-#   }
+#   MPL_MARKERS = {value: key for key, value in PTY_MARKERS.items()}
 #   """
 #   Mapping for marker styles for `matplotlib`.
 #   """
-#   MPL_MARKERS.update({  # next best matches
-#       "triangle-nw": "^",
-#       "triangle-ne": ">",
-#       "triangle-se": "v",
-#       "triangle-sw": "<",
-#       "hexagram": "*",
-#       "star-triangle-up": "^",
-#       "star-triangle-down": "v",
-#       "star-square": "s",
-#       "star-diamond": "D",
-#       "diamond-wide": "D",
-#       "hourglass": "d",
-#       "bowtie": "D",
-#       "circle-cross": "+",
-#       "circle-x": "x",
-#       "cross-thin": "+",
-#       "square-cross": "s",
-#       "square-x": "s",
-#       "diamond-cross": "D",
-#       "diamond-x": "D",
-#       "x-thin": "x",
-#       "hash": "*",
-#       "asterisk": "*",
-#       "line-ne": "|",
-#       "line-nw": "_",
-#       "arrow-bar-up": 6,
-#       "arrow-bar-down": 7,
-#       "arrow-bar-left": 4,
-#       "arrow-bar-right": 5,
-#       "arrow": 6,
-#       "arrow-wide": 6,
-#   })
+#   MPL_MARKERS.update(
+#       {  # next best matches
+#           "triangle-nw": "^",
+#           "triangle-ne": ">",
+#           "triangle-se": "v",
+#           "triangle-sw": "<",
+#           "hexagram": "*",
+#           "star-triangle-up": "^",
+#           "star-triangle-down": "v",
+#           "star-square": "s",
+#           "star-diamond": "D",
+#           "diamond-wide": "D",
+#           "hourglass": "d",
+#           "bowtie": "D",
+#           "circle-cross": "+",
+#           "circle-x": "x",
+#           "cross-thin": "+",
+#           "square-cross": "s",
+#           "square-x": "s",
+#           "diamond-cross": "D",
+#           "diamond-x": "D",
+#           "x-thin": "x",
+#           "hash": "*",
+#           "asterisk": "*",
+#           "line-ne": "|",
+#           "line-nw": "_",
+#           "arrow-bar-up": 6,
+#           "arrow-bar-down": 7,
+#           "arrow-bar-left": 4,
+#           "arrow-bar-right": 5,
+#           "arrow": 6,
+#           "arrow-wide": 6,
+#       }
+#   )
 #   MPL_MARKERS_LIST = list(MPL_MARKERS.values())
 #   """
 #   Possible line styles for `matplotlib`.
@@ -4404,6 +5133,11 @@ if __name__ == "__main__":
 #           the subplots may be provided.
 #   
 #           PTY: Just provide a `str`.
+#       legend_togglegroup: bool, default: False
+#           PLOTLY ONLY.
+#   
+#           Whether legend items with the same group will be toggled together
+#           when clicking on a legend item.
 #       color_cycle: list, optional
 #           Cycle through colors in the provided list.
 #   

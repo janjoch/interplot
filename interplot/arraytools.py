@@ -1,6 +1,5 @@
 """Work with 1D arrays."""
 
-
 import math
 
 import numpy as np
@@ -18,7 +17,7 @@ LISTLIKE_TYPES = (tuple, list, np.ndarray, pd.core.series.Series)
 
 
 def _new_pd_index(series, n):
-    return series.index[(n - 1) // 2: -(n // 2)]
+    return series.index[(n - 1) // 2 : -(n // 2)]
 
 
 def lowpass(data, n=101, new_index=None):
@@ -81,7 +80,7 @@ def lowpass_core(data, n):
 
     array = np.empty(size, dtype=data.dtype)
     for i in nb.prange(size):
-        array[i] = np.mean(data[i: i + n])
+        array[i] = np.mean(data[i : i + n])
 
     return array
 
@@ -120,13 +119,13 @@ def highpass(
     # pandas Series
     if isinstance(data, pd.core.series.Series):
         new_index = _new_pd_index(data, n) if new_index is None else new_index
-        return data[((n - 1) // 2): -((n - 1) // 2)] - lowpass(
+        return data[((n - 1) // 2) : -((n - 1) // 2)] - lowpass(
             np.array(data), n, new_index=new_index
         )
 
     # np.array, list or tuple
     if isinstance(data, LISTLIKE_TYPES):
-        return np.array(data[((n - 1) // 2): -((n - 1) // 2)]) - lowpass_core(
+        return np.array(data[((n - 1) // 2) : -((n - 1) // 2)]) - lowpass_core(
             np.array(data), n
         )
 
@@ -341,13 +340,13 @@ class LinearRegression(plot.NotebookInteraction):
         if not isinstance(label, plot.LabelGroup):
             row = kwargs.get("row", 0)
             col = kwargs.get("col", 0)
-            group_name = "regression_{}_{}_{}".format(
+            group_id = "regression_{}_{}_{}".format(
                 row,
                 col,
                 fig.element_count[row, col],
             )
             label = plot.LabelGroup(
-                group_name=group_name,
+                group_id=group_id,
                 group_title="Regression" if label is None else label,
             )
 
@@ -371,9 +370,7 @@ class LinearRegression(plot.NotebookInteraction):
             self.y2,
             line_style=line_style_reg,
             label=(
-                label_reg
-                if callable(label_reg)
-                else label.element(label_reg)
+                label_reg if callable(label_reg) else label.element(label_reg)
             ),
             color=color if color_reg is None else color_reg,
             **kwargs_reg,
@@ -389,11 +386,11 @@ class LinearRegression(plot.NotebookInteraction):
                     label_ci
                     if callable(label_ci)
                     else plot.LabelGroup(
-                        label.group_name,
+                        group_id=label.group_id,
                         default_label=label_ci,
                     )
                 ),
-            color=color if color_ci is None else color_ci,
+                color=color if color_ci is None else color_ci,
                 **kwargs_ci,
                 **kwargs,
             )
@@ -403,9 +400,7 @@ class LinearRegression(plot.NotebookInteraction):
                 self.x2,
                 self.y2 + self.pi,
                 label=(
-                    label_pi
-                    if callable(label_pi)
-                    else label.element(label_pi)
+                    label_pi if callable(label_pi) else label.element(label_pi)
                 ),
                 line_style=line_style_pi,
                 color=color if color_pi is None else color_pi,
