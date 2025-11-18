@@ -270,7 +270,9 @@ def filter_nozip(iterable, no_iter_types=None, depth=0, length=(2,)):
     either `iterable` or `repeat(iterable)`
     """
     # input validation
-    no_iter_types = (float, int, datetime) if no_iter_types is None else no_iter_types
+    no_iter_types = (
+        (float, int, datetime) if no_iter_types is None else no_iter_types
+    )
     if not isinstance(length, ITERABLE_TYPES):
         length = (length,)
 

@@ -1020,7 +1020,9 @@ class Plot(NotebookInteraction):
                     xlog_row,
                     ylog_row,
                 ):
-                    if xlim_tile is not None and isinstance(xlim_tile[0], datetime):
+                    if xlim_tile is not None and isinstance(
+                        xlim_tile[0], datetime
+                    ):
                         xlim_tile = (
                             xlim_tile[0].timestamp() * 1000,
                             xlim_tile[1].timestamp() * 1000,
@@ -1040,7 +1042,9 @@ class Plot(NotebookInteraction):
 
             # axis labels
             for text, i_col in zip_smart(xlabel, range(1, self.cols + 1)):
-                self.fig.update_xaxes(title_text=text, row=self.rows, col=i_col)
+                self.fig.update_xaxes(
+                    title_text=text, row=self.rows, col=i_col
+                )
             for text, i_row in zip_smart(ylabel, range(1, self.rows + 1)):
                 self.fig.update_yaxes(title_text=text, row=i_row, col=1)
 
@@ -1186,7 +1190,8 @@ class Plot(NotebookInteraction):
             Axes coordinates.
         """
         return (
-            self.ax[row, col].transData + self.ax[row, col].transAxes.inverted()
+            self.ax[row, col].transData
+            + self.ax[row, col].transAxes.inverted()
         ).transform((x, y))
 
     def get_cycle_color(self, increment=1, i=None):
@@ -1735,7 +1740,9 @@ class Plot(NotebookInteraction):
                 (width / _serial_n),
                 color=self.digest_color(color, opacity),
                 edgecolor=(
-                    self.digest_color(line_color, 1) if line_color is not None else None
+                    self.digest_color(line_color, 1)
+                    if line_color is not None
+                    else None
                 ),
                 linewidth=line_width,
                 **self._digest_label(label, show_legend=show_legend),
@@ -2145,7 +2152,9 @@ class Plot(NotebookInteraction):
         kwargs:
             Keyword arguments for `interplot.arraytools.LinearRegression.plot`.
         """
-        if isinstance(x, arraytools.LinearRegression) or hasattr(x, "is_linreg"):
+        if isinstance(x, arraytools.LinearRegression) or hasattr(
+            x, "is_linreg"
+        ):
             x.plot(fig=self, **kwargs)
         else:
             arraytools.LinearRegression(
@@ -2287,7 +2296,9 @@ class Plot(NotebookInteraction):
                     label.element(),
                 ),
                 linewidth=line_width,
-                edgecolor=self.digest_color(line_color, line_opacity, increment=0),
+                edgecolor=self.digest_color(
+                    line_color, line_opacity, increment=0
+                ),
                 facecolor=self.digest_color(color, opacity),
                 **kwargs_mpl,
                 **kwargs,
@@ -2394,8 +2405,10 @@ class Plot(NotebookInteraction):
                 align=text_alignment,
                 xanchor=horizontal_alignment,
                 yanchor=vertical_alignment,
-                xref=self._get_plotly_anchor("x", self.cols, row, col) + x_domain,
-                yref=self._get_plotly_anchor("y", self.cols, row, col) + y_domain,
+                xref=self._get_plotly_anchor("x", self.cols, row, col)
+                + x_domain,
+                yref=self._get_plotly_anchor("y", self.cols, row, col)
+                + y_domain,
                 font=dict(color=self.digest_color(color, opacity)),
                 row=row,
                 col=col,
@@ -2414,7 +2427,9 @@ class Plot(NotebookInteraction):
                     "for static matplotlib plot. x_data_coords was used."
                 )
             transform = (
-                dict() if x_data_coords else dict(transform=self.ax[row, col].transAxes)
+                dict()
+                if x_data_coords
+                else dict(transform=self.ax[row, col].transAxes)
             )
             self.ax[row, col].text(
                 x,
@@ -2516,8 +2531,10 @@ class Plot(NotebookInteraction):
                     source=image,
                     x=x,
                     y=y,
-                    xref=self._get_plotly_anchor("x", self.cols, row, col) + x_domain,
-                    yref=self._get_plotly_anchor("y", self.cols, row, col) + y_domain,
+                    xref=self._get_plotly_anchor("x", self.cols, row, col)
+                    + x_domain,
+                    yref=self._get_plotly_anchor("y", self.cols, row, col)
+                    + y_domain,
                     xanchor=horizontal_alignment,
                     yanchor=vertical_alignment,
                     sizex=x_size,
@@ -2535,7 +2552,10 @@ class Plot(NotebookInteraction):
             if kwargs_mpl is None:
                 kwargs_mpl = dict()
             if not isinstance(image, Image.Image):
-                warn("Image must be a PIL Image object for static " "matplotlib plot.")
+                warn(
+                    "Image must be a PIL Image object for static "
+                    "matplotlib plot."
+                )
 
             if data_coords or data_coords is None:
                 x1 = x + x_size
@@ -2581,7 +2601,8 @@ class Plot(NotebookInteraction):
                     "matplotlib plot. 'contain' behavior is used instead."
                 )
             if sizing == "contain" and (
-                horizontal_alignment != "center" or vertical_alignment != "center"
+                horizontal_alignment != "center"
+                or vertical_alignment != "center"
             ):
                 warn(
                     "When using `sizing='contain'` with `horizontal_alignment`"
@@ -2886,7 +2907,9 @@ class Plot(NotebookInteraction):
         if self.interactive:
             return self.fig.show(
                 config=(
-                    conf.PTY_CONFIG if self.save_config is None else self.save_config
+                    conf.PTY_CONFIG
+                    if self.save_config is None
+                    else self.save_config
                 )
             )
         return self.fig.show()
@@ -3378,4 +3401,6 @@ class ShowDataset(ShowDataArray):
         var = self.default_var if var is None else var
         sel = self.default_sel if sel is None else sel
         isel = self.default_isel if isel is None else isel
-        return super()._plot_core(self.data[var], *args, sel=sel, isel=isel, **kwargs)
+        return super()._plot_core(
+            self.data[var], *args, sel=sel, isel=isel, **kwargs
+        )
