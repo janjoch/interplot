@@ -11,6 +11,7 @@ sphinx_toolbox
 
 # flake8 checks
 flake8
+flake8-pyproject
 
 # testing
 pytest

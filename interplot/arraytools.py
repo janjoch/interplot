@@ -17,7 +17,7 @@ LISTLIKE_TYPES = (tuple, list, np.ndarray, pd.core.series.Series)
 
 
 def _new_pd_index(series, n):
-    return series.index[(n - 1) // 2: -(n // 2)]
+    return series.index[(n - 1) // 2 : -(n // 2)]
 
 
 def lowpass(data, n=101, new_index=None):
@@ -80,7 +80,7 @@ def lowpass_core(data, n):
 
     array = np.empty(size, dtype=data.dtype)
     for i in nb.prange(size):
-        array[i] = np.mean(data[i: i + n])
+        array[i] = np.mean(data[i : i + n])
 
     return array
 
@@ -119,13 +119,13 @@ def highpass(
     # pandas Series
     if isinstance(data, pd.core.series.Series):
         new_index = _new_pd_index(data, n) if new_index is None else new_index
-        return data[((n - 1) // 2): -((n - 1) // 2)] - lowpass(
+        return data[((n - 1) // 2) : -((n - 1) // 2)] - lowpass(
             np.array(data), n, new_index=new_index
         )
 
     # np.array, list or tuple
     if isinstance(data, LISTLIKE_TYPES):
-        return np.array(data[((n - 1) // 2): -((n - 1) // 2)]) - lowpass_core(
+        return np.array(data[((n - 1) // 2) : -((n - 1) // 2)]) - lowpass_core(
             np.array(data), n
         )
 
