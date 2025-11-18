@@ -1,5 +1,26 @@
-"""A small tool to eavesdrop on function calls and print or log them."""
+"""
+A small tool to eavesdrop on function calls and print or log them.
 
+Examples
+--------
+>>> @interplot.debug.wiretap
+... def func(foo):
+...     return foo + foo
+... interplot.debug.start_logging(save_to_log=True, verbose=True)
+... func("bar")
+Wiretap log: {
+    "time": "2025-11-18 09:13:17.387600",
+    "function": "<function func at 0x323088680>",
+    "args": [
+        "bar"
+    ],
+    "kwargs": {},
+    "result": "barbar"
+}
+'barbar'
+>>> interplot.debug.get_log(-1)["args"]  # get the last log entry
+('bar',)
+"""
 
 from functools import wraps
 
@@ -28,7 +49,7 @@ def start_logging(save_to_log=None, verbose=None):
     ----------
     save_to_log: bool, optional
         Data will be accessible at `interplot.debug.log`.
-        
+
         If undefined, the last setting will be used.
 
         By default, save_to_log is turned on once logging is activated.
@@ -61,7 +82,7 @@ def get_log(index=None):
 
     if index is None:
         return log
-    
+
     return log[index]
 
 
@@ -72,10 +93,18 @@ def clear_log():
 
 
 def wiretap(core):
-    """Decorator to wiretap functions for debugging."""
+    """
+    Decorator to log input and output of the decorated function.
+
+    Examples
+    --------
+    >>> @interplot.debug.wiretap
+    ... def func(foo):
+    ...     return foo + foo
+    """
 
     @wraps(core)
-    def wrapper(*args, core=core, **kwargs):
+    def inner(*args, core=core, **kwargs):
         global _active, _save_to_log, _verbose
 
         if not _active:
@@ -98,4 +127,4 @@ def wiretap(core):
 
         return res
 
-    return wrapper
+    return inner
