@@ -54,10 +54,9 @@ def init_notebook_mode(connected=False):
 
     Parameters
     ----------
-    connected: bool, optional
+    connected: bool, default: True
         If True, the plotly.js library will be loaded from an online CDN.
         If False, the plotly.js library will be loaded locally.
-        Default: False
     """
     plotly.offline.init_notebook_mode(connected=connected)
 
@@ -728,6 +727,7 @@ class Plot(NotebookInteraction):
         )
         self.legend_loc = legend_loc
         self.legend_title = legend_title
+        self.legend_togglegroup = legend_togglegroup
         self.legend_ids = set()
         self.color_cycle = pick_non_none(
             color_cycle,
@@ -933,6 +933,10 @@ class Plot(NotebookInteraction):
         self.dpi = pick_non_none(dpi, self.dpi)
         self.legend_loc = pick_non_none(legend_loc, self.legend_loc)
         self.legend_title = pick_non_none(legend_title, self.legend_title)
+        self.legend_togglegroup = pick_non_none(
+            legend_togglegroup,
+            self.legend_togglegroup,
+        )
         self.color_cycle = pick_non_none(
             color_cycle,
             self.color_cycle,
@@ -968,25 +972,25 @@ class Plot(NotebookInteraction):
 
             # unpacking
             width, height = self.fig_size
-            if isinstance(legend_title, ITERABLE_TYPES):
+            if isinstance(self.legend_title, ITERABLE_TYPES):
                 warn(
                     "Plotly only has one legend, however multiple legend_"
                     "titles were provided. Only the first one will be used!"
                 )
-                legend_title = legend_title[0]
-                if isinstance(legend_title, ITERABLE_TYPES):
-                    legend_title = legend_title[0]
+                self.legend_title = self.legend_title[0]
+                if isinstance(self.legend_title, ITERABLE_TYPES):
+                    self.legend_title = self.legend_title[0]
 
             # update layout
             self.fig.update_layout(
                 title=self.title,
-                legend_title=legend_title,
+                legend_title=self.legend_title,
                 height=height,
                 width=width,
                 barmode="group",
             )
             if not pick_non_none(
-                legend_togglegroup,
+                self.legend_togglegroup,
                 conf.PTY_LEGEND_TOGGLEGROUP,
             ):
                 self.fig.update_layout(
@@ -1004,8 +1008,8 @@ class Plot(NotebookInteraction):
                 range(1, self.rows + 1),
                 filter_nozip(self.xlim),
                 filter_nozip(self.ylim),
-                xlog,
-                ylog,
+                self.xlog,
+                self.ylog,
             ):
                 for (
                     i_col,
@@ -1041,11 +1045,11 @@ class Plot(NotebookInteraction):
                     )
 
             # axis labels
-            for text, i_col in zip_smart(xlabel, range(1, self.cols + 1)):
+            for text, i_col in zip_smart(self.xlabel, range(1, self.cols + 1)):
                 self.fig.update_xaxes(
                     title_text=text, row=self.rows, col=i_col
                 )
-            for text, i_row in zip_smart(ylabel, range(1, self.rows + 1)):
+            for text, i_row in zip_smart(self.ylabel, range(1, self.rows + 1)):
                 self.fig.update_yaxes(title_text=text, row=i_row, col=1)
 
         # MATPLOTLIB
@@ -1085,11 +1089,11 @@ class Plot(NotebookInteraction):
                 self.fig.supylabel(self.ylabel)
 
             # log scale
-            for row, xlog_row in zip_smart(range(self.rows), xlog):
+            for row, xlog_row in zip_smart(range(self.rows), self.xlog):
                 for col, xlog_tile in zip_smart(range(self.cols), xlog_row):
                     if xlog_tile:
                         self.ax[row, col].set_xscale("log")
-            for row, ylog_row in zip_smart(range(self.rows), ylog):
+            for row, ylog_row in zip_smart(range(self.rows), self.ylog):
                 for col, ylog_tile in zip_smart(range(self.cols), ylog_row):
                     if ylog_tile:
                         self.ax[row, col].set_yscale("log")
@@ -1114,11 +1118,9 @@ class Plot(NotebookInteraction):
             Name to display.
         default_label: str, optional
             If label is None, fall back to default_label.
-            Default: None
             By default, plotly will enumerate the unnamed traces itself.
         show_legend: bool, optional
             Show label in legend.
-            Default: None
             By default, the label will be displayed if it is not None
             (in case of label=None, the automatic label will only be displayed
             on hover)
@@ -1200,10 +1202,9 @@ class Plot(NotebookInteraction):
 
         Parameters
         ----------
-        increment: int, optional
+        increment: int, default: 1
             If the same color should be returned the next time, pass 0.
             To jump the next color, pass 2.
-            Default: 1
         i: int, optional
             Get a fixed index of the color cycle instead of the next one.
             This will not modify the regular color cycle iteration.
@@ -1233,9 +1234,11 @@ class Plot(NotebookInteraction):
             If None is provided, the next one from COLOR_CYCLE will be picked.
         alpha: float, optional
             Set alpha / opacity.
+
             Overrides alpha contained in color input.
-            Default: None (use the value contained in color or default to 1)
-        increment: int, optional
+
+            By default, `alpha` is derived from `color`, otherwise set to 1.
+        increment: int, default: 1
             If a color from the cycler is picked, increase the cycler by
             this increment.
         """
@@ -1284,6 +1287,9 @@ class Plot(NotebookInteraction):
         mode: str
             The mode to determine if markers should be used.
             If no markers should be drawn, None is returned.
+        recursive: bool, default: False
+            Signals that the method was called from within `digest_marker`
+            recursively.
 
         Returns
         -------
@@ -1406,7 +1412,7 @@ class Plot(NotebookInteraction):
             Can be hex, rgb(a) or any named color that is understood
             by matplotlib.
 
-            Default: same color as `color`.
+            By default, the same color as `color` will be used.
         label: str, optional
             Trace label for legend.
         show_legend: bool, optional
@@ -1421,7 +1427,7 @@ class Plot(NotebookInteraction):
 
             The color cycle can be accessed with "C0", "C1", ...
 
-            Default: color is retrieved from `Plot.digest_color`,
+            By default, the color is retrieved from `Plot.digest_color`,
             which cycles through `COLOR_CYCLE`.
         opacity: float, optional
             Opacity (=alpha) of the fill.
@@ -1671,7 +1677,7 @@ class Plot(NotebookInteraction):
 
             The color cycle can be accessed with "C0", "C1", ...
 
-            Default: color is retrieved from `Plot.digest_color`,
+            By default, the color is retrieved from `Plot.digest_color`,
             which cycles through `COLOR_CYCLE`.
         opacity: float, optional
             Opacity (=alpha) of the fill.
@@ -1784,7 +1790,6 @@ class Plot(NotebookInteraction):
         bins: int, optional
             Number of bins.
             If undefined, plotly/matplotlib will detect automatically.
-            Default: None
         label: str, optional
             Trace label for legend.
         color: str, optional
@@ -1795,7 +1800,7 @@ class Plot(NotebookInteraction):
 
             The color cycle can be accessed with "C0", "C1", ...
 
-            Default: color is retrieved from `Plot.digest_color`,
+            By default, the color is retrieved from `Plot.digest_color`,
             which cycles through `COLOR_CYCLE`.
         opacity: float, optional
             Opacity (=alpha) of the fill.
@@ -1898,7 +1903,7 @@ class Plot(NotebookInteraction):
 
             The color cycle can be accessed with "C0", "C1", ...
 
-            Default: color is retrieved from `Plot.digest_color`,
+            By default, the color is retrieved from `Plot.digest_color`,
             which cycles through `COLOR_CYCLE`.
         color_median: color, default: "black"
             MPL only.
@@ -2021,9 +2026,8 @@ class Plot(NotebookInteraction):
             Lower and upper limits of the color map.
         aspect: float, default: 1
             Aspect ratio of the axes.
-        invert_x, invert_y: bool, optional
+        invert_x, invert_y: bool, default: False
             Invert the axes directions.
-            Default: False
         cmap: str, default: "rainbow"
             Color map to use.
             https://matplotlib.org/stable/gallery/color/colormap_reference.html
@@ -2204,7 +2208,7 @@ class Plot(NotebookInteraction):
 
             If line_color is undefined, the the fill color will be used.
 
-            Default: color is retrieved from `Plot.digest_color`,
+            By default, the color is retrieved from `Plot.digest_color`,
             which cycles through `COLOR_CYCLE`.
         opacity, line_opacity: float, default: 0.5
             Opacity (=alpha) of the fill.
@@ -2366,7 +2370,7 @@ class Plot(NotebookInteraction):
 
             The color cycle can be accessed with "C0", "C1", ...
 
-            Default: color is retrieved from `Plot.digest_color`,
+            By default, the color is retrieved from `Plot.digest_color`,
             which cycles through `COLOR_CYCLE`.
         opacity: float, optional
             Opacity (=alpha) of the fill.
@@ -2810,9 +2814,13 @@ class Plot(NotebookInteraction):
 
             An iterable of multiple formats may be provided. In this case
             the save command will be repeated for each element.
-        print_confirm: bool, optional
+
+            If none is provided, the format will be derived from the filename.
+        html_no_fig_size: bool, default: True
+            Allow the HTML plot to use the entire window and auto-scale upon
+            window resizing.
+        print_confirm: bool, default: True
             Print a confirmation message where the file has been saved.
-            Default: True
 
         Returns
         -------
@@ -2915,7 +2923,7 @@ class Plot(NotebookInteraction):
         return self.fig.show()
 
     def close(self):
-        """Close the plot."""
+        """Close the matplotlib plot."""
         if not self.interactive:
             plt.close(self.fig)
 
@@ -2933,11 +2941,11 @@ class Plot(NotebookInteraction):
         if self.interactive:
             init_notebook_mode()
             return self.JS_RENDER_WARNING + self.fig._repr_html_()
-        raise NotImplementedError
+        raise NotImplementedError("not implemented for static plots.")
 
     def _repr_png_(self):
         if self.interactive:
-            raise NotImplementedError
+            raise NotImplementedError("Not implemented for interactive plots.")
         bio = BytesIO()
         self.fig.savefig(bio, format="png")
         bio.seek(0)
