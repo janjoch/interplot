@@ -22,7 +22,7 @@ import re
 from warnings import warn
 from pathlib import Path
 from functools import wraps
-from datetime import datetime
+import datetime as dt
 from io import BytesIO
 from PIL import Image
 import uuid
@@ -297,13 +297,13 @@ def _adjust_indent(indent_decorator, indent_core, docstring):
     )
 
 
-def _serialize_2d(serialize_pty=True, serialize_mpl=True):
+def _serialize_2d(serialize_pty=True, serialize_mpl=True, omit_y=False):
     """Decorator to catch 2D arrays and other data types to unpack."""
 
     def decorator(core):
 
         @wraps(core)
-        def wrapper(self, x, y=None, label=None, **kwargs):
+        def wrapper(self, x, y=None, label=None, serialize=None, **kwargs):
             """
             Wrapper function for a method.
 
@@ -325,6 +325,11 @@ def _serialize_2d(serialize_pty=True, serialize_mpl=True):
             xarray DataArrays will be convered to pandas and then handled
             accordingly.
             """
+            if serialize is False:
+                if omit_y:
+                    return core(self, y, label=label, **kwargs)
+                return core(self, x, y, label=label, **kwargs)
+
             # reallocate x/y
             if y is None:
 
@@ -341,28 +346,49 @@ def _serialize_2d(serialize_pty=True, serialize_mpl=True):
                         label = label.format(y.name)
 
                 # pd.DataFrame: split columns to pd.Series and iterate
-                elif isinstance(x, pd_DataFrame):
+                elif serialize or isinstance(x, pd_DataFrame):
                     if (
-                        self.interactive
+                        serialize
+                        or self.interactive
                         and serialize_pty
                         or not self.interactive
                         and serialize_mpl
                     ):
-                        for i, ((_, series), label_) in enumerate(
-                            zip_smart(x.items(), label)
-                        ):
-                            _serialize_2d(
-                                serialize_pty=serialize_pty,
-                                serialize_mpl=serialize_mpl,
-                            )(core)(
-                                self,
-                                series,
-                                label=label_,
-                                _serial_i=i,
-                                _serial_n=len(x.columns),
-                                **kwargs,
-                            )
-                        return
+                        if isinstance(x, pd_DataFrame):
+                            for i, ((_, series), label_) in enumerate(
+                                zip_smart(x.items(), label)
+                            ):
+                                _serialize_2d(
+                                    serialize_pty=serialize_pty,
+                                    serialize_mpl=serialize_mpl,
+                                    omit_y=omit_y,
+                                )(core)(
+                                    self,
+                                    x=series,
+                                    label=label_,
+                                    _serial_i=i,
+                                    _serial_n=len(x.columns),
+                                    **kwargs,
+                                )
+                            return
+
+                        else:
+                            for i, (x_, label_) in enumerate(
+                                zip_smart(x, label)
+                            ):
+                                _serialize_2d(
+                                    serialize_pty=serialize_pty,
+                                    serialize_mpl=serialize_mpl,
+                                    omit_y=omit_y,
+                                )(core)(
+                                    self,
+                                    x=x_,
+                                    label=label_,
+                                    _serial_i=i,
+                                    _serial_n=len(x),
+                                    **kwargs,
+                                )
+                            return
 
                 else:
                     if hasattr(x, "copy") and callable(getattr(x, "copy")):
@@ -372,17 +398,20 @@ def _serialize_2d(serialize_pty=True, serialize_mpl=True):
                     x = np.arange(len(y))
 
             # 2D np.array
-            if isinstance(y, np.ndarray) and len(y.shape) == 2:
+            if serialize or isinstance(y, np.ndarray) and len(y.shape) == 2:
+                if isinstance(y, np.ndarray):
+                    y = y.T
                 if (
                     self.interactive
                     and serialize_pty
                     or not self.interactive
                     and serialize_mpl
                 ):
-                    for i, (y_, label_) in enumerate(zip_smart(y.T, label)):
+                    for i, (y_, label_) in enumerate(zip_smart(y, label)):
                         _serialize_2d(
                             serialize_pty=serialize_pty,
                             serialize_mpl=serialize_mpl,
+                            omit_y=omit_y,
                         )(core)(
                             self,
                             x,
@@ -394,6 +423,8 @@ def _serialize_2d(serialize_pty=True, serialize_mpl=True):
                         )
                     return
 
+            if omit_y:
+                return core(self, y, label=label, **kwargs)
             return core(self, x, y, label=label, **kwargs)
 
         return wrapper
@@ -604,7 +635,7 @@ class LabelGroup:
             # MATPLOTLIB
             if show:
                 return dict(label=label)
-            return dict()
+            return dict(label=None)
 
         return inner
 
@@ -741,6 +772,7 @@ class Plot(NotebookInteraction):
         self.pty_custom_func = pty_custom_func
         self.pty_update_layout = pty_update_layout
         self.element_count = np.zeros((rows, cols), dtype=int)
+        self.boxplot_count = np.zeros((rows, cols), dtype=int)
         self.i_color = 0
 
         # init plotly
@@ -1025,7 +1057,7 @@ class Plot(NotebookInteraction):
                     ylog_row,
                 ):
                     if xlim_tile is not None and isinstance(
-                        xlim_tile[0], datetime
+                        xlim_tile[0], dt.datetime
                     ):
                         xlim_tile = (
                             xlim_tile[0].timestamp() * 1000,
@@ -1359,8 +1391,8 @@ class Plot(NotebookInteraction):
         linewidth=None,
         row=0,
         col=0,
-        _serial_i=0,
-        _serial_n=1,
+        _serial_i=0,  # must be accepted from decorator
+        _serial_n=1,  # must be accepted from decorator
         pty_marker_kwargs=None,
         kwargs_pty=None,
         kwargs_mpl=None,
@@ -1374,11 +1406,15 @@ class Plot(NotebookInteraction):
         x: array-like
         y: array-like, optional
             If only `x` is defined, it will be assumed as `y`.
+
             If a pandas `Series` is provided, the index will
             be taken as `x`.
+
             Else if a pandas `DataFrame` is provided, the method call
             is looped for each column.
+
             Else `x` will be an increment, starting from `0`.
+
             If a 2D numpy `array` is provided, the method call
             is looped for each column.
         x_error, y_error: number or shape(N,) or shape(2, N), optional
@@ -1419,13 +1455,14 @@ class Plot(NotebookInteraction):
             Whether to show the label in the legend.
 
             By default, it will be shown if a label is defined.
-        color: str, optional
+        color: str or int, optional
             Trace color.
 
             Can be hex, rgb(a) or any named color that is understood
             by matplotlib.
 
             The color cycle can be accessed with "C0", "C1", ...
+            or the according integer.
 
             By default, the color is retrieved from `Plot.digest_color`,
             which cycles through `COLOR_CYCLE`.
@@ -1438,6 +1475,13 @@ class Plot(NotebookInteraction):
             If the plot contains a grid, provide the coordinates.
 
             Attention: Indexing starts with 0!
+        serialize: bool, optional
+            Enforce or prevent looping over multi-dimensional data.
+
+            By default, interplot will automatically loop with:
+                - pandas DataFrame
+                - xarray DataArray (if 2D)
+                - numpy array (if 2D)
         pty_marker_kwargs: dict, optional
             PLOTLY ONLY.
 
@@ -1669,13 +1713,14 @@ class Plot(NotebookInteraction):
             Whether to show the label in the legend.
 
             By default, it will be shown if a label is defined.
-        color: str, optional
+        color: str or int, optional
             Trace color.
 
             Can be hex, rgb(a) or any named color that is understood
             by matplotlib.
 
             The color cycle can be accessed with "C0", "C1", ...
+            or the according integer.
 
             By default, the color is retrieved from `Plot.digest_color`,
             which cycles through `COLOR_CYCLE`.
@@ -1695,6 +1740,13 @@ class Plot(NotebookInteraction):
             If the plot contains a grid, provide the coordinates.
 
             Attention: Indexing starts with 0!
+        serialize: bool, optional
+            Enforce or prevent looping over multi-dimensional data.
+
+            By default, interplot will automatically loop with:
+                - pandas DataFrame
+                - xarray DataArray (if 2D)
+                - numpy array (if 2D)
         kwargs_pty, kwargs_mpl, **kwargs: optional
             Pass specific keyword arguments to the line core method.
         """
@@ -1792,13 +1844,14 @@ class Plot(NotebookInteraction):
             If undefined, plotly/matplotlib will detect automatically.
         label: str, optional
             Trace label for legend.
-        color: str, optional
+        color: str or int, optional
             Trace color.
 
             Can be hex, rgb(a) or any named color that is understood
             by matplotlib.
 
             The color cycle can be accessed with "C0", "C1", ...
+            or the according integer.
 
             By default, the color is retrieved from `Plot.digest_color`,
             which cycles through `COLOR_CYCLE`.
@@ -1868,6 +1921,7 @@ class Plot(NotebookInteraction):
                 **kwargs,
             )
 
+    @_serialize_2d(omit_y=True)
     def add_boxplot(
         self,
         x,
@@ -1880,6 +1934,8 @@ class Plot(NotebookInteraction):
         notch=True,
         row=0,
         col=0,
+        _serial_i=0,  # must be accepted from decorator
+        _serial_n=1,  # must be accepted from decorator
         kwargs_pty=None,
         kwargs_mpl=None,
         **kwargs,
@@ -1895,13 +1951,14 @@ class Plot(NotebookInteraction):
             Show boxplot horizontally.
         label: tuple of strs, optional
             Trace labels for legend.
-        color: tuple of strs, optional
+        color: str or int, optional
             Fill colors.
 
             Can be hex, rgb(a) or any named color that is understood
             by matplotlib.
 
             The color cycle can be accessed with "C0", "C1", ...
+            or the according integer.
 
             By default, the color is retrieved from `Plot.digest_color`,
             which cycles through `COLOR_CYCLE`.
@@ -1913,6 +1970,18 @@ class Plot(NotebookInteraction):
 
             By default, fallback to alpha value provided with color argument,
             or 1.
+        notch: bool, optional
+            MPL only.
+
+            Whether to draw a notched boxplot (`True`),
+            or a rectangular boxplot (`False`).
+        serialize: bool, optional
+            Enforce or prevent looping over multi-dimensional data.
+
+            By default, interplot will automatically loop with:
+                - pandas DataFrame
+                - xarray DataArray (if 2D)
+                - numpy array (if 2D)
         row, col: int, optional
             If the plot contains a grid, provide the coordinates.
 
@@ -1920,66 +1989,31 @@ class Plot(NotebookInteraction):
         kwargs_pty, kwargs_mpl, **kwargs: optional
             Pass specific keyword arguments to the boxplot core method.
         """
-        # determine number of boxplots
-        if isinstance(x[0], (int, float)):
-            n = 1
-        else:
-            n = len(x)
-        # input validation
-        if not isinstance(label, ITERABLE_TYPES):
-            label = (label,) * n
-        if not isinstance(color, ITERABLE_TYPES):
-            color = (color,) * n
-
         # PLOTLY
         if self.interactive:
             if kwargs_pty is None:
                 kwargs_pty = dict()
 
-            # if x contains multiple datasets, iterate add_boxplot
-            if not n == 1:
-                for x_i, label_, show_legend_, color_, opacity_ in zip_smart(
-                    x,
-                    label,
-                    show_legend,
-                    color,
-                    opacity,
-                ):
-                    self.add_boxplot(
-                        x_i,
-                        horizontal=horizontal,
-                        label=label_,
-                        show_legend=show_legend_,
-                        row=row,
-                        col=col,
-                        color=color_,
-                        opacity=opacity_,
-                        kwargs_pty=kwargs_pty,
-                        **kwargs,
-                    )
-
-            # draw a single plotly boxplot
-            else:
-                row += 1
-                col += 1
-                kw_data = "x" if horizontal else "y"
-                pty_kwargs = {
-                    kw_data: x,
-                }
-                self.fig.add_trace(
-                    go.Box(
-                        **pty_kwargs,
-                        **self._digest_label(
-                            label[0],
-                            show_legend=show_legend,
-                        ),
-                        marker_color=self.digest_color(color[0], opacity),
-                        **kwargs_pty,
-                        **kwargs,
+            row += 1
+            col += 1
+            kw_data = "x" if horizontal else "y"
+            pty_kwargs = {
+                kw_data: x,
+            }
+            self.fig.add_trace(
+                go.Box(
+                    **pty_kwargs,
+                    **self._digest_label(
+                        label,
+                        show_legend=show_legend,
                     ),
-                    row=row,
-                    col=col,
-                )
+                    marker_color=self.digest_color(color, opacity),
+                    **kwargs_pty,
+                    **kwargs,
+                ),
+                row=row,
+                col=col,
+            )
 
         # MATPLOTLIB
         else:
@@ -1988,15 +2022,26 @@ class Plot(NotebookInteraction):
             bplots = self.ax[row, col].boxplot(
                 x,
                 vert=not horizontal,
-                labels=None if show_legend is False else label,
+                labels=(
+                    self._digest_label(
+                        label,
+                        show_legend=show_legend,
+                    )["label"],
+                ),
                 patch_artist=True,
                 notch=notch,
                 medianprops=dict(color=color_median),
+                positions=(self.boxplot_count[row, col],),
                 **kwargs_mpl,
                 **kwargs,
             )
             for bplot, color_ in zip_smart(bplots["boxes"], color):
                 bplot.set_facecolor(self.digest_color(color_, opacity))
+            self.boxplot_count[row, col] += 1
+            if horizontal:
+                self.ax[row, col].set_ylim((-1, self.boxplot_count[row, col]))
+            else:
+                self.ax[row, col].set_xlim((-1, self.boxplot_count[row, col]))
 
     def add_heatmap(
         self,
@@ -2205,6 +2250,7 @@ class Plot(NotebookInteraction):
             by matplotlib.
 
             The color cycle can be accessed with "C0", "C1", ...
+            or the according integer.
 
             If line_color is undefined, the the fill color will be used.
 
@@ -2241,7 +2287,6 @@ class Plot(NotebookInteraction):
 
         if not isinstance(label, LabelGroup):
             label = LabelGroup(
-                "fill_{}_{}_{}".format(row, col, self.element_count[row, col]),
                 default_label="fill" if label is None else label,
             )
 
@@ -2362,13 +2407,14 @@ class Plot(NotebookInteraction):
         x_data_coords, y_data_coords: bool, default: True
             PTY only.
             Specify the anchor for each axis separate.
-        color: str, default: "black"
+        color: str or int, default: "black"
             Trace color.
 
             Can be hex, rgb(a) or any named color that is understood
             by matplotlib.
 
             The color cycle can be accessed with "C0", "C1", ...
+            or the according integer.
 
             By default, the color is retrieved from `Plot.digest_color`,
             which cycles through `COLOR_CYCLE`.

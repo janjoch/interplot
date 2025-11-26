@@ -218,13 +218,13 @@ def test_complex_plot(interactive):
         title="Get Fancy!",
         xlabel="X",
         ylabel=("Y1", "Y2"),
-        xlim=(0, 100),
-        shared_xaxes="all",
+        xlim=(((0, 100), (0, 99), None), ((0, 100), (0, 99), None),),
+        shared_xaxes="cols",
         shared_yaxes=False,
         xlog=False,
-        ylog=(False, True),
+        ylog=(False, (True, False)),
         rows=2,
-        cols=2,
+        cols=3,
         fig_size=(800, 600),
         row_heights=(1, 2),
         legend_loc=(
@@ -251,13 +251,15 @@ def test_complex_plot(interactive):
         ("f", "g", "h", "a"),
         (1, 2, 5, 2),
         horizontal=True,
-        col=1,
+        col=2,
+        row=1,
         label="secondary",
         color="black",
     )
     fig.add_bar(
         ("f", "g", "h", "a"),
         (1, 2, 5, 2),
+        col=2,
         label="styling",
         color=None,
         line_width=10,
@@ -274,6 +276,7 @@ def test_complex_plot(interactive):
 
     fig.add_boxplot(
         [np.random.normal(30, 6, 1000), np.random.normal(70, 5, 1000)],
+        serialize=True,
         horizontal=True,
         row=1,
         col=1,

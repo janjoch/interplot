@@ -1,6 +1,6 @@
 # Roadmap for future development
 
-- [ ] `fig.add_image`
+- [x] `fig.add_image`
 - [ ] enable `zorder` (supported in `plotly>=5.21.0`)
 - [ ] `fig.add_text` more options
     - [ ] font size
