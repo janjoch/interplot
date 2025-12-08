@@ -2192,7 +2192,7 @@ class Plot(NotebookInteraction):
                 over=cmap_over,
                 bad=cmap_bad,
             )
-            
+
             # x, y scaling
             if pick_non_none(extent, x, y) is not None:
                 if extent is None:
