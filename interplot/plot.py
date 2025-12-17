@@ -2046,6 +2046,9 @@ class Plot(NotebookInteraction):
     def add_heatmap(
         self,
         data,
+        extent=None,
+        x=None,
+        y=None,
         lim=(None, None),
         aspect=1,
         invert_x=False,
@@ -2067,6 +2070,26 @@ class Plot(NotebookInteraction):
         ----------
         data: 2D array-like
             2D data to show heatmap.
+        extent: floats (left, right, top, bottom), optional
+            The bounding box in data coordinates that the image will fill.
+
+            The image is stretched individually along x and y to fill the box.
+
+            Will be overridden if `x` and `y` are defined.
+        x, y: iterable, optional
+            Coordinates of data points.
+
+            If length of the axis values equals the length of the data along
+            this dimension, the values describe the center of the data point.
+            If the axis values contains one element more, the edges of the
+            data points are described.
+
+            For consistent behaviour with both `interactive` modes, provide
+            the coordinates of the edges.
+
+            MPL: matplotlib doesn't support unequal spacing. If
+            `interactive=False`, `x` and `y` will be translated to `extent`,
+            overriding the according parameters passed with `extent`.
         lim: list/tuple of 2x float, optional
             Lower and upper limits of the color map.
         aspect: float, default: 1
@@ -2124,9 +2147,19 @@ class Plot(NotebookInteraction):
                     lim[0] = lim[0] - 0.000001 * delta
                     lim[1] = lim[1] + 0.000001 * delta
 
+            # x, y scaling
+            if extent is not None and x is None:
+                nx = np.shape(data)[1]
+                x = np.linspace(extent[0], extent[1], nx + 1)
+            if extent is not None and y is None:
+                ny = np.shape(data)[0]
+                y = np.linspace(extent[3], extent[2], ny + 1)
+
             self.fig.add_trace(
                 go.Heatmap(
                     z=data,
+                    x=x,
+                    y=y,
                     zmin=lim[0],
                     zmax=lim[1],
                     colorscale=cmap,
@@ -2144,7 +2177,7 @@ class Plot(NotebookInteraction):
             self.fig.update_yaxes(
                 scaleanchor=self._get_plotly_anchor("x", self.cols, row, col),
                 scaleratio=aspect,
-                autorange=("reversed" if invert_x else None),
+                autorange=("reversed" if invert_y else None),
                 row=row,
                 col=col,
             )
@@ -2159,12 +2192,29 @@ class Plot(NotebookInteraction):
                 over=cmap_over,
                 bad=cmap_bad,
             )
+
+            # x, y scaling
+            if pick_non_none(extent, x, y) is not None:
+                if extent is None:
+                    ny, nx = np.shape(data)
+                    # (left, right, top, bottom)
+                    extent = [-0.5, nx - 0.5, ny - 0.5, -0.5]
+                else:
+                    extent = list(extent)
+                if x is not None:
+                    extent[0] = x[0]
+                    extent[1] = x[-1]
+                if y is not None:
+                    extent[2] = y[0]
+                    extent[3] = y[-1]
+
             imshow = self.ax[row, col].imshow(
                 data,
                 cmap=cmap,
                 aspect=aspect,
                 vmin=lim[0],
                 vmax=lim[1],
+                extent=extent,
                 **kwargs_mpl,
                 **kwargs,
             )
