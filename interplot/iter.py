@@ -151,7 +151,7 @@ def zip_smart(
     B 42 {'kwarg1': 20, 'kwarg2': True}
     """
     iterables = list(iterables)
-    
+
     if kwargs is None:
         kwargs = dict()
     N_kwargs = len(kwargs)

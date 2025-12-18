@@ -301,8 +301,10 @@ def _serialize_1d():
     def decorator(core):
 
         @wraps(core)
-        def wrapper(self, x, serialize=None, **kwargs):
-            if serialize is False or not isinstance(x, ITERABLE_TYPES):
+        def wrapper(self, x, /, *, serialize=None, **kwargs):
+            if serialize is not True and (
+                serialize is False or not isinstance(x, ITERABLE_TYPES)
+            ):
                 return core(self, x, **kwargs)
 
             else:
@@ -322,7 +324,9 @@ def _serialize_2d(serialize_pty=True, serialize_mpl=True, omit_y=False):
     def decorator(core):
 
         @wraps(core)
-        def wrapper(self, x, y=None, label=None, serialize=None, **kwargs):
+        def wrapper(
+            self, x, /, y=None, *, label=None, serialize=None, **kwargs
+        ):
             """
             Wrapper function for a method.
 
@@ -383,7 +387,7 @@ def _serialize_2d(serialize_pty=True, serialize_mpl=True, omit_y=False):
                                     omit_y=omit_y,
                                 )(core)(
                                     self,
-                                    x=series,
+                                    series,
                                     label=label_,
                                     _serial_i=i,
                                     _serial_n=len(x.columns),
@@ -401,7 +405,7 @@ def _serialize_2d(serialize_pty=True, serialize_mpl=True, omit_y=False):
                                     omit_y=omit_y,
                                 )(core)(
                                     self,
-                                    x=x_,
+                                    x_,
                                     label=label_,
                                     _serial_i=i,
                                     _serial_n=len(x),
@@ -720,6 +724,7 @@ class Plot(NotebookInteraction):
     def __init__(
         self,
         interactive=None,
+        *,
         rows=1,
         cols=1,
         title=None,
@@ -932,6 +937,7 @@ class Plot(NotebookInteraction):
 
     def update(
         self,
+        *,
         title=None,
         xlabel=None,
         ylabel=None,
@@ -1394,7 +1400,9 @@ class Plot(NotebookInteraction):
     def add_line(
         self,
         x,
+        /,
         y=None,
+        *,
         x_error=None,
         y_error=None,
         mode=None,
@@ -1691,7 +1699,9 @@ class Plot(NotebookInteraction):
     def add_bar(
         self,
         x,
+        /,
         y=None,
+        *,
         horizontal=False,
         width=0.8,
         label=None,
@@ -1844,6 +1854,7 @@ class Plot(NotebookInteraction):
         self,
         x=None,
         y=None,
+        *,
         bins=None,
         density=False,
         label=None,
@@ -1949,6 +1960,7 @@ class Plot(NotebookInteraction):
     def add_boxplot(
         self,
         x,
+        /, *,
         horizontal=False,
         label=None,
         show_legend=None,
@@ -2045,7 +2057,7 @@ class Plot(NotebookInteraction):
                 kwargs_mpl = dict()
             bplots = self.ax[row, col].boxplot(
                 x,
-                vert=not horizontal,
+                orientation="horizontal" if horizontal else "vertical",
                 labels=(
                     self._digest_label(
                         label,
@@ -2070,6 +2082,7 @@ class Plot(NotebookInteraction):
     def add_heatmap(
         self,
         data,
+        *,
         extent=None,
         x=None,
         y=None,
@@ -2251,7 +2264,9 @@ class Plot(NotebookInteraction):
     def add_regression(
         self,
         x,
+        /,
         y=None,
+        *,
         p=0.05,
         linspace=101,
         **kwargs,
@@ -2265,6 +2280,7 @@ class Plot(NotebookInteraction):
             X axis data, or pre-existing LinearRegression instance.
         y: array-like, optional
             Y axis data.
+
             If a LinearRegression instance is provided for x,
             y can be omitted and will be ignored.
         p: float, default: 0.05
@@ -2290,8 +2306,10 @@ class Plot(NotebookInteraction):
     def add_fill(
         self,
         x,
+        /,
         y1,
         y2=None,
+        *,
         label=None,
         mode="lines",
         color=None,
@@ -2311,7 +2329,7 @@ class Plot(NotebookInteraction):
         Parameters
         ----------
         x: array-like
-        y1, y2: array-like, optional
+        y1, y2: array-like, y2 optional
             If only `x` and `y1` is defined,
             it will be assumed as `y1` and `y2`,
             and `x` will be the index, starting from 0.
@@ -2430,6 +2448,7 @@ class Plot(NotebookInteraction):
     def add_hvline(
         self,
         pos,
+        /, *,
         horizontal=True,
         line_style="solid",
         line_width=None,
@@ -2439,6 +2458,7 @@ class Plot(NotebookInteraction):
         opacity=None,
         row=0,
         col=0,
+        exclude_empty_subplots=False,
         kwargs_pty=None,
         kwargs_mpl=None,
         **kwargs,
@@ -2483,6 +2503,10 @@ class Plot(NotebookInteraction):
             If the plot contains a grid, provide the coordinates.
 
             Attention: Indexing starts with 0!
+        exclude_empty_subplots: bool, default: False
+            PTY ONLY.
+
+            Whether the line should also be drawn on empty subplots.
         serialize: bool, optional
             Enforce or prevent looping over multi-dimensional data.
 
@@ -2517,6 +2541,7 @@ class Plot(NotebookInteraction):
                     label,
                     show_legend=show_legend,
                 ),
+                exclude_empty_subplots=exclude_empty_subplots,
                 **kwargs_pty,
                 **kwargs,
             )
@@ -2541,19 +2566,21 @@ class Plot(NotebookInteraction):
 
     @wraps(add_hvline)
     @_serialize_1d()
-    def add_hline(self, x, **kwargs):
+    def add_hline(self, x, /, **kwargs):
         self.add_hvline(x, horizontal=True, **kwargs)
 
     @wraps(add_hvline)
     @_serialize_1d()
-    def add_vline(self, x, **kwargs):
+    def add_vline(self, x, /, **kwargs):
         self.add_hvline(x, horizontal=False, **kwargs)
 
     def add_text(
         self,
         x,
         y,
+        /,
         text,
+        *,
         horizontal_alignment="center",
         vertical_alignment="center",
         text_alignment=None,
@@ -2694,7 +2721,9 @@ class Plot(NotebookInteraction):
         self,
         x,
         y,
+        /,
         image,
+        *,
         horizontal_alignment="center",
         vertical_alignment="center",
         data_coords=True,
@@ -2870,6 +2899,7 @@ class Plot(NotebookInteraction):
 
     def post_process(
         self,
+        *,
         global_custom_func=None,
         mpl_custom_func=None,
         pty_custom_func=None,
@@ -3034,6 +3064,7 @@ class Plot(NotebookInteraction):
     def save(
         self,
         path,
+        *,
         export_format=None,
         html_no_fig_size=True,
         print_confirm=True,
@@ -3454,26 +3485,6 @@ def fill(
 
 
 @magic_plot
-@wraps(Plot.add_text)
-def text(
-    *args,
-    fig,
-    **kwargs,
-):
-    fig.add_text(*args, **kwargs)
-
-
-@magic_plot
-@wraps(Plot.add_image)
-def image(
-    *args,
-    fig,
-    **kwargs,
-):
-    fig.add_image(*args, **kwargs)
-
-
-@magic_plot
 @wraps(Plot.add_hist)
 def hist(
     *args,
@@ -3511,6 +3522,66 @@ def regression(
     **kwargs,
 ):
     fig.add_regression(*args, **kwargs)
+
+
+@magic_plot
+@wraps(Plot.add_fill)
+def fill(
+    *args,
+    fig,
+    **kwargs,
+):
+    fig.add_fill(*args, **kwargs)
+
+
+@magic_plot
+@wraps(Plot.add_hvline)
+def hvline(
+    *args,
+    fig,
+    **kwargs,
+):
+    fig.add_hvline(*args, **kwargs)
+
+
+@magic_plot
+@wraps(Plot.add_hline)
+def hline(
+    *args,
+    fig,
+    **kwargs,
+):
+    fig.add_hline(*args, **kwargs)
+
+
+@magic_plot
+@wraps(Plot.add_vline)
+def vline(
+    *args,
+    fig,
+    **kwargs,
+):
+    fig.add_vline(*args, **kwargs)
+
+
+@magic_plot
+@wraps(Plot.add_text)
+def text(
+    *args,
+    fig,
+    **kwargs,
+):
+    fig.add_text(*args, **kwargs)
+
+
+@magic_plot
+@wraps(Plot.add_image)
+def image(
+    *args,
+    fig,
+    **kwargs,
+):
+    fig.add_image(*args, **kwargs)
 
 
 class ShowDataArray(NotebookInteraction):

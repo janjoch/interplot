@@ -37,8 +37,10 @@ def test_for_errors(f=lambda: None):
             f(*args, **kwargs, interactive=interactive)
             if not interactive:
                 plt.close("all")
-        except:  # noqa: E722
+        except Exception as e:
             no_error = False
+            print("Error encountered when analyzing {}".format(str(f)))
+            print(e)
 
         assert no_error
 
@@ -47,14 +49,18 @@ def test_for_errors(f=lambda: None):
 
 @test_for_errors
 def test_line_basic(interactive):
-    ip.line([1, 2, 3], [4, 5, 6], interactive=interactive)
+    ip.line(
+        [1, 2, 3],
+        [4, 5, 6],
+        interactive=interactive,
+    )
 
 
 @test_for_errors
 def test_line_adv(interactive):
     ip.line(
+        np.array(((1, 2), (3, 4))),
         interactive=interactive,
-        x=np.array(((1, 2), (3, 4))),
         x_error=((0.1, 0.2), (0.3, 0.4)),
         y_error=2,
         mode="lines+markers",
@@ -119,19 +125,28 @@ def test_line_markers(marker, interactive):
 )
 @test_for_errors
 def test_line_colors(color, interactive):
-    ip.line([1, 2, 3], [4, 5, 6], color=color, interactive=interactive)
+    ip.line(
+        [1, 2, 3],
+        [4, 5, 6],
+        color=color,
+        interactive=interactive,
+    )
 
 
 @test_for_errors
 def test_bar_basic(interactive):
-    ip.bar([1, 2, 3], [4, 5, 6], interactive=interactive)
+    ip.bar(
+        [1, 2, 3],
+        [4, 5, 6],
+        interactive=interactive
+    )
 
 
 @test_for_errors
 def test_bar_adv(interactive):
     ip.bar(
+        np.array(((1, 2), (3, 4))),
         interactive=interactive,
-        x=np.array(((1, 2), (3, 4))),
         horizontal=True,
         width=0.2,
         label="test",
@@ -149,7 +164,7 @@ def test_bar_adv(interactive):
 
 @test_for_errors
 def test_2d_data(interactive):
-    fig = ip.Plot(rows=2, cols=2)
+    fig = ip.Plot(rows=2, cols=2, interactive=interactive)
 
     fig.add_line(data2d)
     fig.add_line(df2d, col=1)

@@ -22,7 +22,10 @@ Currently supported building blocks:
 - boxplot `boxplot`
 - heatmap `heatmap`
 - linear regression `regression`
-- line fill `fill`
+- line and area fill `fill`
+- horizontal and vertical lines
+    - `hline`
+    - `vline`
 - annotations `text`
 
 Supported
