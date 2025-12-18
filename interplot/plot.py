@@ -1380,6 +1380,7 @@ class Plot(NotebookInteraction):
         y_error=None,
         mode=None,
         line_style="solid",
+        line_width=None,
         marker=None,
         marker_size=None,
         marker_line_width=1,
@@ -1388,7 +1389,6 @@ class Plot(NotebookInteraction):
         show_legend=None,
         color=None,
         opacity=None,
-        linewidth=None,
         row=0,
         col=0,
         _serial_i=0,  # must be accepted from decorator
@@ -1437,13 +1437,14 @@ class Plot(NotebookInteraction):
             Options: `solid`, `dashed`, `dotted`, `dashdot`
 
             Aliases: `-`, `--`, `dash`, `:`, `dot`, `-.`
+        line_width: float, optional
         marker: int or str, optional
             Marker style.
             If an integer is provided, it will be converted to the
             corresponding string marker using `plotly` numbering.
             If not provided, the default marker `circle` is used.
-        marker_size: int, optional
-        marker_line_width: int, optional
+        marker_size: float, optional
+        marker_line_width: float, optional
         marker_line_color: str, optional
             Can be hex, rgb(a) or any named color that is understood
             by matplotlib.
@@ -1527,6 +1528,9 @@ class Plot(NotebookInteraction):
         mode = "lines" if mode is None else mode
         color = self.digest_color(color, opacity)
 
+        # for backwards-compatibility: listen to "linewidth"
+        line_width = pick_non_none(line_width, kwargs.pop("linewidth", None))
+
         # PLOTLY
         if self.interactive:
             if kwargs_pty is None:
@@ -1594,7 +1598,7 @@ class Plot(NotebookInteraction):
                     ),
                     marker_color=color,
                     line=dict(
-                        width=linewidth,
+                        width=line_width,
                         dash=conf.PTY_LINE_STYLES.get(line_style, line_style),
                     ),
                     **kwargs_pty,
@@ -1615,7 +1619,7 @@ class Plot(NotebookInteraction):
                 yerr=y_error,
                 **self._digest_label(label, show_legend=show_legend),
                 color=color,
-                lw=linewidth,
+                lw=line_width,
                 linestyle=(
                     conf.MPL_LINE_STYLES.get(line_style, line_style)
                     if "lines" in mode
