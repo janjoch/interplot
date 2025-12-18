@@ -297,6 +297,25 @@ def _adjust_indent(indent_decorator, indent_core, docstring):
     )
 
 
+def _serialize_1d():
+    def decorator(core):
+
+        @wraps(core)
+        def wrapper(self, x, serialize=None, **kwargs):
+            if serialize is False or not isinstance(x, ITERABLE_TYPES):
+                return core(self, x, **kwargs)
+
+            else:
+                for x_, kwargs_ in zip_smart(
+                    x, kwargs=kwargs, non_iterable_types=(dict,)
+                ):
+                    core(self, x_, **kwargs_)
+
+        return wrapper
+
+    return decorator
+
+
 def _serialize_2d(serialize_pty=True, serialize_mpl=True, omit_y=False):
     """Decorator to catch 2D arrays and other data types to unpack."""
 
@@ -1434,6 +1453,7 @@ class Plot(NotebookInteraction):
                 - `add_linescatter`: `lines+markers`
         line_style: str, optional
             Line style.
+
             Options: `solid`, `dashed`, `dotted`, `dashdot`
 
             Aliases: `-`, `--`, `dash`, `:`, `dot`, `-.`
@@ -1678,7 +1698,7 @@ class Plot(NotebookInteraction):
         show_legend=None,
         color=None,
         opacity=None,
-        line_width=1,
+        line_width=1.0,
         line_color=None,
         row=0,
         col=0,
@@ -1733,8 +1753,8 @@ class Plot(NotebookInteraction):
 
             By default, fallback to alpha value provided with color argument,
             or 1.
-        line_width: float, optional
-            The width of the bar outline. Default is 1.
+        line_width: float, default: 1.0
+            The width of the bar outline.
         line_color: str, optional
             The color of the bar outline. This can be a named color or a tuple
             specifying the RGB values.
@@ -2406,6 +2426,128 @@ class Plot(NotebookInteraction):
                 **kwargs_mpl,
                 **kwargs,
             )
+
+    def add_hvline(
+        self,
+        pos,
+        horizontal=True,
+        line_style="solid",
+        line_width=None,
+        label=None,
+        show_legend=None,
+        color=None,
+        opacity=None,
+        row=0,
+        col=0,
+        kwargs_pty=None,
+        kwargs_mpl=None,
+        **kwargs,
+    ):
+        """
+        Draw one or multiple horizontal or vertical line(s).
+
+        Parameters
+        ----------
+        pos: float or iterable of floats
+            Position in data coordinates of the according axis.
+        line_style: str, optional
+            Line style.
+
+            Options: `solid`, `dashed`, `dotted`, `dashdot`
+
+            Aliases: `-`, `--`, `dash`, `:`, `dot`, `-.`
+        line_width: float, optional
+        label: str, optional
+            Trace label for legend.
+        show_legend: bool, optional
+            Whether to show the label in the legend.
+
+            By default, it will be shown if a label is defined.
+        color: str or int, optional
+            Trace color.
+
+            Can be hex, rgb(a) or any named color that is understood
+            by matplotlib.
+
+            The color cycle can be accessed with "C0", "C1", ...
+            or the according integer.
+
+            By default, the color is retrieved from `Plot.digest_color`,
+            which cycles through `COLOR_CYCLE`.
+        opacity: float, optional
+            Opacity (=alpha) of the fill.
+
+            By default, fallback to alpha value provided with color argument,
+            or 1.
+        row, col: int, optional
+            If the plot contains a grid, provide the coordinates.
+
+            Attention: Indexing starts with 0!
+        serialize: bool, optional
+            Enforce or prevent looping over multi-dimensional data.
+
+            By default, interplot will automatically loop with:
+                - pandas DataFrame
+                - xarray DataArray (if 2D)
+                - numpy array (if 2D)
+        kwargs_pty, kwargs_mpl, **kwargs: optional
+            Pass specific keyword arguments to the line core method.
+        """
+        self.element_count[row, col] += 1
+        color = self.digest_color(color, opacity)
+
+        # for backwards-compatibility: listen to "linewidth"
+        line_width = pick_non_none(line_width, kwargs.pop("linewidth", None))
+
+        # PLOTLY
+        if self.interactive:
+            if kwargs_pty is None:
+                kwargs_pty = dict()
+            row += 1
+            col += 1
+
+            (self.fig.add_hline if horizontal else self.fig.add_vline)(
+                pos,
+                row=row,
+                col=col,
+                line_color=color,
+                line_width=line_width,
+                line_dash=conf.PTY_LINE_STYLES.get(line_style, line_style),
+                **self._digest_label(
+                    label,
+                    show_legend=show_legend,
+                ),
+                **kwargs_pty,
+                **kwargs,
+            )
+
+        # MATPLOTLIB
+        else:
+            if kwargs_mpl is None:
+                kwargs_mpl = dict()
+            (
+                self.ax[row, col].axhline
+                if horizontal
+                else self.ax[row, col].axvline
+            )(
+                pos,
+                **self._digest_label(label, show_legend=show_legend),
+                color=color,
+                lw=1.0 if line_width is None else line_width,
+                linestyle=conf.MPL_LINE_STYLES.get(line_style, line_style),
+                **kwargs_mpl,
+                **kwargs,
+            )
+
+    @wraps(add_hvline)
+    @_serialize_1d()
+    def add_hline(self, x, **kwargs):
+        self.add_hvline(x, horizontal=True, **kwargs)
+
+    @wraps(add_hvline)
+    @_serialize_1d()
+    def add_vline(self, x, **kwargs):
+        self.add_hvline(x, horizontal=False, **kwargs)
 
     def add_text(
         self,

@@ -62,7 +62,14 @@ def repeat(arg, unpack_nozip=True):
         yield arg
 
 
-def zip_smart(*iterables, unpack_nozip=True, strict=False):
+def zip_smart(
+    *iterables,
+    kwargs=None,
+    unpack_nozip=True,
+    strict=False,
+    iterable_types=(),
+    non_iterable_types=(),
+):
     """
     Iterate over several iterables in parallel,
     producing tuples with an item from each one.
@@ -88,12 +95,26 @@ def zip_smart(*iterables, unpack_nozip=True, strict=False):
     ----------
     *iterables: misc
         Elements to iterate or repeat.
+    kwargs: dict, optional
+        The values will be treated the same way as the positional arguments
+        `*iterables`. If a `dict` with at least one item is provided,
+        each iteration yields the "zipped" version of the dict at the last
+        position.
+
+        Note: keyword arguments to unpack are collected as a dict, not as
+        individual keyword arguments.
     unpack_nozip: bool, default: True
         Unpack a `NoZip`-wrapped iterable.
     strict: bool, default: True
         Fail if iterables are not the same length.
 
         Warning: Not supported in Python <3.10.
+    iterable_types: tuple, optional
+        Explicitly flag these types to be provided "as is"
+        to Python's built-in `zip`.
+    non_iterable_types: tuple, optional
+        Explicitly flag these types to be repeated "as is",
+        i.e. to not be unpacked.
 
     Returns
     -------
@@ -103,26 +124,50 @@ def zip_smart(*iterables, unpack_nozip=True, strict=False):
     Examples
     --------
     >>> for a, b, c, d, e in interplot.zip_smart(
-    ...     ("A", "B", "C", "D"),
-    ...     True,
-    ...     [1, 2, 3, 4, 5],  # notice the extra element won't be unpacked
-    ...     "always the same",
-    ...     interplot.repeat((1, 2)),
+    ...     ("A", "B", "C", "D"),      # will be unpacked
+    ...     True,                      # will not be unpacked
+    ...     [1, 2, 3, 4, 5],           # will be unpacked, but only 1-4
+    ...     "always the same",         # will not be unpacked
+    ...     interplot.repeat((1, 2)),  # will not be unpacked
     ... ):
     ...     print(a, b, c, d, e)
     A True 1 always the same (1, 2)
     B True 2 always the same (1, 2)
     C True 3 always the same (1, 2)
     D True 4 always the same (1, 2)
+
+    >>> def print_all(*args, **kwargs):
+    ...     print(*args, kwargs)
+    ... for a, b, kwargs in interplot.zip_smart(
+    ...     ("A", "B"),           # will be unpacked
+    ...     42,                   # will not be unpacked
+    ...     kwargs=dict(
+    ...         kwarg1=[10, 20],  # will be unpacked
+    ...         kwarg2=True,      # will not be unpacked
+    ...     )
+    ... ):
+    ...     print_all(a, b, **kwargs)
+    A 42 {'kwarg1': 10, 'kwarg2': True}
+    B 42 {'kwarg1': 20, 'kwarg2': True}
     """
     iterables = list(iterables)
+    
+    if kwargs is None:
+        kwargs = dict()
+    N_kwargs = len(kwargs)
+    kwargs_keys = kwargs.keys()
+    iterables.extend(kwargs.values())
 
     for i, arg in enumerate(iterables):
-        if not hasattr(arg, "__iter__") or isinstance(arg, NON_ITERABLE_TYPES):
+        if not isinstance(arg, iterable_types) and (
+            not hasattr(arg, "__iter__")
+            or isinstance(arg, NON_ITERABLE_TYPES)
+            or isinstance(arg, non_iterable_types)
+        ):
             iterables[i] = repeat(arg, unpack_nozip=unpack_nozip)
 
     try:
-        return zip(*iterables, strict=strict)
+        it = zip(*iterables, strict=strict)
 
     # strict mode not implemented in Python<3.10
     except TypeError:
@@ -132,7 +177,13 @@ def zip_smart(*iterables, unpack_nozip=True, strict=False):
                     "zip's strict mode not supported in Python<3.10.\n\n"
                     "Falling back to non-strict mode."
                 )
-        return zip(*iterables)
+        it = zip(*iterables)
+
+    for y in it:
+        if N_kwargs > 0:
+            y, kwargs_ = y[:-N_kwargs], y[-N_kwargs:]
+            y += ({key: value for key, value in zip(kwargs_keys, kwargs_)},)
+        yield y
 
 
 def sum_nested(
