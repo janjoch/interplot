@@ -156,6 +156,57 @@ def interp(array, pos):
     return array[i] + w * d
 
 
+def _stepsize(N, max_length):
+    return int(math.ceil(N / max_length))
+
+
+def downsample(max_length, *x, mode="step", **kwargs):
+    if mode == "step":
+        return downsample_step(max_length, *x, **kwargs)
+    
+    return downsample_average(max_length, *x, **kwargs)
+
+
+def downsample_step(max_length, *x, axis=0):
+    N = x[0].shape[axis]
+
+    if N < max_length:
+        return x
+
+    s = [slice(None)] * x[0].ndim
+    step = _stepsize(N, max_length)
+    s[axis] = slice(None, None, step)
+    s = tuple(s)
+
+    if len(x) == 1:
+        return x[0][s]
+
+    return list(
+        x_[s]
+        for x_
+        in x
+    )
+
+
+def downsample_average(max_length, *x):
+    N = x[0].shape[0]
+
+    if N < max_length:
+        return x
+
+    step = _stepsize(N, max_length)
+    length = N // step
+
+    if len(x) == 1:
+        return np.array(x[0])[:length * step].reshape((length, step)).mean(axis=1)
+
+    return list(
+        np.array(x_)[:length * step].reshape((length, step)).mean(axis=1)
+        for x_
+        in x
+    )
+
+
 class LinearRegression(plot.NotebookInteraction):
     def __init__(
         self,
