@@ -2109,7 +2109,7 @@ class Plot(NotebookInteraction):
             bplots = self.ax[row, col].boxplot(
                 x,
                 orientation="horizontal" if horizontal else "vertical",
-                labels=(
+                tick_labels=(
                     self._digest_label(
                         label,
                         show_legend=show_legend,
