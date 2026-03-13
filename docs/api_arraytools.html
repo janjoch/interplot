@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>interplot.arraytools: Array Tools &#8212; interplot  documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="_static/classic.css?v=f11ead97" />
+    <link rel="stylesheet" type="text/css" href="_static/mobile.css?v=ab6fdb28" />
+    
+    <script src="_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/mobile.js?v=ebcc83c9"></script>
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="interplot.debug: Debugging Tool" href="api_debug.html" />
+    <link rel="prev" title="interplot.iter: Iteration Tools Documentation and API reference" href="api_iter.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="api_debug.html" title="interplot.debug: Debugging Tool"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="api_iter.html" title="interplot.iter: Iteration Tools Documentation and API reference"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">interplot  documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href=""><cite>interplot.arraytools</cite>: Array Tools</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="interplot-arraytools-array-tools">
+<h1><a class="toc-backref" href="#id1" role="doc-backlink"><cite>interplot.arraytools</cite>: Array Tools</a><a class="headerlink" href="#interplot-arraytools-array-tools" title="Link to this heading">¶</a></h1>
+<nav class="contents" id="on-this-page">
+<p class="topic-title">On this page</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#interplot-arraytools-array-tools" id="id1"><cite>interplot.arraytools</cite>: Array Tools</a></p></li>
+</ul>
+</nav>
+<p id="module-interplot.arraytools">A collection of useful functions to work with numpy arrays.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="interplot.arraytools.lowpass">
+<span class="sig-prename descclassname"><span class="pre">interplot.arraytools.</span></span><span class="sig-name descname"><span class="pre">lowpass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">101</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#interplot.arraytools.lowpass" title="Link to this definition">¶</a></dt>
+<dd><p>Moving average symetrically over n data points.</p>
+<p>Accepts numpy arrays, lists and pandas Series.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>data: array-like</strong></dt><dd><p>np.array, list, tuple or pd.Series to filter.</p>
+</dd>
+<dt><strong>n: int, optional</strong></dt><dd><p>Number of data points to average over.</p>
+</dd>
+<dt><strong>new_index: list-like, optional</strong></dt><dd><p>If a pandas Series is provided as data,
+use this new_index.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>np.ndarray or pd.Series</dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="interplot.arraytools.highpass">
+<span class="sig-prename descclassname"><span class="pre">interplot.arraytools.</span></span><span class="sig-name descname"><span class="pre">highpass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">101</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#interplot.arraytools.highpass" title="Link to this definition">¶</a></dt>
+<dd><p>Filter out low-frequency drift.</p>
+<p>Offsets each datapoint by the average of the surrounding n data points.
+N must be odd.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>data: array-like</strong></dt><dd><p>np.array, list, tuple or pd.Series to filter.</p>
+</dd>
+<dt><strong>n: int, optional</strong></dt><dd><p>Number of data points to average over.</p>
+</dd>
+<dt><strong>new_index: list-like, optional</strong></dt><dd><p>If a pandas Series is provided as data,
+use this new_index.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>np.ndarray or pd.Series</dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="interplot.arraytools.interp">
+<span class="sig-prename descclassname"><span class="pre">interplot.arraytools.</span></span><span class="sig-name descname"><span class="pre">interp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#interplot.arraytools.interp" title="Link to this definition">¶</a></dt>
+<dd><p>Linearly interpolate between neighboring indexes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>array: 1D list-like</strong></dt><dd></dd>
+<dt><strong>pos: float</strong></dt><dd></dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>float</dt><dd><p>interpolated value</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="interplot.arraytools.downsample">
+<span class="sig-prename descclassname"><span class="pre">interplot.arraytools.</span></span><span class="sig-name descname"><span class="pre">downsample</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">max_length</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'step'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#interplot.arraytools.downsample" title="Link to this definition">¶</a></dt>
+<dd><p>Reduce size of array to <cite>max_length</cite> or lower.</p>
+<p>If <cite>mode=&quot;step&quot;</cite>, each <cite>stepsize</cite>-th element is returned.</p>
+<p>If <cite>mode=&quot;average&quot;</cite>, the array is averaged in bins of size <cite>stepsize</cite>.</p>
+<p>If multiple x are provided, they are are assumed to have the same shape.
+<cite>stepsize</cite> is determined from the first element.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>max_length: int</strong></dt><dd></dd>
+<dt><strong>*x: np.ndarray</strong></dt><dd><p>The array(s) to be downsampled. If multiple arrays are provided,
+the result will be a list of the downsampled arrays.</p>
+</dd>
+<dt><strong>mode: str, default: step</strong></dt><dd><p>Mode for downsampling to reduce file size.</p>
+<p>Options:</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt>step:</dt><dd><p>Based on <cite>max_length</cite> and the array size, the smallest
+<cite>stepsize</cite> is determined, such that the new length is
+smaller or equal to <cite>max_length</cite>. Each <cite>stepsize</cite>-th element
+is displayed.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>average:</dt><dd><p>Bins of length <cite>stepsize</cite> are averaged. The remainders
+are discarded.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+<dt><strong>axis: int, default: 0</strong></dt><dd><p>The axis along which to perform the downsampling.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="interplot.arraytools.downsample_step">
+<span class="sig-prename descclassname"><span class="pre">interplot.arraytools.</span></span><span class="sig-name descname"><span class="pre">downsample_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">max_length</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#interplot.arraytools.downsample_step" title="Link to this definition">¶</a></dt>
+<dd><p>Reduce size of array to <cite>max_length</cite> or lower by returning each
+<cite>stepsize</cite>-th element.</p>
+<p>If multiple x are provided, they are are assumed to have the same shape.
+<cite>stepsize</cite> is determined from the first element.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>max_length: int</strong></dt><dd></dd>
+<dt><strong>*x: np.ndarray</strong></dt><dd><p>The array(s) to be downsampled. If multiple arrays are provided,
+the result will be a list of the downsampled arrays.</p>
+</dd>
+<dt><strong>axis: int, default: 0</strong></dt><dd><p>The axis along which to perform the downsampling.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="interplot.arraytools.downsample_average">
+<span class="sig-prename descclassname"><span class="pre">interplot.arraytools.</span></span><span class="sig-name descname"><span class="pre">downsample_average</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">max_length</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#interplot.arraytools.downsample_average" title="Link to this definition">¶</a></dt>
+<dd><p>Reduce size of array to <cite>max_length</cite> or lower by returning each
+<cite>stepsize</cite>-th element.</p>
+<p>If multiple x are provided, they are are assumed to have the same shape.
+<cite>stepsize</cite> is determined from the first element.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>max_length: int</strong></dt><dd></dd>
+<dt><strong>*x: np.ndarray</strong></dt><dd><p>The array(s) to be downsampled. If multiple arrays are provided,
+the result will be a list of the downsampled arrays.</p>
+</dd>
+<dt><strong>axis: int, default: 0</strong></dt><dd><p>The axis along which to perform the downsampling.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="interplot.arraytools.LinearRegression">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">interplot.arraytools.</span></span><span class="sig-name descname"><span class="pre">LinearRegression</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linspace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">101</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#interplot.arraytools.LinearRegression" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="api_plot.html#interplot.NotebookInteraction" title="interplot.plot.NotebookInteraction"><code class="xref py py-class docutils literal notranslate"><span class="pre">NotebookInteraction</span></code></a></p>
+<p>Model regression and its parameters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>x, y: array-like</strong></dt><dd><p>Data points.</p>
+</dd>
+<dt><strong>p: float, default: 0.05</strong></dt><dd><p>p-value.</p>
+</dd>
+<dt><strong>linspace: int, default: 101</strong></dt><dd><p>Number of data points for linear regression model
+and conficence and prediction intervals.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Attributes<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>The instance will provide the following data attributes:</strong></dt><dd></dd>
+<dt><strong>x, y: array-like</strong></dt><dd><p>The original data.</p>
+</dd>
+<dt><strong>p: float</strong></dt><dd><p>The original p-value.</p>
+</dd>
+<dt><strong>poly: np.ndarray of 2x float</strong></dt><dd><p>Polynomial coefficients.
+[a, b] -&gt; a * x + b.</p>
+</dd>
+<dt><strong>cov: float</strong></dt><dd><p>Covariance matrix of the polynomial coefficient estimates.
+See for poly, cov:
+<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.polyfit.html">https://numpy.org/doc/stable/reference/generated/numpy.polyfit.html</a></p>
+</dd>
+<dt><strong>y_model: np.ndarray</strong></dt><dd><p>The regression modeled y values for the input x</p>
+</dd>
+<dt><strong>n: int</strong></dt><dd><p>Number of observations</p>
+</dd>
+<dt><strong>m: int</strong></dt><dd><p>Number of parameters</p>
+</dd>
+<dt><strong>dof: int</strong></dt><dd><p>Degree of freedoms
+n - m</p>
+</dd>
+<dt><strong>t: float</strong></dt><dd><p>t statistics</p>
+</dd>
+<dt><strong>...</strong></dt><dd></dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<colgroup>
+<col style="width: 10.0%" />
+<col style="width: 90.0%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">__call__</span></code>(*args, **kwargs)</p></td>
+<td><p>Calls the <cite>self.show()</cite> or <cite>self.plot()</cite> method.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#interplot.arraytools.LinearRegression.plot" title="interplot.arraytools.LinearRegression.plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a>(*[, fig, skip_post_process, ...])</p></td>
+<td><p>Plot the correlation analysis.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="interplot.arraytools.LinearRegression.plot">
+<span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">fig</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip_post_process</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interactive</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rows</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cols</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xlabel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ylabel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xlim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ylim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xlog</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ylog</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shared_xaxes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shared_yaxes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">column_widths</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row_heights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fig_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dpi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legend_loc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legend_title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legend_togglegroup</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color_cycle</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_fig</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">global_custom_func</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mpl_custom_func</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pty_custom_func</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pty_update_layout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#interplot.arraytools.LinearRegression.plot" title="Link to this definition">¶</a></dt>
+<dd><p>Plot the correlation analysis.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>plot_ci, plot_pi: bool, optional</strong></dt><dd><p>Plot the confidence and prediction intervals.
+Default: True</p>
+</dd>
+<dt><strong>label: str or interplot.Labelgroup, optional</strong></dt><dd></dd>
+<dt><strong>label_data, label_reg, label_ci, label_pi: str or callable, optional</strong></dt><dd><p>Trace labels.</p>
+</dd>
+<dt><strong>color_data, color_reg, color_ci, color_pi: str, optional</strong></dt><dd><p>Trace color.
+Can be hex, rgb(a) or any named color that is understood
+by matplotlib.
+Default: None
+In the default case, Plot will cycle through COLOR_CYCLE.</p>
+</dd>
+<dt><strong>kwargs_data, kwargs_reg, kwargs_ci, kwargs_pi: dict, optional</strong></dt><dd><p>Keyword arguments to pass to corresponding figure element.</p>
+</dd>
+<dt><strong>**kwargs: optional</strong></dt><dd><p>Keyword arguments to pass to each figure element.</p>
+</dd>
+<dt><strong>interactive: bool, default: True</strong></dt><dd><p>Display an interactive plotly line plot
+instead of the default matplotlib figure.</p>
+</dd>
+<dt><strong>rows, cols: int, default: 1</strong></dt><dd><p>Create a grid with <cite>n</cite> rows and <cite>m</cite> columns.</p>
+</dd>
+<dt><strong>title: str, default: None</strong></dt><dd><p>Plot title.</p>
+</dd>
+<dt><strong>xlabel, ylabel: str or str tuple, default: None</strong></dt><dd><p>Axis labels.</p>
+<p>Either one title for the entire axis or one for each row/column.</p>
+</dd>
+<dt><strong>xlim, ylim: tuple of 2 numbers or nested, default: None</strong></dt><dd><p>Axis range limits.</p>
+<dl class="simple">
+<dt>In case of multiple rows/cols provide either:</dt><dd><ul class="simple">
+<li><p>a tuple</p></li>
+<li><p>a tuple for each row</p></li>
+<li><p>a tuple for each row containing a tuple for each column.</p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+<dt><strong>xlog, ylog: bool or bool tuple, default: False</strong></dt><dd><p>Logarithmic scale for the axis.</p>
+<p>Either one boolean for the entire axis or one for each row/column.</p>
+</dd>
+<dt><strong>shared_xaxes, shared_yaxes: str, default: None</strong></dt><dd><p>Define how multiple subplots share there axes.</p>
+<dl class="simple">
+<dt>Options:</dt><dd><ul class="simple">
+<li><p>&quot;all&quot; or True</p></li>
+<li><p>&quot;rows&quot;</p></li>
+<li><p>&quot;columns&quot; or &quot;cols&quot;</p></li>
+<li><p>None or False</p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+<dt><strong>column_widths, row_heights: tuple/list, default: None</strong></dt><dd><p>Ratios of the width/height dimensions in each column/row.
+Will be normalised to a sum of 1.</p>
+</dd>
+<dt><strong>fig_size: tuple of 2x float, optional</strong></dt><dd><p>Width, height in pixels.</p>
+<p>Default behavior defined by <cite>conf.MPL_FIG_SIZE</cite>
+and <cite>conf.PTY_FIG_SIZE</cite>.
+Plotly allows None for responsive size adapting to viewport.</p>
+</dd>
+<dt><strong>dpi: int, default: 100</strong></dt><dd><p>Plot resolution.</p>
+</dd>
+<dt><strong>legend_loc: str, optional</strong></dt><dd><p>MATPLOTLIB ONLY.</p>
+<dl class="simple">
+<dt>Default:</dt><dd><ul class="simple">
+<li><p>In case of 1 line: None</p></li>
+<li><p>In case of &gt;1 line: &quot;best&quot; (auto-detect)</p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+<dt><strong>legend_title: str, default: None</strong></dt><dd><p>MPL: Each subplot has its own legend, so a 2d list in the shape of
+the subplots may be provided.</p>
+<p>PTY: Just provide a <cite>str</cite>.</p>
+</dd>
+<dt><strong>legend_togglegroup: bool, default: False</strong></dt><dd><p>PLOTLY ONLY.</p>
+<p>Whether legend items with the same group will be toggled together
+when clicking on a legend item.</p>
+</dd>
+<dt><strong>color_cycle: list, optional</strong></dt><dd><p>Cycle through colors in the provided list.</p>
+<p>If left <cite>None</cite>, the default color cycle
+<cite>conf.COLOR_CYCLE</cite> will be used.</p>
+</dd>
+<dt><strong>save_fig: str or pathlib.Path, default: None</strong></dt><dd><p>Provide a path to export the plot.</p>
+<p>Possible formats: png, jpg, svg, html, ...</p>
+<p>The figure will only be saved on calling the instance's
+<cite>.post_process()</cite>.</p>
+<p>If a directory (or <cite>True</cite> for local directory) is provided,
+the filename will be automatically generated based on the title.</p>
+<p>An iterable of multiple paths / filenames may be provided. In this case
+the save command will be repeated for each element.</p>
+</dd>
+<dt><strong>save_format: str, default: None</strong></dt><dd><p>Provide a format for the exported plot, if not declared in <cite>save_fig</cite>.</p>
+<p>An iterable of multiple formats may be provided. In this case
+the save command will be repeated for each element.</p>
+</dd>
+<dt><strong>save_config: dict, default: None</strong></dt><dd><p>Plotly only.</p>
+<p>Pass config options to
+<cite>plotly.graph_objects.Figure.write_html(config=save_config)</cite>.</p>
+</dd>
+<dt><strong>global_custom_func: function, default: None</strong></dt><dd><p>Pass a function reference to further style the figures.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span><span class="w"> </span><span class="nf">global_custom_func</span><span class="p">(</span><span class="n">fig</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="c1"># do your customisations</span>
+<span class="gp">... </span>    <span class="n">fig</span><span class="o">.</span><span class="n">add_text</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;watermark&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;gray&quot;</span><span class="p">)</span>
+<span class="gp">...</span>
+<span class="gp">... </span>    <span class="c1"># also include default function</span>
+<span class="gp">... </span>    <span class="n">conf</span><span class="o">.</span><span class="n">GLOBAL_CUSTOM_FUNC</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
+<span class="gp">...</span>
+<span class="gp">... </span><span class="n">fig</span> <span class="o">=</span> <span class="n">interplot</span><span class="o">.</span><span class="n">Plot</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">global_custom_func</span><span class="o">=</span><span class="n">global_custom_func</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">... </span><span class="n">fig</span><span class="o">.</span><span class="n">add_line</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="gp">... </span><span class="n">fig</span><span class="o">.</span><span class="n">post_process</span><span class="p">()</span>  <span class="c1"># global_custom_func will be executed here</span>
+<span class="gp">... </span><span class="n">fig</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</dd>
+<dt><strong>mpl_custom_func: function, default: None</strong></dt><dd><p>MATPLOTLIB ONLY.</p>
+<p>Pass a function reference to further style the matplotlib graphs.
+Function must accept <cite>fig, ax</cite> and return <cite>fig, ax</cite>.</p>
+<p>Note: <cite>ax</cite> always has <cite>row</cite> and <cite>col</cite> coordinates, even if the
+plot is just 1x1.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span><span class="w"> </span><span class="nf">mpl_custom_func</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="c1"># do your customisations</span>
+<span class="gp">... </span>    <span class="n">fig</span><span class="o">.</span><span class="n">do_stuff</span><span class="p">()</span>
+<span class="gp">... </span>    <span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">do_more</span><span class="p">()</span>
+<span class="gp">...</span>
+<span class="gp">... </span>    <span class="c1"># also include default function</span>
+<span class="gp">... </span>    <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">conf</span><span class="o">.</span><span class="n">MPL_CUSTOM_FUNC</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span><span class="p">)</span>
+<span class="gp">...</span>
+<span class="gp">... </span>    <span class="k">return</span> <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span>
+<span class="gp">...</span>
+<span class="gp">... </span><span class="n">fig</span> <span class="o">=</span> <span class="n">interplot</span><span class="o">.</span><span class="n">Plot</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">interactive</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">mpl_custom_func</span><span class="o">=</span><span class="n">mpl_custom_func</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">... </span><span class="n">fig</span><span class="o">.</span><span class="n">add_line</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="gp">... </span><span class="n">fig</span><span class="o">.</span><span class="n">post_process</span><span class="p">()</span>  <span class="c1"># mpl_custom_func will be executed here</span>
+<span class="gp">... </span><span class="n">fig</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</dd>
+<dt><strong>pty_custom_func: function, default: None</strong></dt><dd><p>PLOTLY ONLY.</p>
+<p>Pass a function reference to further style the plotly graphs.
+Function must accept <cite>fig</cite> and return <cite>fig</cite>.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span><span class="w"> </span><span class="nf">pty_custom_func</span><span class="p">(</span><span class="n">fig</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="c1"># do your customisations</span>
+<span class="gp">... </span>    <span class="n">fig</span><span class="o">.</span><span class="n">do_stuff</span><span class="p">()</span>
+<span class="gp">...</span>
+<span class="gp">... </span>    <span class="c1"># also include default function</span>
+<span class="gp">... </span>    <span class="n">fig</span> <span class="o">=</span> <span class="n">conf</span><span class="o">.</span><span class="n">PTY_CUSTOM_FUNC</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
+<span class="gp">...</span>
+<span class="gp">... </span>    <span class="k">return</span> <span class="n">fig</span>
+<span class="gp">...</span>
+<span class="gp">... </span><span class="n">fig</span> <span class="o">=</span> <span class="n">interplot</span><span class="o">.</span><span class="n">Plot</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">interactive</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">pty_custom_func</span><span class="o">=</span><span class="n">pty_custom_func</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">... </span><span class="n">fig</span><span class="o">.</span><span class="n">add_line</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="gp">... </span><span class="n">fig</span><span class="o">.</span><span class="n">post_process</span><span class="p">()</span>  <span class="c1"># pty_custom_func will be executed here</span>
+<span class="gp">... </span><span class="n">fig</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</dd>
+<dt><strong>pty_update_layout: dict, default: None</strong></dt><dd><p>PLOTLY ONLY.</p>
+<p>Pass keyword arguments to plotly's
+<cite>plotly.graph_objects.Figure.update_layout(**pty_update_layout)</cite></p>
+<p>Default: None</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><cite>interplot.Plot</cite> instance</dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="interplot.arraytools.LinearRegression.JS_RENDER_WARNING">
+<span class="sig-name descname"><span class="pre">JS_RENDER_WARNING</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></em><a class="headerlink" href="#interplot.arraytools.LinearRegression.JS_RENDER_WARNING" title="Link to this definition">¶</a></dt>
+<dd><p><strong>Type:</strong>    <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="index.html">Table of Contents</a></h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api_plot.html"><cite>interplot</cite> Documentation and API reference</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api_conf.html"><cite>interplot.conf</cite>: Module Defaults Configuration</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api_iter.html"><cite>interplot.iter</cite>: Iteration Tools Documentation and API reference</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#"><cite>interplot.arraytools</cite>: Array Tools</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#interplot.arraytools.lowpass"><code class="docutils literal notranslate"><span class="pre">lowpass()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#interplot.arraytools.highpass"><code class="docutils literal notranslate"><span class="pre">highpass()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#interplot.arraytools.interp"><code class="docutils literal notranslate"><span class="pre">interp()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#interplot.arraytools.downsample"><code class="docutils literal notranslate"><span class="pre">downsample()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#interplot.arraytools.downsample_step"><code class="docutils literal notranslate"><span class="pre">downsample_step()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#interplot.arraytools.downsample_average"><code class="docutils literal notranslate"><span class="pre">downsample_average()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#interplot.arraytools.LinearRegression"><code class="docutils literal notranslate"><span class="pre">LinearRegression</span></code></a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api_debug.html"><cite>interplot.debug</cite>: Debugging Tool</a></li>
+</ul>
+
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#"><cite>interplot.arraytools</cite>: Array Tools</a><ul>
+<li><a class="reference internal" href="#interplot.arraytools.lowpass"><code class="docutils literal notranslate"><span class="pre">lowpass()</span></code></a></li>
+<li><a class="reference internal" href="#interplot.arraytools.highpass"><code class="docutils literal notranslate"><span class="pre">highpass()</span></code></a></li>
+<li><a class="reference internal" href="#interplot.arraytools.interp"><code class="docutils literal notranslate"><span class="pre">interp()</span></code></a></li>
+<li><a class="reference internal" href="#interplot.arraytools.downsample"><code class="docutils literal notranslate"><span class="pre">downsample()</span></code></a></li>
+<li><a class="reference internal" href="#interplot.arraytools.downsample_step"><code class="docutils literal notranslate"><span class="pre">downsample_step()</span></code></a></li>
+<li><a class="reference internal" href="#interplot.arraytools.downsample_average"><code class="docutils literal notranslate"><span class="pre">downsample_average()</span></code></a></li>
+<li><a class="reference internal" href="#interplot.arraytools.LinearRegression"><code class="docutils literal notranslate"><span class="pre">LinearRegression</span></code></a><ul>
+<li><a class="reference internal" href="#interplot.arraytools.LinearRegression.plot"><code class="docutils literal notranslate"><span class="pre">LinearRegression.plot()</span></code></a></li>
+<li><a class="reference internal" href="#interplot.arraytools.LinearRegression.JS_RENDER_WARNING"><code class="docutils literal notranslate"><span class="pre">LinearRegression.JS_RENDER_WARNING</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="api_iter.html"
+                          title="previous chapter"><cite>interplot.iter</cite>: Iteration Tools Documentation and API reference</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="api_debug.html"
+                          title="next chapter"><cite>interplot.debug</cite>: Debugging Tool</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/api_arraytools.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="api_debug.html" title="interplot.debug: Debugging Tool"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="api_iter.html" title="interplot.iter: Iteration Tools Documentation and API reference"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">interplot  documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href=""><cite>interplot.arraytools</cite>: Array Tools</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2023-2026, Janosch Jörg.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    </div>
+  </body>
+</html>
