@@ -1,4 +1,6 @@
-"""Work with 1D arrays."""
+"""
+A collection of useful functions to work with numpy arrays.
+"""
 
 import math
 
@@ -22,7 +24,7 @@ def _new_pd_index(series, n):
 
 def lowpass(data, n=101, new_index=None):
     """
-    Average symetrically over n data points.
+    Moving average symetrically over n data points.
 
     Accepts numpy arrays, lists and pandas Series.
 
@@ -160,18 +162,74 @@ def _stepsize(N, max_length):
     return int(math.ceil(N / max_length))
 
 
-def downsample(max_length, *x, mode="step", **kwargs):
+def downsample(max_length, *x, mode="step", axis=0):
+    """
+    Reduce size of array to `max_length` or lower.
+
+    If `mode="step"`, each `stepsize`-th element is returned.
+
+    If `mode="average"`, the array is averaged in bins of size `stepsize`.
+
+    If multiple x are provided, they are are assumed to have the same shape.
+    `stepsize` is determined from the first element.
+
+    Parameters
+    ----------
+    max_length: int
+    *x: np.ndarray
+        The array(s) to be downsampled. If multiple arrays are provided,
+        the result will be a list of the downsampled arrays.
+    mode: str, default: step
+        Mode for downsampling to reduce file size.
+
+        Options:
+
+        - step:
+            Based on `max_length` and the array size, the smallest
+            `stepsize` is determined, such that the new length is
+            smaller or equal to `max_length`. Each `stepsize`-th element
+            is displayed.
+        - average:
+            Bins of length `stepsize` are averaged. The remainders
+            are discarded.
+    axis: int, default: 0
+        The axis along which to perform the downsampling.
+    """
     if mode == "step":
-        return downsample_step(max_length, *x, **kwargs)
+        return downsample_step(max_length, *x, axis=axis)
     
-    return downsample_average(max_length, *x, **kwargs)
+    elif mode == "average":
+        return downsample_average(max_length, *x, axis=axis)
+    
+    else:
+        raise NotImplementedError(
+            f"{mode=} is not implemented for downsampling."
+        )
 
 
 def downsample_step(max_length, *x, axis=0):
+    """
+    Reduce size of array to `max_length` or lower by returning each
+    `stepsize`-th element.
+
+    If multiple x are provided, they are are assumed to have the same shape.
+    `stepsize` is determined from the first element.
+
+    Parameters
+    ----------
+    max_length: int
+    *x: np.ndarray
+        The array(s) to be downsampled. If multiple arrays are provided,
+        the result will be a list of the downsampled arrays.
+    axis: int, default: 0
+        The axis along which to perform the downsampling.
+    """
     N = x[0].shape[axis]
 
     if N < max_length:
-        return x
+        if len(x) == 1:
+            return x[0]
+        return list(x)
 
     s = [slice(None)] * x[0].ndim
     step = _stepsize(N, max_length)
@@ -181,33 +239,104 @@ def downsample_step(max_length, *x, axis=0):
     if len(x) == 1:
         return x[0][s]
 
-    return list(
-        x_[s]
-        for x_
+    return [
+        y[s]
+        for y
         in x
-    )
+    ]
 
 
-def downsample_average(max_length, *x):
-    N = x[0].shape[0]
+def _downsample_average_item(x, transp, step, length):
+    """
+    Performs the binning and averaging for one `np.ndarray`.
+    """
+    x = x.transpose(transp)[: length * step, ...]
+    shape = x.shape
+    x = x.reshape((length, step, *shape[1:])).mean(axis=1)
+    return x.transpose(transp)
+
+
+def downsample_average(max_length, *x, axis=0):
+    """
+    Reduce size of array to `max_length` or lower by returning each
+    `stepsize`-th element.
+
+    If multiple x are provided, they are are assumed to have the same shape.
+    `stepsize` is determined from the first element.
+
+    Parameters
+    ----------
+    max_length: int
+    *x: np.ndarray
+        The array(s) to be downsampled. If multiple arrays are provided,
+        the result will be a list of the downsampled arrays.
+    axis: int, default: 0
+        The axis along which to perform the downsampling.
+    """
+    N = x[0].shape[axis]
 
     if N < max_length:
-        return x
+        if len(x) == 1:
+            return x[0]
+        return list(x)
 
     step = _stepsize(N, max_length)
     length = N // step
 
+    transp = np.arange(x[0].ndim)
+    transp[axis] = 0
+    transp[0] = axis
+
     if len(x) == 1:
-        return np.array(x[0])[:length * step].reshape((length, step)).mean(axis=1)
-
-    return list(
-        np.array(x_)[:length * step].reshape((length, step)).mean(axis=1)
-        for x_
+        return _downsample_average_item(x[0], transp, step, length)
+    
+    return [
+        _downsample_average_item(y, transp, step, length)
+        for y
         in x
-    )
-
+    ]
 
 class LinearRegression(plot.NotebookInteraction):
+    """
+    Model regression and its parameters.
+
+    Parameters
+    ----------
+    x, y: array-like
+        Data points.
+    p: float, default: 0.05
+        p-value.
+    linspace: int, default: 101
+        Number of data points for linear regression model
+        and conficence and prediction intervals.
+
+    Attributes
+    ----------
+    The instance will provide the following data attributes:
+    x, y: array-like
+        The original data.
+    p: float
+        The original p-value.
+    poly: np.ndarray of 2x float
+        Polynomial coefficients.
+        [a, b] -> a * x + b.
+    cov: float
+        Covariance matrix of the polynomial coefficient estimates.
+        See for poly, cov:
+        https://numpy.org/doc/stable/reference/generated/numpy.polyfit.html
+    y_model: np.ndarray
+        The regression modeled y values for the input x
+    n: int
+        Number of observations
+    m: int
+        Number of parameters
+    dof: int
+        Degree of freedoms
+        n - m
+    t: float
+        t statistics
+    ...
+    """
     def __init__(
         self,
         x,
@@ -215,49 +344,6 @@ class LinearRegression(plot.NotebookInteraction):
         p=0.05,
         linspace=101,
     ):
-        """
-        Model regression and its parameters.
-
-        Parameters
-        ----------
-        x, y: array-like
-            Data points.
-        p: float, optional
-            p-value.
-            Default: 0.05
-        linspace: int, optional
-            Number of data points for linear regression model
-            and conficence and prediction intervals.
-            Default: 101
-
-        The instance will provide the following data attributes:
-            x, y: array-like
-                The original data.
-            p: float
-                The original p-value.
-            poly: np.ndarray of 2x float
-                Polynomial coefficients.
-                [a, b] -> a * x + b.
-            cov: float
-                Covariance matrix of the polynomial coefficient estimates.
-                See for poly, cov:
-                https://numpy.org/doc/stable/reference/generated/numpy.polyfit.html
-            y_model: np.ndarray
-                The regression modeled y values for the input x
-            n: int
-                Number of observations
-            m: int
-                Number of parameters
-            dof: int
-                Degree of freedoms
-                n - m
-            t: float
-                t statistics
-            ...
-
-        Code derived from pylang's StackOverflow post:
-        https://stackoverflow.com/questions/27164114/show-confidence-limits-and-prediction-limits-in-scatter-plot
-        """
         self.x = np.array(x)
         self.y = np.array(y)
         self.p = p
@@ -371,10 +457,6 @@ class LinearRegression(plot.NotebookInteraction):
             Keyword arguments to pass to corresponding figure element.
         **kwargs: optional
             Keyword arguments to pass to each figure element.
-
-        Returns
-        -------
-        plot.Plot instance
         """
         # input validation
         if kwargs_data is None:

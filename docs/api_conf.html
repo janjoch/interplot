@@ -127,6 +127,27 @@ Use <cite>None</cite> for adaptive size.</p>
 </dd></dl>
 
 <dl class="py data">
+<dt class="sig sig-object py" id="interplot.conf.MAX_LENGTH">
+<span class="sig-prename descclassname"><span class="pre">interplot.conf.</span></span><span class="sig-name descname"><span class="pre">MAX_LENGTH</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#interplot.conf.MAX_LENGTH" title="Link to this definition">¶</a></dt>
+<dd><p><strong>Type:</strong>    <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
+<p>Downsample traces to reduce file size.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="interplot.conf.DOWNSAMPLE_MODE">
+<span class="sig-prename descclassname"><span class="pre">interplot.conf.</span></span><span class="sig-name descname"><span class="pre">DOWNSAMPLE_MODE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'step'</span></em><a class="headerlink" href="#interplot.conf.DOWNSAMPLE_MODE" title="Link to this definition">¶</a></dt>
+<dd><p><strong>Type:</strong>    <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+<p>Default mode for downsampling.</p>
+<p>Options:</p>
+<dl class="simple">
+<dt>step: Based on <cite>max_length</cite> and the array size, the smallest <cite>stepsize</cite> is</dt><dd><p>determined, such that the new length is smaller or equal to <cite>max_length</cite>.
+Each <cite>stepsize</cite>-th element is displayed.</p>
+</dd>
+</dl>
+<p>average: Bins of length <cite>stepsize</cite> are averaged. The remainders are discarded.</p>
+</dd></dl>
+
+<dl class="py data">
 <dt class="sig sig-object py" id="interplot.conf.EXPORT_FORMAT">
 <span class="sig-prename descclassname"><span class="pre">interplot.conf.</span></span><span class="sig-name descname"><span class="pre">EXPORT_FORMAT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'png'</span></em><a class="headerlink" href="#interplot.conf.EXPORT_FORMAT" title="Link to this definition">¶</a></dt>
 <dd><p><strong>Type:</strong>    <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
@@ -327,6 +348,9 @@ and returns <cite>fig</cite>.</p>
 <li class="toctree-l1"><a class="reference internal" href="api_iter.html"><cite>interplot.iter</cite>: Iteration Tools Documentation and API reference</a></li>
 </ul>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="api_arraytools.html"><cite>interplot.arraytools</cite>: Array Tools</a></li>
+</ul>
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="api_debug.html"><cite>interplot.debug</cite>: Debugging Tool</a></li>
 </ul>
 
@@ -340,6 +364,8 @@ and returns <cite>fig</cite>.</p>
 <li><a class="reference internal" href="#interplot.conf.DPI"><code class="docutils literal notranslate"><span class="pre">DPI</span></code></a></li>
 <li><a class="reference internal" href="#interplot.conf.PTY_FIG_SIZE"><code class="docutils literal notranslate"><span class="pre">PTY_FIG_SIZE</span></code></a></li>
 <li><a class="reference internal" href="#interplot.conf.MPL_FIG_SIZE"><code class="docutils literal notranslate"><span class="pre">MPL_FIG_SIZE</span></code></a></li>
+<li><a class="reference internal" href="#interplot.conf.MAX_LENGTH"><code class="docutils literal notranslate"><span class="pre">MAX_LENGTH</span></code></a></li>
+<li><a class="reference internal" href="#interplot.conf.DOWNSAMPLE_MODE"><code class="docutils literal notranslate"><span class="pre">DOWNSAMPLE_MODE</span></code></a></li>
 <li><a class="reference internal" href="#interplot.conf.EXPORT_FORMAT"><code class="docutils literal notranslate"><span class="pre">EXPORT_FORMAT</span></code></a></li>
 <li><a class="reference internal" href="#interplot.conf.EXPORT_REPLACE"><code class="docutils literal notranslate"><span class="pre">EXPORT_REPLACE</span></code></a></li>
 <li><a class="reference internal" href="#interplot.conf.GLOBAL_CUSTOM_FUNC"><code class="docutils literal notranslate"><span class="pre">GLOBAL_CUSTOM_FUNC()</span></code></a></li>
@@ -409,7 +435,7 @@ and returns <cite>fig</cite>.</p>
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-    &#169; Copyright 2023, Janosch Jörg.
+    &#169; Copyright 2023-2026, Janosch Jörg.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
     </div>
   </body>
