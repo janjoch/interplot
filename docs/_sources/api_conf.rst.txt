@@ -23,6 +23,10 @@
 
 .. autovariable:: interplot.conf.MPL_FIG_SIZE
 
+.. autovariable:: interplot.conf.MAX_LENGTH
+
+.. autovariable:: interplot.conf.DOWNSAMPLE_MODE
+
 .. autovariable:: interplot.conf.EXPORT_FORMAT
 
 .. autovariable:: interplot.conf.EXPORT_REPLACE

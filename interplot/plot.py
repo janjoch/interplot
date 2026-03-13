@@ -1389,6 +1389,8 @@ class Plot(NotebookInteraction):
         color=None,
         opacity=None,
         linewidth=None,
+        max_length=None,
+        downsample_mode=None,
         row=0,
         col=0,
         _serial_i=0,  # must be accepted from decorator
@@ -1471,6 +1473,22 @@ class Plot(NotebookInteraction):
 
             By default, fallback to alpha value provided with color argument,
             or 1.
+        max_length: int, optional
+            If the length of `x` (and `y`) exceeds `max_length`, downsample
+            the arrays to reduce file size.
+        downsample_mode: str, optional
+            Mode for downsampling to reduce file size.
+
+            Options:
+
+            - step:
+                Based on `max_length` and the array size, the smallest
+                `stepsize` is determined, such that the new length is
+                smaller or equal to `max_length`. Each `stepsize`-th element
+                is displayed.
+            - average:
+                Bins of length `stepsize` are averaged. The remainders
+                are discarded.
         row, col: int, optional
             If the plot contains a grid, provide the coordinates.
 
@@ -1526,6 +1544,39 @@ class Plot(NotebookInteraction):
         self.element_count[row, col] += 1
         mode = "lines" if mode is None else mode
         color = self.digest_color(color, opacity)
+
+        # downsampling
+        max_length = pick_non_none(max_length, conf.MAX_LENGTH)
+        if max_length is not None:
+            downsample_mode = pick_non_none(
+                downsample_mode,
+                conf.DOWNSAMPLE_MODE,
+            )
+            x, y = arraytools.downsample(
+                max_length,
+                x, y,
+                mode=downsample_mode,
+            )
+            if x_error is not None:
+                x_error = np.array(x_error)
+                if x_error.ndim == 1:
+                    x_error = x_error.reshape((1, -1))
+                if x_error.ndim == 2:
+                    x_error = arraytools.downsample(
+                        max_length,
+                        *x_error,
+                        mode=downsample_mode,
+                    )
+            if y_error is not None:
+                y_error = np.array(y_error)
+                if y_error.ndim == 1:
+                    y_error = y_error.reshape((1, -1))
+                if y_error.ndim == 2:
+                    y_error = arraytools.downsample(
+                        max_length,
+                        *y_error,
+                        mode=downsample_mode,
+                    )
 
         # PLOTLY
         if self.interactive:

@@ -18,7 +18,7 @@
 # -- Project information -----------------------------------------------------
 
 project = "interplot"
-copyright = "2023, Janosch Jörg"
+copyright = "2023-2026, Janosch Jörg"
 author = "Janosch Jörg"
 
 

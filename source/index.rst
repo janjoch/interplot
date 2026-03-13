@@ -32,6 +32,11 @@ Quick Start
 .. toctree::
     :maxdepth: 2
 
+    api_arraytools
+
+.. toctree::
+    :maxdepth: 2
+
     api_debug
 
 
