@@ -78,8 +78,6 @@ def stop_logging():
 
 def get_log(index=None):
     """Get the logged events."""
-    global log
-
     if index is None:
         return log
 
@@ -105,8 +103,6 @@ def wiretap(core):
 
     @wraps(core)
     def inner(*args, core=core, **kwargs):
-        global _active, _save_to_log, _verbose
-
         if not _active:
             return core(*args, **kwargs)
 

@@ -76,3 +76,5 @@ html_sidebars = {
         "searchbox.html",
     ]
 }
+
+smartquotes = False

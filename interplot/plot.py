@@ -297,13 +297,36 @@ def _adjust_indent(indent_decorator, indent_core, docstring):
     )
 
 
+def _serialize_1d():
+    def decorator(core):
+
+        @wraps(core)
+        def wrapper(self, x, /, *, serialize=None, **kwargs):
+            if serialize is not True and (
+                serialize is False or not isinstance(x, ITERABLE_TYPES)
+            ):
+                return core(self, x, **kwargs)
+
+            else:
+                for x_, kwargs_ in zip_smart(
+                    x, kwargs=kwargs, non_iterable_types=(dict,)
+                ):
+                    core(self, x_, **kwargs_)
+
+        return wrapper
+
+    return decorator
+
+
 def _serialize_2d(serialize_pty=True, serialize_mpl=True, omit_y=False):
     """Decorator to catch 2D arrays and other data types to unpack."""
 
     def decorator(core):
 
         @wraps(core)
-        def wrapper(self, x, y=None, label=None, serialize=None, **kwargs):
+        def wrapper(
+            self, x, /, y=None, *, label=None, serialize=None, **kwargs
+        ):
             """
             Wrapper function for a method.
 
@@ -364,7 +387,7 @@ def _serialize_2d(serialize_pty=True, serialize_mpl=True, omit_y=False):
                                     omit_y=omit_y,
                                 )(core)(
                                     self,
-                                    x=series,
+                                    series,
                                     label=label_,
                                     _serial_i=i,
                                     _serial_n=len(x.columns),
@@ -382,7 +405,7 @@ def _serialize_2d(serialize_pty=True, serialize_mpl=True, omit_y=False):
                                     omit_y=omit_y,
                                 )(core)(
                                     self,
-                                    x=x_,
+                                    x_,
                                     label=label_,
                                     _serial_i=i,
                                     _serial_n=len(x),
@@ -701,6 +724,7 @@ class Plot(NotebookInteraction):
     def __init__(
         self,
         interactive=None,
+        *,
         rows=1,
         cols=1,
         title=None,
@@ -913,6 +937,7 @@ class Plot(NotebookInteraction):
 
     def update(
         self,
+        *,
         title=None,
         xlabel=None,
         ylabel=None,
@@ -1375,11 +1400,14 @@ class Plot(NotebookInteraction):
     def add_line(
         self,
         x,
+        /,
         y=None,
+        *,
         x_error=None,
         y_error=None,
         mode=None,
         line_style="solid",
+        line_width=None,
         marker=None,
         marker_size=None,
         marker_line_width=1,
@@ -1388,7 +1416,6 @@ class Plot(NotebookInteraction):
         show_legend=None,
         color=None,
         opacity=None,
-        linewidth=None,
         max_length=None,
         downsample_mode=None,
         row=0,
@@ -1436,16 +1463,18 @@ class Plot(NotebookInteraction):
                 - `add_linescatter`: `lines+markers`
         line_style: str, optional
             Line style.
+
             Options: `solid`, `dashed`, `dotted`, `dashdot`
 
             Aliases: `-`, `--`, `dash`, `:`, `dot`, `-.`
+        line_width: float, optional
         marker: int or str, optional
             Marker style.
             If an integer is provided, it will be converted to the
             corresponding string marker using `plotly` numbering.
             If not provided, the default marker `circle` is used.
-        marker_size: int, optional
-        marker_line_width: int, optional
+        marker_size: float, optional
+        marker_line_width: float, optional
         marker_line_color: str, optional
             Can be hex, rgb(a) or any named color that is understood
             by matplotlib.
@@ -1544,6 +1573,9 @@ class Plot(NotebookInteraction):
         self.element_count[row, col] += 1
         mode = "lines" if mode is None else mode
         color = self.digest_color(color, opacity)
+
+        # for backwards-compatibility: listen to "linewidth"
+        line_width = pick_non_none(line_width, kwargs.pop("linewidth", None))
 
         # downsampling
         max_length = pick_non_none(max_length, conf.MAX_LENGTH)
@@ -1645,7 +1677,7 @@ class Plot(NotebookInteraction):
                     ),
                     marker_color=color,
                     line=dict(
-                        width=linewidth,
+                        width=line_width,
                         dash=conf.PTY_LINE_STYLES.get(line_style, line_style),
                     ),
                     **kwargs_pty,
@@ -1666,7 +1698,7 @@ class Plot(NotebookInteraction):
                 yerr=y_error,
                 **self._digest_label(label, show_legend=show_legend),
                 color=color,
-                lw=linewidth,
+                lw=line_width,
                 linestyle=(
                     conf.MPL_LINE_STYLES.get(line_style, line_style)
                     if "lines" in mode
@@ -1718,14 +1750,16 @@ class Plot(NotebookInteraction):
     def add_bar(
         self,
         x,
+        /,
         y=None,
+        *,
         horizontal=False,
         width=0.8,
         label=None,
         show_legend=None,
         color=None,
         opacity=None,
-        line_width=1,
+        line_width=1.0,
         line_color=None,
         row=0,
         col=0,
@@ -1780,8 +1814,8 @@ class Plot(NotebookInteraction):
 
             By default, fallback to alpha value provided with color argument,
             or 1.
-        line_width: float, optional
-            The width of the bar outline. Default is 1.
+        line_width: float, default: 1.0
+            The width of the bar outline.
         line_color: str, optional
             The color of the bar outline. This can be a named color or a tuple
             specifying the RGB values.
@@ -1871,6 +1905,7 @@ class Plot(NotebookInteraction):
         self,
         x=None,
         y=None,
+        *,
         bins=None,
         density=False,
         label=None,
@@ -1976,6 +2011,7 @@ class Plot(NotebookInteraction):
     def add_boxplot(
         self,
         x,
+        /, *,
         horizontal=False,
         label=None,
         show_legend=None,
@@ -2072,7 +2108,7 @@ class Plot(NotebookInteraction):
                 kwargs_mpl = dict()
             bplots = self.ax[row, col].boxplot(
                 x,
-                vert=not horizontal,
+                orientation="horizontal" if horizontal else "vertical",
                 labels=(
                     self._digest_label(
                         label,
@@ -2097,6 +2133,7 @@ class Plot(NotebookInteraction):
     def add_heatmap(
         self,
         data,
+        *,
         extent=None,
         x=None,
         y=None,
@@ -2278,7 +2315,9 @@ class Plot(NotebookInteraction):
     def add_regression(
         self,
         x,
+        /,
         y=None,
+        *,
         p=0.05,
         linspace=101,
         **kwargs,
@@ -2292,6 +2331,7 @@ class Plot(NotebookInteraction):
             X axis data, or pre-existing LinearRegression instance.
         y: array-like, optional
             Y axis data.
+
             If a LinearRegression instance is provided for x,
             y can be omitted and will be ignored.
         p: float, default: 0.05
@@ -2317,8 +2357,10 @@ class Plot(NotebookInteraction):
     def add_fill(
         self,
         x,
+        /,
         y1,
         y2=None,
+        *,
         label=None,
         mode="lines",
         color=None,
@@ -2338,7 +2380,7 @@ class Plot(NotebookInteraction):
         Parameters
         ----------
         x: array-like
-        y1, y2: array-like, optional
+        y1, y2: array-like, y2 optional
             If only `x` and `y1` is defined,
             it will be assumed as `y1` and `y2`,
             and `x` will be the index, starting from 0.
@@ -2454,11 +2496,147 @@ class Plot(NotebookInteraction):
                 **kwargs,
             )
 
+    def add_hvline(
+        self,
+        pos,
+        /, *,
+        horizontal=True,
+        line_style="solid",
+        line_width=None,
+        label=None,
+        show_legend=None,
+        color=None,
+        opacity=None,
+        row=0,
+        col=0,
+        exclude_empty_subplots=False,
+        kwargs_pty=None,
+        kwargs_mpl=None,
+        **kwargs,
+    ):
+        """
+        Draw one or multiple horizontal or vertical line(s).
+
+        Parameters
+        ----------
+        pos: float or iterable of floats
+            Position in data coordinates of the according axis.
+        horizontal: bool, optional
+            Whether to draw a horizontal or vertical line.
+
+            `ip.Plot.add_hline` and `ip.Plot.add_vline` are direct calls for
+            `horizontal=True` and `horizontal=False` respectively.
+        line_style: str, optional
+            Line style.
+
+            Options: `solid`, `dashed`, `dotted`, `dashdot`
+
+            Aliases: `-`, `--`, `dash`, `:`, `dot`, `-.`
+        line_width: float, optional
+        label: str, optional
+            Trace label for legend.
+        show_legend: bool, optional
+            Whether to show the label in the legend.
+
+            By default, it will be shown if a label is defined.
+        color: str or int, optional
+            Trace color.
+
+            Can be hex, rgb(a) or any named color that is understood
+            by matplotlib.
+
+            The color cycle can be accessed with "C0", "C1", ...
+            or the according integer.
+
+            By default, the color is retrieved from `Plot.digest_color`,
+            which cycles through `COLOR_CYCLE`.
+        opacity: float, optional
+            Opacity (=alpha) of the fill.
+
+            By default, fallback to alpha value provided with color argument,
+            or 1.
+        row, col: int, optional
+            If the plot contains a grid, provide the coordinates.
+
+            Attention: Indexing starts with 0!
+        exclude_empty_subplots: bool, default: False
+            PTY ONLY.
+
+            Whether the line should also be drawn on empty subplots.
+        serialize: bool, optional
+            Enforce or prevent looping over multi-dimensional data.
+
+            By default, interplot will automatically loop with:
+                - pandas DataFrame
+                - xarray DataArray (if 2D)
+                - numpy array (if 2D)
+        kwargs_pty, kwargs_mpl, **kwargs: optional
+            Pass specific keyword arguments to the line core method.
+        """
+        self.element_count[row, col] += 1
+        color = self.digest_color(color, opacity)
+
+        # for backwards-compatibility: listen to "linewidth"
+        line_width = pick_non_none(line_width, kwargs.pop("linewidth", None))
+
+        # PLOTLY
+        if self.interactive:
+            if kwargs_pty is None:
+                kwargs_pty = dict()
+            row += 1
+            col += 1
+
+            (self.fig.add_hline if horizontal else self.fig.add_vline)(
+                pos,
+                row=row,
+                col=col,
+                line_color=color,
+                line_width=line_width,
+                line_dash=conf.PTY_LINE_STYLES.get(line_style, line_style),
+                **self._digest_label(
+                    label,
+                    show_legend=show_legend,
+                ),
+                exclude_empty_subplots=exclude_empty_subplots,
+                **kwargs_pty,
+                **kwargs,
+            )
+
+        # MATPLOTLIB
+        else:
+            if kwargs_mpl is None:
+                kwargs_mpl = dict()
+            (
+                self.ax[row, col].axhline
+                if horizontal
+                else self.ax[row, col].axvline
+            )(
+                pos,
+                **self._digest_label(label, show_legend=show_legend),
+                color=color,
+                lw=1.0 if line_width is None else line_width,
+                linestyle=conf.MPL_LINE_STYLES.get(line_style, line_style),
+                **kwargs_mpl,
+                **kwargs,
+            )
+
+    @wraps(add_hvline)
+    @_serialize_1d()
+    def add_hline(self, pos, /, **kwargs):
+        self.add_hvline(pos, horizontal=True, **kwargs)
+
+    @wraps(add_hvline)
+    @_serialize_1d()
+    def add_vline(self, pos, /, **kwargs):
+        self.add_hvline(pos, horizontal=False, **kwargs)
+
     def add_text(
         self,
         x,
         y,
+        /,
         text,
+        *,
         horizontal_alignment="center",
         vertical_alignment="center",
         text_alignment=None,
@@ -2599,7 +2777,9 @@ class Plot(NotebookInteraction):
         self,
         x,
         y,
+        /,
         image,
+        *,
         horizontal_alignment="center",
         vertical_alignment="center",
         data_coords=True,
@@ -2775,6 +2955,7 @@ class Plot(NotebookInteraction):
 
     def post_process(
         self,
+        *,
         global_custom_func=None,
         mpl_custom_func=None,
         pty_custom_func=None,
@@ -2939,6 +3120,7 @@ class Plot(NotebookInteraction):
     def save(
         self,
         path,
+        *,
         export_format=None,
         html_no_fig_size=True,
         print_confirm=True,
@@ -3349,36 +3531,6 @@ def bar(
 
 
 @magic_plot
-@wraps(Plot.add_fill)
-def fill(
-    *args,
-    fig,
-    **kwargs,
-):
-    fig.add_fill(*args, **kwargs)
-
-
-@magic_plot
-@wraps(Plot.add_text)
-def text(
-    *args,
-    fig,
-    **kwargs,
-):
-    fig.add_text(*args, **kwargs)
-
-
-@magic_plot
-@wraps(Plot.add_image)
-def image(
-    *args,
-    fig,
-    **kwargs,
-):
-    fig.add_image(*args, **kwargs)
-
-
-@magic_plot
 @wraps(Plot.add_hist)
 def hist(
     *args,
@@ -3416,6 +3568,66 @@ def regression(
     **kwargs,
 ):
     fig.add_regression(*args, **kwargs)
+
+
+@magic_plot
+@wraps(Plot.add_fill)
+def fill(
+    *args,
+    fig,
+    **kwargs,
+):
+    fig.add_fill(*args, **kwargs)
+
+
+@magic_plot
+@wraps(Plot.add_hvline)
+def hvline(
+    *args,
+    fig,
+    **kwargs,
+):
+    fig.add_hvline(*args, **kwargs)
+
+
+@magic_plot
+@wraps(Plot.add_hline)
+def hline(
+    *args,
+    fig,
+    **kwargs,
+):
+    fig.add_hline(*args, **kwargs)
+
+
+@magic_plot
+@wraps(Plot.add_vline)
+def vline(
+    *args,
+    fig,
+    **kwargs,
+):
+    fig.add_vline(*args, **kwargs)
+
+
+@magic_plot
+@wraps(Plot.add_text)
+def text(
+    *args,
+    fig,
+    **kwargs,
+):
+    fig.add_text(*args, **kwargs)
+
+
+@magic_plot
+@wraps(Plot.add_image)
+def image(
+    *args,
+    fig,
+    **kwargs,
+):
+    fig.add_image(*args, **kwargs)
 
 
 class ShowDataArray(NotebookInteraction):

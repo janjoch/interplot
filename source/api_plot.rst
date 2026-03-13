@@ -45,6 +45,12 @@ One-line Plotting
 
 .. autofunction:: interplot.fill
 
+.. autofunction:: interplot.hvline
+
+.. autofunction:: interplot.hline
+
+.. autofunction:: interplot.vline
+
 .. autofunction:: interplot.text
 
 .. autofunction:: interplot.image
