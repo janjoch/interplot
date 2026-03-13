@@ -2470,6 +2470,11 @@ class Plot(NotebookInteraction):
         ----------
         pos: float or iterable of floats
             Position in data coordinates of the according axis.
+        horizontal: bool, optional
+            Whether to draw a horizontal or vertical line.
+
+            `ip.Plot.add_hline` and `ip.Plot.add_vline` are direct calls for
+            `horizontal=True` and `horizontal=False` respectively.
         line_style: str, optional
             Line style.
 
@@ -2566,13 +2571,13 @@ class Plot(NotebookInteraction):
 
     @wraps(add_hvline)
     @_serialize_1d()
-    def add_hline(self, x, /, **kwargs):
-        self.add_hvline(x, horizontal=True, **kwargs)
+    def add_hline(self, pos, /, **kwargs):
+        self.add_hvline(pos, horizontal=True, **kwargs)
 
     @wraps(add_hvline)
     @_serialize_1d()
-    def add_vline(self, x, /, **kwargs):
-        self.add_hvline(x, horizontal=False, **kwargs)
+    def add_vline(self, pos, /, **kwargs):
+        self.add_hvline(pos, horizontal=False, **kwargs)
 
     def add_text(
         self,
@@ -3472,16 +3477,6 @@ def bar(
     **kwargs,
 ):
     fig.add_bar(*args, **kwargs)
-
-
-@magic_plot
-@wraps(Plot.add_fill)
-def fill(
-    *args,
-    fig,
-    **kwargs,
-):
-    fig.add_fill(*args, **kwargs)
 
 
 @magic_plot
