@@ -1,8 +1,5 @@
-numba
 numpy
-pandas
 matplotlib
 plotly
 kaleido
 scipy
-xarray

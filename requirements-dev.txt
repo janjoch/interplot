@@ -1,7 +1,15 @@
 -r requirements.txt
 
+# for auto type handling
+pandas
+xarray
+
+# speedup
+numba
+
 # development
 jupyter
+jupyterlab
 
 # documentation
 sphinx
@@ -12,6 +20,7 @@ sphinx_toolbox
 # flake8 checks
 flake8
 flake8-pyproject
+black
 
 # testing
 pytest
@@ -20,5 +29,5 @@ pytest
 build
 twine
 
-# editable
+# interplot itself editable
 -e .

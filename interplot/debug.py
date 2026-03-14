@@ -28,7 +28,6 @@ import datetime as dt
 
 import json
 
-
 _active = False
 """Whether to watch for events."""
 _save_to_log = True
@@ -78,8 +77,6 @@ def stop_logging():
 
 def get_log(index=None):
     """Get the logged events."""
-    global log
-
     if index is None:
         return log
 
@@ -105,8 +102,6 @@ def wiretap(core):
 
     @wraps(core)
     def inner(*args, core=core, **kwargs):
-        global _active, _save_to_log, _verbose
-
         if not _active:
             return core(*args, **kwargs)
 

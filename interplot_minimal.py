@@ -158,7 +158,7 @@ if __name__ == "__main__":
 #   
 #   setup(
 #       name="interplot",
-#       version="1.1.0",
+#       version="1.2.0",
 #       description=(
 #           "Create matplotlib and plotly charts with the same few lines of code."
 #       ),
@@ -189,21 +189,21 @@ if __name__ == "__main__":
 ##########################
 #### requirements.txt ####
 ##########################
-#   numba
 #   numpy
-#   pandas
 #   matplotlib
 #   plotly
 #   kaleido
 #   scipy
-#   xarray
 #   
 ###################
 #### README.md ####
 ###################
 #   # interplot
 #   
-#   [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0) [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/janjoch/interplot/HEAD) [![NBViewer](https://raw.githubusercontent.com/jupyter/design/master/logos/Badges/nbviewer_badge.svg)](https://nbviewer.org/github/janjoch/interplot/tree/main/demo/)
+#   [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+#   [![PyPI version](https://img.shields.io/pypi/v/interplot)](https://pypi.org/project/interplot/)
+#   [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/janjoch/interplot/HEAD)
+#   [![NBViewer](https://raw.githubusercontent.com/jupyter/design/master/logos/Badges/nbviewer_badge.svg)](https://nbviewer.org/github/janjoch/interplot/tree/main/demo/)
 #   
 #   Create `matplotlib` and `plotly` charts with the same few lines of code.
 #   
@@ -222,7 +222,10 @@ if __name__ == "__main__":
 #   - boxplot `boxplot`
 #   - heatmap `heatmap`
 #   - linear regression `regression`
-#   - line fill `fill`
+#   - line and area fill `fill`
+#   - horizontal and vertical lines
+#       - `hline`
+#       - `vline`
 #   - annotations `text`
 #   
 #   Supported
@@ -238,36 +241,34 @@ if __name__ == "__main__":
 #           [matplotlib hist figure]
 #   
 #           >>> interplot.boxplot(
-#           >>>     [
-#           >>>         np.random.normal(20, 5, 1000),
-#           >>>         np.random.normal(40, 8, 1000),
-#           >>>         np.random.normal(60, 5, 1000),
-#           >>>     ],
-#           >>> )
+#           ...     [
+#           ...         np.random.normal(20, 5, 1000),
+#           ...         np.random.normal(40, 8, 1000),
+#           ...         np.random.normal(60, 5, 1000),
+#           ...     ],
+#           ... )
 #           [plotly boxplots]
 #           ```
 #   
 #       - Decorator to auto-initialize plots to use in your methods
 #           ```python
 #           >>> @interplot.magic_plot
-#           >>> def plot_my_data(fig=None):
-#           >>>     # import and process your data...
-#           >>>     data = np.random.normal(2, 3, 1000)
-#           >>>     # draw with the fig instance obtained from the decorator function
-#           >>>     fig.add_line(data, label="my data")
-#           >>>     fig.add_fill((0, 999), (-1, -1), (5, 5), label="sigma")
-#   
+#           ... def plot_my_data(fig=None):
+#           ...     # import and process your data...
+#           ...     data = np.random.normal(2, 3, 1000)
+#           ...     # draw with the fig instance obtained from the decorator function
+#           ...     fig.add_line(data, label="my data")
+#           ...     fig.add_fill((0, 999), (-1, -1), (5, 5), label="sigma")
 #           >>> plot_my_data(title="My Recording")
 #           [plotly figure "My Recording"]
 #   
 #           >>> @interplot.magic_plot_preset(interactive=False, title="Preset Title")
 #           >>> def plot_my_data_preconfigured(fig=None):
-#           >>>     # import and process your data...
-#           >>>     data = np.random.normal(2, 3, 1000)
-#           >>>     # draw with the fig instance obtained from the decorator function
-#           >>>     fig.add_line(data, label="my data")
-#           >>>     fig.add_fill((0, 999), (-1, -1), (5, 5), label="sigma")
-#   
+#           ...     # import and process your data...
+#           ...     data = np.random.normal(2, 3, 1000)
+#           ...     # draw with the fig instance obtained from the decorator function
+#           ...     fig.add_line(data, label="my data")
+#           ...     fig.add_fill((0, 999), (-1, -1), (5, 5), label="sigma")
 #           >>> plot_my_data_preconfigured()
 #           [matplotlib figure "Preset Title"]
 #           ```
@@ -275,25 +276,25 @@ if __name__ == "__main__":
 #       - The `interplot.Plot` class for full control
 #           ```python
 #           >>> fig = interplot.Plot(
-#           >>>     interactive=True,
-#           >>>     title="Everything Under Control",
-#           >>>     fig_size=(800, 500),
-#           >>>     rows=1,
-#           >>>     cols=2,
-#           >>>     shared_yaxes=True,
-#           >>>     # ...
-#           >>> )
+#           ...     interactive=True,
+#           ...     title="Everything Under Control",
+#           ...     fig_size=(800, 500),
+#           ...     rows=1,
+#           ...     cols=2,
+#           ...     shared_yaxes=True,
+#           ...     # ...
+#           ... )
 #           >>> fig.add_hist(np.random.normal(1, 0.5, 1000), row=0, col=0)
 #           >>> fig.add_boxplot(
-#           >>>     [
-#           >>>         np.random.normal(20, 5, 1000),
-#           >>>         np.random.normal(40, 8, 1000),
-#           >>>         np.random.normal(60, 5, 1000),
-#           >>>     ],
-#           >>>     row=0,
-#           >>>     col=1,
-#           >>> )
-#           >>> # ...
+#           ...     [
+#           ...         np.random.normal(20, 5, 1000),
+#           ...         np.random.normal(40, 8, 1000),
+#           ...         np.random.normal(60, 5, 1000),
+#           ...     ],
+#           ...     row=0,
+#           ...     col=1,
+#           ... )
+#           ... # ...
 #           >>> fig.post_process()
 #           >>> fig.show()
 #           [plotly figure "Everything Under Control"]
@@ -491,22 +492,52 @@ if __name__ == "__main__":
 #################################
 #### interplot/arraytools.py ####
 #################################
-#   """Work with 1D arrays."""
+#   """
+#   A collection of useful functions to work with numpy arrays.
+#   """
 #   
 #   import math
+#   from warnings import warn
 #   
 #   import numpy as np
 #   
 #   import scipy.stats as sp_stats
 #   
-#   import pandas as pd
+#   try:
+#       from pandas.core.series import Series as pd_Series
+#       from pandas import Series
 #   
-#   import numba as nb
+#   except ImportError:
+#       class pd_Series:
+#           pass
+#       class Series:
+#           pass
+#   
+#   
+#   __warn_numba_import = False
+#   
+#   try:
+#       from numba import jit, prange
+#   
+#       __warn_numba_import = False
+#   
+#   except ImportError:
+#       __warn_numba_import = True
+#   
+#       def jit(**_):
+#           def decorator(func):
+#               def wrapper(*args, **kwargs):
+#                   return func(*args, **kwargs)
+#   
+#               return wrapper
+#   
+#           return decorator
+#   
+#       prange = range
 #   
 #   from . import plot
 #   
-#   
-#   LISTLIKE_TYPES = (tuple, list, np.ndarray, pd.core.series.Series)
+#   LISTLIKE_TYPES = (tuple, list, np.ndarray, pd_Series)
 #   
 #   
 #   def _new_pd_index(series, n):
@@ -515,7 +546,7 @@ if __name__ == "__main__":
 #   
 #   def lowpass(data, n=101, new_index=None):
 #       """
-#       Average symetrically over n data points.
+#       Moving average symetrically over n data points.
 #   
 #       Accepts numpy arrays, lists and pandas Series.
 #   
@@ -537,10 +568,17 @@ if __name__ == "__main__":
 #       if n == 1:
 #           return data
 #   
+#       global __warn_numba_import
+#       if __warn_numba_import:
+#           warn(
+#               "Import numba to speed up the lowpass filtering: `pip install numba`"
+#           )
+#           __warn_numba_import = False
+#   
 #       # pandas Series
-#       if isinstance(data, pd.core.series.Series):
+#       if isinstance(data, pd_Series):
 #           new_index = _new_pd_index(data, n) if new_index is None else new_index
-#           return pd.Series(
+#           return Series(
 #               lowpass_core(np.array(data), n),
 #               index=new_index,
 #           )
@@ -553,7 +591,7 @@ if __name__ == "__main__":
 #       raise TypeError("Data type not supported:\n{}".format(type(data)))
 #   
 #   
-#   @nb.jit(nopython=True, parallel=True)
+#   @jit(nopython=True, parallel=True)
 #   def lowpass_core(data, n):
 #       """
 #       Average symetrically over n data points.
@@ -572,7 +610,7 @@ if __name__ == "__main__":
 #       size = data.size - n + 1
 #   
 #       array = np.empty(size, dtype=data.dtype)
-#       for i in nb.prange(size):
+#       for i in prange(size):
 #           array[i] = np.mean(data[i : i + n])
 #   
 #       return array
@@ -610,7 +648,7 @@ if __name__ == "__main__":
 #           raise ValueError("n must be odd!")
 #   
 #       # pandas Series
-#       if isinstance(data, pd.core.series.Series):
+#       if isinstance(data, pd_Series):
 #           new_index = _new_pd_index(data, n) if new_index is None else new_index
 #           return data[((n - 1) // 2) : -((n - 1) // 2)] - lowpass(
 #               np.array(data), n, new_index=new_index
@@ -649,7 +687,179 @@ if __name__ == "__main__":
 #       return array[i] + w * d
 #   
 #   
+#   def _stepsize(N, max_length):
+#       return int(math.ceil(N / max_length))
+#   
+#   
+#   def downsample(max_length, *x, mode="step", axis=0):
+#       """
+#       Reduce size of array to `max_length` or lower.
+#   
+#       If `mode="step"`, each `stepsize`-th element is returned.
+#   
+#       If `mode="average"`, the array is averaged in bins of size `stepsize`.
+#   
+#       If multiple x are provided, they are are assumed to have the same shape.
+#       `stepsize` is determined from the first element.
+#   
+#       Parameters
+#       ----------
+#       max_length: int
+#       *x: np.ndarray
+#           The array(s) to be downsampled. If multiple arrays are provided,
+#           the result will be a list of the downsampled arrays.
+#       mode: str, default: step
+#           Mode for downsampling to reduce file size.
+#   
+#           Options:
+#   
+#           - step:
+#               Based on `max_length` and the array size, the smallest
+#               `stepsize` is determined, such that the new length is
+#               smaller or equal to `max_length`. Each `stepsize`-th element
+#               is displayed.
+#           - average:
+#               Bins of length `stepsize` are averaged. The remainders
+#               are discarded.
+#       axis: int, default: 0
+#           The axis along which to perform the downsampling.
+#       """
+#       if mode == "step":
+#           return downsample_step(max_length, *x, axis=axis)
+#   
+#       elif mode == "average":
+#           return downsample_average(max_length, *x, axis=axis)
+#   
+#       else:
+#           raise NotImplementedError(
+#               f"{mode=} is not implemented for downsampling."
+#           )
+#   
+#   
+#   def downsample_step(max_length, *x, axis=0):
+#       """
+#       Reduce size of array to `max_length` or lower by returning each
+#       `stepsize`-th element.
+#   
+#       If multiple x are provided, they are are assumed to have the same shape.
+#       `stepsize` is determined from the first element.
+#   
+#       Parameters
+#       ----------
+#       max_length: int
+#       *x: np.ndarray
+#           The array(s) to be downsampled. If multiple arrays are provided,
+#           the result will be a list of the downsampled arrays.
+#       axis: int, default: 0
+#           The axis along which to perform the downsampling.
+#       """
+#       N = x[0].shape[axis]
+#   
+#       if N < max_length:
+#           if len(x) == 1:
+#               return x[0]
+#           return list(x)
+#   
+#       s = [slice(None)] * x[0].ndim
+#       step = _stepsize(N, max_length)
+#       s[axis] = slice(None, None, step)
+#       s = tuple(s)
+#   
+#       if len(x) == 1:
+#           return x[0][s]
+#   
+#       return [y[s] for y in x]
+#   
+#   
+#   def _downsample_average_item(x, transp, step, length):
+#       """
+#       Performs the binning and averaging for one `np.ndarray`.
+#       """
+#       x = x.transpose(transp)[: length * step, ...]
+#       shape = x.shape
+#       x = x.reshape((length, step, *shape[1:])).mean(axis=1)
+#       return x.transpose(transp)
+#   
+#   
+#   def downsample_average(max_length, *x, axis=0):
+#       """
+#       Reduce size of array to `max_length` or lower by returning each
+#       `stepsize`-th element.
+#   
+#       If multiple x are provided, they are are assumed to have the same shape.
+#       `stepsize` is determined from the first element.
+#   
+#       Parameters
+#       ----------
+#       max_length: int
+#       *x: np.ndarray
+#           The array(s) to be downsampled. If multiple arrays are provided,
+#           the result will be a list of the downsampled arrays.
+#       axis: int, default: 0
+#           The axis along which to perform the downsampling.
+#       """
+#       N = x[0].shape[axis]
+#   
+#       if N < max_length:
+#           if len(x) == 1:
+#               return x[0]
+#           return list(x)
+#   
+#       step = _stepsize(N, max_length)
+#       length = N // step
+#   
+#       transp = np.arange(x[0].ndim)
+#       transp[axis] = 0
+#       transp[0] = axis
+#   
+#       if len(x) == 1:
+#           return _downsample_average_item(x[0], transp, step, length)
+#   
+#       return [_downsample_average_item(y, transp, step, length) for y in x]
+#   
+#   
 #   class LinearRegression(plot.NotebookInteraction):
+#       """
+#       Model regression and its parameters.
+#   
+#       Parameters
+#       ----------
+#       x, y: array-like
+#           Data points.
+#       p: float, default: 0.05
+#           p-value.
+#       linspace: int, default: 101
+#           Number of data points for linear regression model
+#           and conficence and prediction intervals.
+#   
+#       Attributes
+#       ----------
+#       The instance will provide the following data attributes:
+#       x, y: array-like
+#           The original data.
+#       p: float
+#           The original p-value.
+#       poly: np.ndarray of 2x float
+#           Polynomial coefficients.
+#           [a, b] -> a * x + b.
+#       cov: float
+#           Covariance matrix of the polynomial coefficient estimates.
+#           See for poly, cov:
+#           https://numpy.org/doc/stable/reference/generated/numpy.polyfit.html
+#       y_model: np.ndarray
+#           The regression modeled y values for the input x
+#       n: int
+#           Number of observations
+#       m: int
+#           Number of parameters
+#       dof: int
+#           Degree of freedoms
+#           n - m
+#       t: float
+#           t statistics
+#       ...
+#       """
+#   
 #       def __init__(
 #           self,
 #           x,
@@ -657,49 +867,6 @@ if __name__ == "__main__":
 #           p=0.05,
 #           linspace=101,
 #       ):
-#           """
-#           Model regression and its parameters.
-#   
-#           Parameters
-#           ----------
-#           x, y: array-like
-#               Data points.
-#           p: float, optional
-#               p-value.
-#               Default: 0.05
-#           linspace: int, optional
-#               Number of data points for linear regression model
-#               and conficence and prediction intervals.
-#               Default: 101
-#   
-#           The instance will provide the following data attributes:
-#               x, y: array-like
-#                   The original data.
-#               p: float
-#                   The original p-value.
-#               poly: np.ndarray of 2x float
-#                   Polynomial coefficients.
-#                   [a, b] -> a * x + b.
-#               cov: float
-#                   Covariance matrix of the polynomial coefficient estimates.
-#                   See for poly, cov:
-#                   https://numpy.org/doc/stable/reference/generated/numpy.polyfit.html
-#               y_model: np.ndarray
-#                   The regression modeled y values for the input x
-#               n: int
-#                   Number of observations
-#               m: int
-#                   Number of parameters
-#               dof: int
-#                   Degree of freedoms
-#                   n - m
-#               t: float
-#                   t statistics
-#               ...
-#   
-#           Code derived from pylang's StackOverflow post:
-#           https://stackoverflow.com/questions/27164114/show-confidence-limits-and-prediction-limits-in-scatter-plot
-#           """
 #           self.x = np.array(x)
 #           self.y = np.array(y)
 #           self.p = p
@@ -813,10 +980,6 @@ if __name__ == "__main__":
 #               Keyword arguments to pass to corresponding figure element.
 #           **kwargs: optional
 #               Keyword arguments to pass to each figure element.
-#   
-#           Returns
-#           -------
-#           plot.Plot instance
 #           """
 #           # input validation
 #           if kwargs_data is None:
@@ -847,7 +1010,11 @@ if __name__ == "__main__":
 #           fig.add_scatter(
 #               self.x,
 #               self.y,
-#               label=(label_data if callable(label_data) else label.element(label_data)),
+#               label=(
+#                   label_data
+#                   if callable(label_data)
+#                   else label.element(label_data)
+#               ),
 #               color=color if color_data is None else color_data,
 #               **kwargs_data,
 #               **kwargs,
@@ -858,7 +1025,9 @@ if __name__ == "__main__":
 #               self.x2,
 #               self.y2,
 #               line_style=line_style_reg,
-#               label=(label_reg if callable(label_reg) else label.element(label_reg)),
+#               label=(
+#                   label_reg if callable(label_reg) else label.element(label_reg)
+#               ),
 #               color=color if color_reg is None else color_reg,
 #               **kwargs_reg,
 #               **kwargs,
@@ -886,7 +1055,9 @@ if __name__ == "__main__":
 #               fig.add_line(
 #                   self.x2,
 #                   self.y2 + self.pi,
-#                   label=(label_pi if callable(label_pi) else label.element(label_pi)),
+#                   label=(
+#                       label_pi if callable(label_pi) else label.element(label_pi)
+#                   ),
 #                   line_style=line_style_pi,
 #                   color=color if color_pi is None else color_pi,
 #                   **kwargs_pi,
@@ -917,7 +1088,13 @@ if __name__ == "__main__":
 #   from types import GeneratorType
 #   
 #   from numpy import ndarray as np_ndarray
-#   from pandas.core.series import Series as pd_Series
+#   
+#   try:
+#       from pandas.core.series import Series as pd_Series
+#   
+#   except ImportError:
+#       class pd_Series:
+#           pass
 #   
 #   
 #   ITERABLE_TYPES = (
@@ -974,7 +1151,14 @@ if __name__ == "__main__":
 #           yield arg
 #   
 #   
-#   def zip_smart(*iterables, unpack_nozip=True, strict=False):
+#   def zip_smart(
+#       *iterables,
+#       kwargs=None,
+#       unpack_nozip=True,
+#       strict=False,
+#       iterable_types=(),
+#       non_iterable_types=(),
+#   ):
 #       """
 #       Iterate over several iterables in parallel,
 #       producing tuples with an item from each one.
@@ -1000,12 +1184,26 @@ if __name__ == "__main__":
 #       ----------
 #       *iterables: misc
 #           Elements to iterate or repeat.
+#       kwargs: dict, optional
+#           The values will be treated the same way as the positional arguments
+#           `*iterables`. If a `dict` with at least one item is provided,
+#           each iteration yields the "zipped" version of the dict at the last
+#           position.
+#   
+#           Note: keyword arguments to unpack are collected as a dict, not as
+#           individual keyword arguments.
 #       unpack_nozip: bool, default: True
 #           Unpack a `NoZip`-wrapped iterable.
 #       strict: bool, default: True
 #           Fail if iterables are not the same length.
 #   
 #           Warning: Not supported in Python <3.10.
+#       iterable_types: tuple, optional
+#           Explicitly flag these types to be provided "as is"
+#           to Python's built-in `zip`.
+#       non_iterable_types: tuple, optional
+#           Explicitly flag these types to be repeated "as is",
+#           i.e. to not be unpacked.
 #   
 #       Returns
 #       -------
@@ -1015,26 +1213,50 @@ if __name__ == "__main__":
 #       Examples
 #       --------
 #       >>> for a, b, c, d, e in interplot.zip_smart(
-#       ...     ("A", "B", "C", "D"),
-#       ...     True,
-#       ...     [1, 2, 3, 4, 5],  # notice the extra element won't be unpacked
-#       ...     "always the same",
-#       ...     interplot.repeat((1, 2)),
+#       ...     ("A", "B", "C", "D"),      # will be unpacked
+#       ...     True,                      # will not be unpacked
+#       ...     [1, 2, 3, 4, 5],           # will be unpacked, but only 1-4
+#       ...     "always the same",         # will not be unpacked
+#       ...     interplot.repeat((1, 2)),  # will not be unpacked
 #       ... ):
 #       ...     print(a, b, c, d, e)
 #       A True 1 always the same (1, 2)
 #       B True 2 always the same (1, 2)
 #       C True 3 always the same (1, 2)
 #       D True 4 always the same (1, 2)
+#   
+#       >>> def print_all(*args, **kwargs):
+#       ...     print(*args, kwargs)
+#       ... for a, b, kwargs in interplot.zip_smart(
+#       ...     ("A", "B"),           # will be unpacked
+#       ...     42,                   # will not be unpacked
+#       ...     kwargs=dict(
+#       ...         kwarg1=[10, 20],  # will be unpacked
+#       ...         kwarg2=True,      # will not be unpacked
+#       ...     )
+#       ... ):
+#       ...     print_all(a, b, **kwargs)
+#       A 42 {'kwarg1': 10, 'kwarg2': True}
+#       B 42 {'kwarg1': 20, 'kwarg2': True}
 #       """
 #       iterables = list(iterables)
 #   
+#       if kwargs is None:
+#           kwargs = dict()
+#       N_kwargs = len(kwargs)
+#       kwargs_keys = kwargs.keys()
+#       iterables.extend(kwargs.values())
+#   
 #       for i, arg in enumerate(iterables):
-#           if not hasattr(arg, "__iter__") or isinstance(arg, NON_ITERABLE_TYPES):
+#           if not isinstance(arg, iterable_types) and (
+#               not hasattr(arg, "__iter__")
+#               or isinstance(arg, NON_ITERABLE_TYPES)
+#               or isinstance(arg, non_iterable_types)
+#           ):
 #               iterables[i] = repeat(arg, unpack_nozip=unpack_nozip)
 #   
 #       try:
-#           return zip(*iterables, strict=strict)
+#           it = zip(*iterables, strict=strict)
 #   
 #       # strict mode not implemented in Python<3.10
 #       except TypeError:
@@ -1044,7 +1266,13 @@ if __name__ == "__main__":
 #                       "zip's strict mode not supported in Python<3.10.\n\n"
 #                       "Falling back to non-strict mode."
 #                   )
-#           return zip(*iterables)
+#           it = zip(*iterables)
+#   
+#       for y in it:
+#           if N_kwargs > 0:
+#               y, kwargs_ = y[:-N_kwargs], y[-N_kwargs:]
+#               y += ({key: value for key, value in zip(kwargs_keys, kwargs_)},)
+#           yield y
 #   
 #   
 #   def sum_nested(
@@ -1182,7 +1410,9 @@ if __name__ == "__main__":
 #       either `iterable` or `repeat(iterable)`
 #       """
 #       # input validation
-#       no_iter_types = (float, int, datetime) if no_iter_types is None else no_iter_types
+#       no_iter_types = (
+#           (float, int, datetime) if no_iter_types is None else no_iter_types
+#       )
 #       if not isinstance(length, ITERABLE_TYPES):
 #           length = (length,)
 #   
@@ -1298,17 +1528,12 @@ if __name__ == "__main__":
 #   from warnings import warn
 #   from pathlib import Path
 #   from functools import wraps
-#   from datetime import datetime
+#   import datetime as dt
 #   from io import BytesIO
 #   from PIL import Image
 #   import uuid
 #   
 #   import numpy as np
-#   
-#   from pandas.core.series import Series as pd_Series
-#   from pandas.core.frame import DataFrame as pd_DataFrame
-#   
-#   from xarray.core.dataarray import DataArray as xr_DataArray
 #   
 #   import matplotlib.pyplot as plt
 #   import matplotlib.colors as mcolors
@@ -1317,6 +1542,23 @@ if __name__ == "__main__":
 #   import plotly.express as px
 #   import plotly.subplots as sp
 #   import plotly.offline
+#   
+#   try:
+#       from xarray.core.dataarray import DataArray as xr_DataArray
+#   
+#   except ImportError:
+#       class xr_DataArray:
+#           pass
+#   
+#   try:
+#       from pandas.core.series import Series as pd_Series
+#       from pandas.core.frame import DataFrame as pd_DataFrame
+#   
+#   except ImportError:
+#       class pd_Series:
+#           pass
+#       class pd_DataFrame:
+#           pass
 #   
 #   from . import conf
 #   from .iter import ITERABLE_TYPES, zip_smart, filter_nozip
@@ -1330,10 +1572,9 @@ if __name__ == "__main__":
 #   
 #       Parameters
 #       ----------
-#       connected: bool, optional
+#       connected: bool, default: True
 #           If True, the plotly.js library will be loaded from an online CDN.
 #           If False, the plotly.js library will be loaded locally.
-#           Default: False
 #       """
 #       plotly.offline.init_notebook_mode(connected=connected)
 #   
@@ -1574,13 +1815,36 @@ if __name__ == "__main__":
 #       )
 #   
 #   
-#   def _serialize_2d(serialize_pty=True, serialize_mpl=True):
+#   def _serialize_1d():
+#       def decorator(core):
+#   
+#           @wraps(core)
+#           def wrapper(self, x, /, *, serialize=None, **kwargs):
+#               if serialize is not True and (
+#                   serialize is False or not isinstance(x, ITERABLE_TYPES)
+#               ):
+#                   return core(self, x, **kwargs)
+#   
+#               else:
+#                   for x_, kwargs_ in zip_smart(
+#                       x, kwargs=kwargs, non_iterable_types=(dict,)
+#                   ):
+#                       core(self, x_, **kwargs_)
+#   
+#           return wrapper
+#   
+#       return decorator
+#   
+#   
+#   def _serialize_2d(serialize_pty=True, serialize_mpl=True, omit_y=False):
 #       """Decorator to catch 2D arrays and other data types to unpack."""
 #   
 #       def decorator(core):
 #   
 #           @wraps(core)
-#           def wrapper(self, x, y=None, label=None, **kwargs):
+#           def wrapper(
+#               self, x, /, y=None, *, label=None, serialize=None, **kwargs
+#           ):
 #               """
 #               Wrapper function for a method.
 #   
@@ -1602,6 +1866,11 @@ if __name__ == "__main__":
 #               xarray DataArrays will be convered to pandas and then handled
 #               accordingly.
 #               """
+#               if serialize is False:
+#                   if omit_y:
+#                       return core(self, y, label=label, **kwargs)
+#                   return core(self, x, y, label=label, **kwargs)
+#   
 #               # reallocate x/y
 #               if y is None:
 #   
@@ -1618,28 +1887,49 @@ if __name__ == "__main__":
 #                           label = label.format(y.name)
 #   
 #                   # pd.DataFrame: split columns to pd.Series and iterate
-#                   elif isinstance(x, pd_DataFrame):
+#                   elif serialize or isinstance(x, pd_DataFrame):
 #                       if (
-#                           self.interactive
+#                           serialize
+#                           or self.interactive
 #                           and serialize_pty
 #                           or not self.interactive
 #                           and serialize_mpl
 #                       ):
-#                           for i, ((_, series), label_) in enumerate(
-#                               zip_smart(x.items(), label)
-#                           ):
-#                               _serialize_2d(
-#                                   serialize_pty=serialize_pty,
-#                                   serialize_mpl=serialize_mpl,
-#                               )(core)(
-#                                   self,
-#                                   series,
-#                                   label=label_,
-#                                   _serial_i=i,
-#                                   _serial_n=len(x.columns),
-#                                   **kwargs,
-#                               )
-#                           return
+#                           if isinstance(x, pd_DataFrame):
+#                               for i, ((_, series), label_) in enumerate(
+#                                   zip_smart(x.items(), label)
+#                               ):
+#                                   _serialize_2d(
+#                                       serialize_pty=serialize_pty,
+#                                       serialize_mpl=serialize_mpl,
+#                                       omit_y=omit_y,
+#                                   )(core)(
+#                                       self,
+#                                       series,
+#                                       label=label_,
+#                                       _serial_i=i,
+#                                       _serial_n=len(x.columns),
+#                                       **kwargs,
+#                                   )
+#                               return
+#   
+#                           else:
+#                               for i, (x_, label_) in enumerate(
+#                                   zip_smart(x, label)
+#                               ):
+#                                   _serialize_2d(
+#                                       serialize_pty=serialize_pty,
+#                                       serialize_mpl=serialize_mpl,
+#                                       omit_y=omit_y,
+#                                   )(core)(
+#                                       self,
+#                                       x_,
+#                                       label=label_,
+#                                       _serial_i=i,
+#                                       _serial_n=len(x),
+#                                       **kwargs,
+#                                   )
+#                               return
 #   
 #                   else:
 #                       if hasattr(x, "copy") and callable(getattr(x, "copy")):
@@ -1649,17 +1939,20 @@ if __name__ == "__main__":
 #                       x = np.arange(len(y))
 #   
 #               # 2D np.array
-#               if isinstance(y, np.ndarray) and len(y.shape) == 2:
+#               if serialize or isinstance(y, np.ndarray) and len(y.shape) == 2:
+#                   if isinstance(y, np.ndarray):
+#                       y = y.T
 #                   if (
 #                       self.interactive
 #                       and serialize_pty
 #                       or not self.interactive
 #                       and serialize_mpl
 #                   ):
-#                       for i, (y_, label_) in enumerate(zip_smart(y.T, label)):
+#                       for i, (y_, label_) in enumerate(zip_smart(y, label)):
 #                           _serialize_2d(
 #                               serialize_pty=serialize_pty,
 #                               serialize_mpl=serialize_mpl,
+#                               omit_y=omit_y,
 #                           )(core)(
 #                               self,
 #                               x,
@@ -1671,6 +1964,8 @@ if __name__ == "__main__":
 #                           )
 #                       return
 #   
+#               if omit_y:
+#                   return core(self, y, label=label, **kwargs)
 #               return core(self, x, y, label=label, **kwargs)
 #   
 #           return wrapper
@@ -1881,7 +2176,7 @@ if __name__ == "__main__":
 #               # MATPLOTLIB
 #               if show:
 #                   return dict(label=label)
-#               return dict()
+#               return dict(label=None)
 #   
 #           return inner
 #   
@@ -1947,6 +2242,7 @@ if __name__ == "__main__":
 #       def __init__(
 #           self,
 #           interactive=None,
+#           *,
 #           rows=1,
 #           cols=1,
 #           title=None,
@@ -2004,6 +2300,7 @@ if __name__ == "__main__":
 #           )
 #           self.legend_loc = legend_loc
 #           self.legend_title = legend_title
+#           self.legend_togglegroup = legend_togglegroup
 #           self.legend_ids = set()
 #           self.color_cycle = pick_non_none(
 #               color_cycle,
@@ -2017,6 +2314,7 @@ if __name__ == "__main__":
 #           self.pty_custom_func = pty_custom_func
 #           self.pty_update_layout = pty_update_layout
 #           self.element_count = np.zeros((rows, cols), dtype=int)
+#           self.boxplot_count = np.zeros((rows, cols), dtype=int)
 #           self.i_color = 0
 #   
 #           # init plotly
@@ -2157,6 +2455,7 @@ if __name__ == "__main__":
 #   
 #       def update(
 #           self,
+#           *,
 #           title=None,
 #           xlabel=None,
 #           ylabel=None,
@@ -2209,6 +2508,10 @@ if __name__ == "__main__":
 #           self.dpi = pick_non_none(dpi, self.dpi)
 #           self.legend_loc = pick_non_none(legend_loc, self.legend_loc)
 #           self.legend_title = pick_non_none(legend_title, self.legend_title)
+#           self.legend_togglegroup = pick_non_none(
+#               legend_togglegroup,
+#               self.legend_togglegroup,
+#           )
 #           self.color_cycle = pick_non_none(
 #               color_cycle,
 #               self.color_cycle,
@@ -2244,25 +2547,25 @@ if __name__ == "__main__":
 #   
 #               # unpacking
 #               width, height = self.fig_size
-#               if isinstance(legend_title, ITERABLE_TYPES):
+#               if isinstance(self.legend_title, ITERABLE_TYPES):
 #                   warn(
 #                       "Plotly only has one legend, however multiple legend_"
 #                       "titles were provided. Only the first one will be used!"
 #                   )
-#                   legend_title = legend_title[0]
-#                   if isinstance(legend_title, ITERABLE_TYPES):
-#                       legend_title = legend_title[0]
+#                   self.legend_title = self.legend_title[0]
+#                   if isinstance(self.legend_title, ITERABLE_TYPES):
+#                       self.legend_title = self.legend_title[0]
 #   
 #               # update layout
 #               self.fig.update_layout(
 #                   title=self.title,
-#                   legend_title=legend_title,
+#                   legend_title=self.legend_title,
 #                   height=height,
 #                   width=width,
 #                   barmode="group",
 #               )
 #               if not pick_non_none(
-#                   legend_togglegroup,
+#                   self.legend_togglegroup,
 #                   conf.PTY_LEGEND_TOGGLEGROUP,
 #               ):
 #                   self.fig.update_layout(
@@ -2280,8 +2583,8 @@ if __name__ == "__main__":
 #                   range(1, self.rows + 1),
 #                   filter_nozip(self.xlim),
 #                   filter_nozip(self.ylim),
-#                   xlog,
-#                   ylog,
+#                   self.xlog,
+#                   self.ylog,
 #               ):
 #                   for (
 #                       i_col,
@@ -2296,7 +2599,9 @@ if __name__ == "__main__":
 #                       xlog_row,
 #                       ylog_row,
 #                   ):
-#                       if xlim_tile is not None and isinstance(xlim_tile[0], datetime):
+#                       if xlim_tile is not None and isinstance(
+#                           xlim_tile[0], dt.datetime
+#                       ):
 #                           xlim_tile = (
 #                               xlim_tile[0].timestamp() * 1000,
 #                               xlim_tile[1].timestamp() * 1000,
@@ -2315,9 +2620,11 @@ if __name__ == "__main__":
 #                       )
 #   
 #               # axis labels
-#               for text, i_col in zip_smart(xlabel, range(1, self.cols + 1)):
-#                   self.fig.update_xaxes(title_text=text, row=self.rows, col=i_col)
-#               for text, i_row in zip_smart(ylabel, range(1, self.rows + 1)):
+#               for text, i_col in zip_smart(self.xlabel, range(1, self.cols + 1)):
+#                   self.fig.update_xaxes(
+#                       title_text=text, row=self.rows, col=i_col
+#                   )
+#               for text, i_row in zip_smart(self.ylabel, range(1, self.rows + 1)):
 #                   self.fig.update_yaxes(title_text=text, row=i_row, col=1)
 #   
 #           # MATPLOTLIB
@@ -2357,11 +2664,11 @@ if __name__ == "__main__":
 #                   self.fig.supylabel(self.ylabel)
 #   
 #               # log scale
-#               for row, xlog_row in zip_smart(range(self.rows), xlog):
+#               for row, xlog_row in zip_smart(range(self.rows), self.xlog):
 #                   for col, xlog_tile in zip_smart(range(self.cols), xlog_row):
 #                       if xlog_tile:
 #                           self.ax[row, col].set_xscale("log")
-#               for row, ylog_row in zip_smart(range(self.rows), ylog):
+#               for row, ylog_row in zip_smart(range(self.rows), self.ylog):
 #                   for col, ylog_tile in zip_smart(range(self.cols), ylog_row):
 #                       if ylog_tile:
 #                           self.ax[row, col].set_yscale("log")
@@ -2386,11 +2693,9 @@ if __name__ == "__main__":
 #               Name to display.
 #           default_label: str, optional
 #               If label is None, fall back to default_label.
-#               Default: None
 #               By default, plotly will enumerate the unnamed traces itself.
 #           show_legend: bool, optional
 #               Show label in legend.
-#               Default: None
 #               By default, the label will be displayed if it is not None
 #               (in case of label=None, the automatic label will only be displayed
 #               on hover)
@@ -2462,7 +2767,8 @@ if __name__ == "__main__":
 #               Axes coordinates.
 #           """
 #           return (
-#               self.ax[row, col].transData + self.ax[row, col].transAxes.inverted()
+#               self.ax[row, col].transData
+#               + self.ax[row, col].transAxes.inverted()
 #           ).transform((x, y))
 #   
 #       def get_cycle_color(self, increment=1, i=None):
@@ -2471,10 +2777,9 @@ if __name__ == "__main__":
 #   
 #           Parameters
 #           ----------
-#           increment: int, optional
+#           increment: int, default: 1
 #               If the same color should be returned the next time, pass 0.
 #               To jump the next color, pass 2.
-#               Default: 1
 #           i: int, optional
 #               Get a fixed index of the color cycle instead of the next one.
 #               This will not modify the regular color cycle iteration.
@@ -2504,9 +2809,11 @@ if __name__ == "__main__":
 #               If None is provided, the next one from COLOR_CYCLE will be picked.
 #           alpha: float, optional
 #               Set alpha / opacity.
+#   
 #               Overrides alpha contained in color input.
-#               Default: None (use the value contained in color or default to 1)
-#           increment: int, optional
+#   
+#               By default, `alpha` is derived from `color`, otherwise set to 1.
+#           increment: int, default: 1
 #               If a color from the cycler is picked, increase the cycler by
 #               this increment.
 #           """
@@ -2555,6 +2862,9 @@ if __name__ == "__main__":
 #           mode: str
 #               The mode to determine if markers should be used.
 #               If no markers should be drawn, None is returned.
+#           recursive: bool, default: False
+#               Signals that the method was called from within `digest_marker`
+#               recursively.
 #   
 #           Returns
 #           -------
@@ -2608,11 +2918,14 @@ if __name__ == "__main__":
 #       def add_line(
 #           self,
 #           x,
+#           /,
 #           y=None,
+#           *,
 #           x_error=None,
 #           y_error=None,
 #           mode=None,
 #           line_style="solid",
+#           line_width=None,
 #           marker=None,
 #           marker_size=None,
 #           marker_line_width=1,
@@ -2621,11 +2934,12 @@ if __name__ == "__main__":
 #           show_legend=None,
 #           color=None,
 #           opacity=None,
-#           linewidth=None,
+#           max_length=None,
+#           downsample_mode=None,
 #           row=0,
 #           col=0,
-#           _serial_i=0,
-#           _serial_n=1,
+#           _serial_i=0,  # must be accepted from decorator
+#           _serial_n=1,  # must be accepted from decorator
 #           pty_marker_kwargs=None,
 #           kwargs_pty=None,
 #           kwargs_mpl=None,
@@ -2639,11 +2953,15 @@ if __name__ == "__main__":
 #           x: array-like
 #           y: array-like, optional
 #               If only `x` is defined, it will be assumed as `y`.
+#   
 #               If a pandas `Series` is provided, the index will
 #               be taken as `x`.
+#   
 #               Else if a pandas `DataFrame` is provided, the method call
 #               is looped for each column.
+#   
 #               Else `x` will be an increment, starting from `0`.
+#   
 #               If a 2D numpy `array` is provided, the method call
 #               is looped for each column.
 #           x_error, y_error: number or shape(N,) or shape(2, N), optional
@@ -2663,46 +2981,72 @@ if __name__ == "__main__":
 #                   - `add_linescatter`: `lines+markers`
 #           line_style: str, optional
 #               Line style.
+#   
 #               Options: `solid`, `dashed`, `dotted`, `dashdot`
 #   
 #               Aliases: `-`, `--`, `dash`, `:`, `dot`, `-.`
+#           line_width: float, optional
 #           marker: int or str, optional
 #               Marker style.
 #               If an integer is provided, it will be converted to the
 #               corresponding string marker using `plotly` numbering.
 #               If not provided, the default marker `circle` is used.
-#           marker_size: int, optional
-#           marker_line_width: int, optional
+#           marker_size: float, optional
+#           marker_line_width: float, optional
 #           marker_line_color: str, optional
 #               Can be hex, rgb(a) or any named color that is understood
 #               by matplotlib.
 #   
-#               Default: same color as `color`.
+#               By default, the same color as `color` will be used.
 #           label: str, optional
 #               Trace label for legend.
 #           show_legend: bool, optional
 #               Whether to show the label in the legend.
 #   
 #               By default, it will be shown if a label is defined.
-#           color: str, optional
+#           color: str or int, optional
 #               Trace color.
 #   
 #               Can be hex, rgb(a) or any named color that is understood
 #               by matplotlib.
 #   
 #               The color cycle can be accessed with "C0", "C1", ...
+#               or the according integer.
 #   
-#               Default: color is retrieved from `Plot.digest_color`,
+#               By default, the color is retrieved from `Plot.digest_color`,
 #               which cycles through `COLOR_CYCLE`.
 #           opacity: float, optional
 #               Opacity (=alpha) of the fill.
 #   
 #               By default, fallback to alpha value provided with color argument,
 #               or 1.
+#           max_length: int, optional
+#               If the length of `x` (and `y`) exceeds `max_length`, downsample
+#               the arrays to reduce file size.
+#           downsample_mode: str, optional
+#               Mode for downsampling to reduce file size.
+#   
+#               Options:
+#   
+#               - step:
+#                   Based on `max_length` and the array size, the smallest
+#                   `stepsize` is determined, such that the new length is
+#                   smaller or equal to `max_length`. Each `stepsize`-th element
+#                   is displayed.
+#               - average:
+#                   Bins of length `stepsize` are averaged. The remainders
+#                   are discarded.
 #           row, col: int, optional
 #               If the plot contains a grid, provide the coordinates.
 #   
 #               Attention: Indexing starts with 0!
+#           serialize: bool, optional
+#               Enforce or prevent looping over multi-dimensional data.
+#   
+#               By default, interplot will automatically loop with:
+#                   - pandas DataFrame
+#                   - xarray DataArray (if 2D)
+#                   - numpy array (if 2D)
 #           pty_marker_kwargs: dict, optional
 #               PLOTLY ONLY.
 #   
@@ -2747,6 +3091,43 @@ if __name__ == "__main__":
 #           self.element_count[row, col] += 1
 #           mode = "lines" if mode is None else mode
 #           color = self.digest_color(color, opacity)
+#   
+#           # for backwards-compatibility: listen to "linewidth"
+#           line_width = pick_non_none(line_width, kwargs.pop("linewidth", None))
+#   
+#           # downsampling
+#           max_length = pick_non_none(max_length, conf.MAX_LENGTH)
+#           if max_length is not None:
+#               downsample_mode = pick_non_none(
+#                   downsample_mode,
+#                   conf.DOWNSAMPLE_MODE,
+#               )
+#               x, y = arraytools.downsample(
+#                   max_length,
+#                   x,
+#                   y,
+#                   mode=downsample_mode,
+#               )
+#               if x_error is not None:
+#                   x_error = np.array(x_error)
+#                   if x_error.ndim == 1:
+#                       x_error = x_error.reshape((1, -1))
+#                   if x_error.ndim == 2:
+#                       x_error = arraytools.downsample(
+#                           max_length,
+#                           *x_error,
+#                           mode=downsample_mode,
+#                       )
+#               if y_error is not None:
+#                   y_error = np.array(y_error)
+#                   if y_error.ndim == 1:
+#                       y_error = y_error.reshape((1, -1))
+#                   if y_error.ndim == 2:
+#                       y_error = arraytools.downsample(
+#                           max_length,
+#                           *y_error,
+#                           mode=downsample_mode,
+#                       )
 #   
 #           # PLOTLY
 #           if self.interactive:
@@ -2815,7 +3196,7 @@ if __name__ == "__main__":
 #                       ),
 #                       marker_color=color,
 #                       line=dict(
-#                           width=linewidth,
+#                           width=line_width,
 #                           dash=conf.PTY_LINE_STYLES.get(line_style, line_style),
 #                       ),
 #                       **kwargs_pty,
@@ -2836,7 +3217,7 @@ if __name__ == "__main__":
 #                   yerr=y_error,
 #                   **self._digest_label(label, show_legend=show_legend),
 #                   color=color,
-#                   lw=linewidth,
+#                   lw=line_width,
 #                   linestyle=(
 #                       conf.MPL_LINE_STYLES.get(line_style, line_style)
 #                       if "lines" in mode
@@ -2888,14 +3269,16 @@ if __name__ == "__main__":
 #       def add_bar(
 #           self,
 #           x,
+#           /,
 #           y=None,
+#           *,
 #           horizontal=False,
 #           width=0.8,
 #           label=None,
 #           show_legend=None,
 #           color=None,
 #           opacity=None,
-#           line_width=1,
+#           line_width=1.0,
 #           line_color=None,
 #           row=0,
 #           col=0,
@@ -2934,23 +3317,24 @@ if __name__ == "__main__":
 #               Whether to show the label in the legend.
 #   
 #               By default, it will be shown if a label is defined.
-#           color: str, optional
+#           color: str or int, optional
 #               Trace color.
 #   
 #               Can be hex, rgb(a) or any named color that is understood
 #               by matplotlib.
 #   
 #               The color cycle can be accessed with "C0", "C1", ...
+#               or the according integer.
 #   
-#               Default: color is retrieved from `Plot.digest_color`,
+#               By default, the color is retrieved from `Plot.digest_color`,
 #               which cycles through `COLOR_CYCLE`.
 #           opacity: float, optional
 #               Opacity (=alpha) of the fill.
 #   
 #               By default, fallback to alpha value provided with color argument,
 #               or 1.
-#           line_width: float, optional
-#               The width of the bar outline. Default is 1.
+#           line_width: float, default: 1.0
+#               The width of the bar outline.
 #           line_color: str, optional
 #               The color of the bar outline. This can be a named color or a tuple
 #               specifying the RGB values.
@@ -2960,6 +3344,13 @@ if __name__ == "__main__":
 #               If the plot contains a grid, provide the coordinates.
 #   
 #               Attention: Indexing starts with 0!
+#           serialize: bool, optional
+#               Enforce or prevent looping over multi-dimensional data.
+#   
+#               By default, interplot will automatically loop with:
+#                   - pandas DataFrame
+#                   - xarray DataArray (if 2D)
+#                   - numpy array (if 2D)
 #           kwargs_pty, kwargs_mpl, **kwargs: optional
 #               Pass specific keyword arguments to the line core method.
 #           """
@@ -3011,7 +3402,9 @@ if __name__ == "__main__":
 #                   (width / _serial_n),
 #                   color=self.digest_color(color, opacity),
 #                   edgecolor=(
-#                       self.digest_color(line_color, 1) if line_color is not None else None
+#                       self.digest_color(line_color, 1)
+#                       if line_color is not None
+#                       else None
 #                   ),
 #                   linewidth=line_width,
 #                   **self._digest_label(label, show_legend=show_legend),
@@ -3031,6 +3424,7 @@ if __name__ == "__main__":
 #           self,
 #           x=None,
 #           y=None,
+#           *,
 #           bins=None,
 #           density=False,
 #           label=None,
@@ -3053,18 +3447,18 @@ if __name__ == "__main__":
 #           bins: int, optional
 #               Number of bins.
 #               If undefined, plotly/matplotlib will detect automatically.
-#               Default: None
 #           label: str, optional
 #               Trace label for legend.
-#           color: str, optional
+#           color: str or int, optional
 #               Trace color.
 #   
 #               Can be hex, rgb(a) or any named color that is understood
 #               by matplotlib.
 #   
 #               The color cycle can be accessed with "C0", "C1", ...
+#               or the according integer.
 #   
-#               Default: color is retrieved from `Plot.digest_color`,
+#               By default, the color is retrieved from `Plot.digest_color`,
 #               which cycles through `COLOR_CYCLE`.
 #           opacity: float, optional
 #               Opacity (=alpha) of the fill.
@@ -3132,9 +3526,12 @@ if __name__ == "__main__":
 #                   **kwargs,
 #               )
 #   
+#       @_serialize_2d(omit_y=True)
 #       def add_boxplot(
 #           self,
 #           x,
+#           /,
+#           *,
 #           horizontal=False,
 #           label=None,
 #           show_legend=None,
@@ -3144,6 +3541,8 @@ if __name__ == "__main__":
 #           notch=True,
 #           row=0,
 #           col=0,
+#           _serial_i=0,  # must be accepted from decorator
+#           _serial_n=1,  # must be accepted from decorator
 #           kwargs_pty=None,
 #           kwargs_mpl=None,
 #           **kwargs,
@@ -3159,15 +3558,16 @@ if __name__ == "__main__":
 #               Show boxplot horizontally.
 #           label: tuple of strs, optional
 #               Trace labels for legend.
-#           color: tuple of strs, optional
+#           color: str or int, optional
 #               Fill colors.
 #   
 #               Can be hex, rgb(a) or any named color that is understood
 #               by matplotlib.
 #   
 #               The color cycle can be accessed with "C0", "C1", ...
+#               or the according integer.
 #   
-#               Default: color is retrieved from `Plot.digest_color`,
+#               By default, the color is retrieved from `Plot.digest_color`,
 #               which cycles through `COLOR_CYCLE`.
 #           color_median: color, default: "black"
 #               MPL only.
@@ -3177,6 +3577,18 @@ if __name__ == "__main__":
 #   
 #               By default, fallback to alpha value provided with color argument,
 #               or 1.
+#           notch: bool, optional
+#               MPL only.
+#   
+#               Whether to draw a notched boxplot (`True`),
+#               or a rectangular boxplot (`False`).
+#           serialize: bool, optional
+#               Enforce or prevent looping over multi-dimensional data.
+#   
+#               By default, interplot will automatically loop with:
+#                   - pandas DataFrame
+#                   - xarray DataArray (if 2D)
+#                   - numpy array (if 2D)
 #           row, col: int, optional
 #               If the plot contains a grid, provide the coordinates.
 #   
@@ -3184,66 +3596,31 @@ if __name__ == "__main__":
 #           kwargs_pty, kwargs_mpl, **kwargs: optional
 #               Pass specific keyword arguments to the boxplot core method.
 #           """
-#           # determine number of boxplots
-#           if isinstance(x[0], (int, float)):
-#               n = 1
-#           else:
-#               n = len(x)
-#           # input validation
-#           if not isinstance(label, ITERABLE_TYPES):
-#               label = (label,) * n
-#           if not isinstance(color, ITERABLE_TYPES):
-#               color = (color,) * n
-#   
 #           # PLOTLY
 #           if self.interactive:
 #               if kwargs_pty is None:
 #                   kwargs_pty = dict()
 #   
-#               # if x contains multiple datasets, iterate add_boxplot
-#               if not n == 1:
-#                   for x_i, label_, show_legend_, color_, opacity_ in zip_smart(
-#                       x,
-#                       label,
-#                       show_legend,
-#                       color,
-#                       opacity,
-#                   ):
-#                       self.add_boxplot(
-#                           x_i,
-#                           horizontal=horizontal,
-#                           label=label_,
-#                           show_legend=show_legend_,
-#                           row=row,
-#                           col=col,
-#                           color=color_,
-#                           opacity=opacity_,
-#                           kwargs_pty=kwargs_pty,
-#                           **kwargs,
-#                       )
-#   
-#               # draw a single plotly boxplot
-#               else:
-#                   row += 1
-#                   col += 1
-#                   kw_data = "x" if horizontal else "y"
-#                   pty_kwargs = {
-#                       kw_data: x,
-#                   }
-#                   self.fig.add_trace(
-#                       go.Box(
-#                           **pty_kwargs,
-#                           **self._digest_label(
-#                               label[0],
-#                               show_legend=show_legend,
-#                           ),
-#                           marker_color=self.digest_color(color[0], opacity),
-#                           **kwargs_pty,
-#                           **kwargs,
+#               row += 1
+#               col += 1
+#               kw_data = "x" if horizontal else "y"
+#               pty_kwargs = {
+#                   kw_data: x,
+#               }
+#               self.fig.add_trace(
+#                   go.Box(
+#                       **pty_kwargs,
+#                       **self._digest_label(
+#                           label,
+#                           show_legend=show_legend,
 #                       ),
-#                       row=row,
-#                       col=col,
-#                   )
+#                       marker_color=self.digest_color(color, opacity),
+#                       **kwargs_pty,
+#                       **kwargs,
+#                   ),
+#                   row=row,
+#                   col=col,
+#               )
 #   
 #           # MATPLOTLIB
 #           else:
@@ -3251,20 +3628,35 @@ if __name__ == "__main__":
 #                   kwargs_mpl = dict()
 #               bplots = self.ax[row, col].boxplot(
 #                   x,
-#                   vert=not horizontal,
-#                   labels=None if show_legend is False else label,
+#                   orientation="horizontal" if horizontal else "vertical",
+#                   tick_labels=(
+#                       self._digest_label(
+#                           label,
+#                           show_legend=show_legend,
+#                       )["label"],
+#                   ),
 #                   patch_artist=True,
 #                   notch=notch,
 #                   medianprops=dict(color=color_median),
+#                   positions=(self.boxplot_count[row, col],),
 #                   **kwargs_mpl,
 #                   **kwargs,
 #               )
 #               for bplot, color_ in zip_smart(bplots["boxes"], color):
 #                   bplot.set_facecolor(self.digest_color(color_, opacity))
+#               self.boxplot_count[row, col] += 1
+#               if horizontal:
+#                   self.ax[row, col].set_ylim((-1, self.boxplot_count[row, col]))
+#               else:
+#                   self.ax[row, col].set_xlim((-1, self.boxplot_count[row, col]))
 #   
 #       def add_heatmap(
 #           self,
 #           data,
+#           *,
+#           extent=None,
+#           x=None,
+#           y=None,
 #           lim=(None, None),
 #           aspect=1,
 #           invert_x=False,
@@ -3286,13 +3678,32 @@ if __name__ == "__main__":
 #           ----------
 #           data: 2D array-like
 #               2D data to show heatmap.
+#           extent: floats (left, right, top, bottom), optional
+#               The bounding box in data coordinates that the image will fill.
+#   
+#               The image is stretched individually along x and y to fill the box.
+#   
+#               Will be overridden if `x` and `y` are defined.
+#           x, y: iterable, optional
+#               Coordinates of data points.
+#   
+#               If length of the axis values equals the length of the data along
+#               this dimension, the values describe the center of the data point.
+#               If the axis values contains one element more, the edges of the
+#               data points are described.
+#   
+#               For consistent behaviour with both `interactive` modes, provide
+#               the coordinates of the edges.
+#   
+#               MPL: matplotlib doesn't support unequal spacing. If
+#               `interactive=False`, `x` and `y` will be translated to `extent`,
+#               overriding the according parameters passed with `extent`.
 #           lim: list/tuple of 2x float, optional
 #               Lower and upper limits of the color map.
 #           aspect: float, default: 1
 #               Aspect ratio of the axes.
-#           invert_x, invert_y: bool, optional
+#           invert_x, invert_y: bool, default: False
 #               Invert the axes directions.
-#               Default: False
 #           cmap: str, default: "rainbow"
 #               Color map to use.
 #               https://matplotlib.org/stable/gallery/color/colormap_reference.html
@@ -3344,9 +3755,19 @@ if __name__ == "__main__":
 #                       lim[0] = lim[0] - 0.000001 * delta
 #                       lim[1] = lim[1] + 0.000001 * delta
 #   
+#               # x, y scaling
+#               if extent is not None and x is None:
+#                   nx = np.shape(data)[1]
+#                   x = np.linspace(extent[0], extent[1], nx + 1)
+#               if extent is not None and y is None:
+#                   ny = np.shape(data)[0]
+#                   y = np.linspace(extent[3], extent[2], ny + 1)
+#   
 #               self.fig.add_trace(
 #                   go.Heatmap(
 #                       z=data,
+#                       x=x,
+#                       y=y,
 #                       zmin=lim[0],
 #                       zmax=lim[1],
 #                       colorscale=cmap,
@@ -3364,7 +3785,7 @@ if __name__ == "__main__":
 #               self.fig.update_yaxes(
 #                   scaleanchor=self._get_plotly_anchor("x", self.cols, row, col),
 #                   scaleratio=aspect,
-#                   autorange=("reversed" if invert_x else None),
+#                   autorange=("reversed" if invert_y else None),
 #                   row=row,
 #                   col=col,
 #               )
@@ -3379,12 +3800,29 @@ if __name__ == "__main__":
 #                   over=cmap_over,
 #                   bad=cmap_bad,
 #               )
+#   
+#               # x, y scaling
+#               if pick_non_none(extent, x, y) is not None:
+#                   if extent is None:
+#                       ny, nx = np.shape(data)
+#                       # (left, right, top, bottom)
+#                       extent = [-0.5, nx - 0.5, ny - 0.5, -0.5]
+#                   else:
+#                       extent = list(extent)
+#                   if x is not None:
+#                       extent[0] = x[0]
+#                       extent[1] = x[-1]
+#                   if y is not None:
+#                       extent[2] = y[0]
+#                       extent[3] = y[-1]
+#   
 #               imshow = self.ax[row, col].imshow(
 #                   data,
 #                   cmap=cmap,
 #                   aspect=aspect,
 #                   vmin=lim[0],
 #                   vmax=lim[1],
+#                   extent=extent,
 #                   **kwargs_mpl,
 #                   **kwargs,
 #               )
@@ -3397,7 +3835,9 @@ if __name__ == "__main__":
 #       def add_regression(
 #           self,
 #           x,
+#           /,
 #           y=None,
+#           *,
 #           p=0.05,
 #           linspace=101,
 #           **kwargs,
@@ -3411,6 +3851,7 @@ if __name__ == "__main__":
 #               X axis data, or pre-existing LinearRegression instance.
 #           y: array-like, optional
 #               Y axis data.
+#   
 #               If a LinearRegression instance is provided for x,
 #               y can be omitted and will be ignored.
 #           p: float, default: 0.05
@@ -3421,7 +3862,9 @@ if __name__ == "__main__":
 #           kwargs:
 #               Keyword arguments for `interplot.arraytools.LinearRegression.plot`.
 #           """
-#           if isinstance(x, arraytools.LinearRegression) or hasattr(x, "is_linreg"):
+#           if isinstance(x, arraytools.LinearRegression) or hasattr(
+#               x, "is_linreg"
+#           ):
 #               x.plot(fig=self, **kwargs)
 #           else:
 #               arraytools.LinearRegression(
@@ -3434,8 +3877,10 @@ if __name__ == "__main__":
 #       def add_fill(
 #           self,
 #           x,
+#           /,
 #           y1,
 #           y2=None,
+#           *,
 #           label=None,
 #           mode="lines",
 #           color=None,
@@ -3455,7 +3900,7 @@ if __name__ == "__main__":
 #           Parameters
 #           ----------
 #           x: array-like
-#           y1, y2: array-like, optional
+#           y1, y2: array-like, y2 optional
 #               If only `x` and `y1` is defined,
 #               it will be assumed as `y1` and `y2`,
 #               and `x` will be the index, starting from 0.
@@ -3468,10 +3913,11 @@ if __name__ == "__main__":
 #               by matplotlib.
 #   
 #               The color cycle can be accessed with "C0", "C1", ...
+#               or the according integer.
 #   
 #               If line_color is undefined, the the fill color will be used.
 #   
-#               Default: color is retrieved from `Plot.digest_color`,
+#               By default, the color is retrieved from `Plot.digest_color`,
 #               which cycles through `COLOR_CYCLE`.
 #           opacity, line_opacity: float, default: 0.5
 #               Opacity (=alpha) of the fill.
@@ -3504,7 +3950,6 @@ if __name__ == "__main__":
 #   
 #           if not isinstance(label, LabelGroup):
 #               label = LabelGroup(
-#                   "fill_{}_{}_{}".format(row, col, self.element_count[row, col]),
 #                   default_label="fill" if label is None else label,
 #               )
 #   
@@ -3563,17 +4008,156 @@ if __name__ == "__main__":
 #                       label.element(),
 #                   ),
 #                   linewidth=line_width,
-#                   edgecolor=self.digest_color(line_color, line_opacity, increment=0),
+#                   edgecolor=self.digest_color(
+#                       line_color, line_opacity, increment=0
+#                   ),
 #                   facecolor=self.digest_color(color, opacity),
 #                   **kwargs_mpl,
 #                   **kwargs,
 #               )
 #   
+#       def add_hvline(
+#           self,
+#           pos,
+#           /,
+#           *,
+#           horizontal=True,
+#           line_style="solid",
+#           line_width=None,
+#           label=None,
+#           show_legend=None,
+#           color=None,
+#           opacity=None,
+#           row=0,
+#           col=0,
+#           exclude_empty_subplots=False,
+#           kwargs_pty=None,
+#           kwargs_mpl=None,
+#           **kwargs,
+#       ):
+#           """
+#           Draw one or multiple horizontal or vertical line(s).
+#   
+#           Parameters
+#           ----------
+#           pos: float or iterable of floats
+#               Position in data coordinates of the according axis.
+#           horizontal: bool, optional
+#               Whether to draw a horizontal or vertical line.
+#   
+#               `ip.Plot.add_hline` and `ip.Plot.add_vline` are direct calls for
+#               `horizontal=True` and `horizontal=False` respectively.
+#           line_style: str, optional
+#               Line style.
+#   
+#               Options: `solid`, `dashed`, `dotted`, `dashdot`
+#   
+#               Aliases: `-`, `--`, `dash`, `:`, `dot`, `-.`
+#           line_width: float, optional
+#           label: str, optional
+#               Trace label for legend.
+#           show_legend: bool, optional
+#               Whether to show the label in the legend.
+#   
+#               By default, it will be shown if a label is defined.
+#           color: str or int, optional
+#               Trace color.
+#   
+#               Can be hex, rgb(a) or any named color that is understood
+#               by matplotlib.
+#   
+#               The color cycle can be accessed with "C0", "C1", ...
+#               or the according integer.
+#   
+#               By default, the color is retrieved from `Plot.digest_color`,
+#               which cycles through `COLOR_CYCLE`.
+#           opacity: float, optional
+#               Opacity (=alpha) of the fill.
+#   
+#               By default, fallback to alpha value provided with color argument,
+#               or 1.
+#           row, col: int, optional
+#               If the plot contains a grid, provide the coordinates.
+#   
+#               Attention: Indexing starts with 0!
+#           exclude_empty_subplots: bool, default: False
+#               PTY ONLY.
+#   
+#               Whether the line should also be drawn on empty subplots.
+#           serialize: bool, optional
+#               Enforce or prevent looping over multi-dimensional data.
+#   
+#               By default, interplot will automatically loop with:
+#                   - pandas DataFrame
+#                   - xarray DataArray (if 2D)
+#                   - numpy array (if 2D)
+#           kwargs_pty, kwargs_mpl, **kwargs: optional
+#               Pass specific keyword arguments to the line core method.
+#           """
+#           self.element_count[row, col] += 1
+#           color = self.digest_color(color, opacity)
+#   
+#           # for backwards-compatibility: listen to "linewidth"
+#           line_width = pick_non_none(line_width, kwargs.pop("linewidth", None))
+#   
+#           # PLOTLY
+#           if self.interactive:
+#               if kwargs_pty is None:
+#                   kwargs_pty = dict()
+#               row += 1
+#               col += 1
+#   
+#               (self.fig.add_hline if horizontal else self.fig.add_vline)(
+#                   pos,
+#                   row=row,
+#                   col=col,
+#                   line_color=color,
+#                   line_width=line_width,
+#                   line_dash=conf.PTY_LINE_STYLES.get(line_style, line_style),
+#                   **self._digest_label(
+#                       label,
+#                       show_legend=show_legend,
+#                   ),
+#                   exclude_empty_subplots=exclude_empty_subplots,
+#                   **kwargs_pty,
+#                   **kwargs,
+#               )
+#   
+#           # MATPLOTLIB
+#           else:
+#               if kwargs_mpl is None:
+#                   kwargs_mpl = dict()
+#               (
+#                   self.ax[row, col].axhline
+#                   if horizontal
+#                   else self.ax[row, col].axvline
+#               )(
+#                   pos,
+#                   **self._digest_label(label, show_legend=show_legend),
+#                   color=color,
+#                   lw=1.0 if line_width is None else line_width,
+#                   linestyle=conf.MPL_LINE_STYLES.get(line_style, line_style),
+#                   **kwargs_mpl,
+#                   **kwargs,
+#               )
+#   
+#       @wraps(add_hvline)
+#       @_serialize_1d()
+#       def add_hline(self, pos, /, **kwargs):
+#           self.add_hvline(pos, horizontal=True, **kwargs)
+#   
+#       @wraps(add_hvline)
+#       @_serialize_1d()
+#       def add_vline(self, pos, /, **kwargs):
+#           self.add_hvline(pos, horizontal=False, **kwargs)
+#   
 #       def add_text(
 #           self,
 #           x,
 #           y,
+#           /,
 #           text,
+#           *,
 #           horizontal_alignment="center",
 #           vertical_alignment="center",
 #           text_alignment=None,
@@ -3623,15 +4207,16 @@ if __name__ == "__main__":
 #           x_data_coords, y_data_coords: bool, default: True
 #               PTY only.
 #               Specify the anchor for each axis separate.
-#           color: str, default: "black"
+#           color: str or int, default: "black"
 #               Trace color.
 #   
 #               Can be hex, rgb(a) or any named color that is understood
 #               by matplotlib.
 #   
 #               The color cycle can be accessed with "C0", "C1", ...
+#               or the according integer.
 #   
-#               Default: color is retrieved from `Plot.digest_color`,
+#               By default, the color is retrieved from `Plot.digest_color`,
 #               which cycles through `COLOR_CYCLE`.
 #           opacity: float, optional
 #               Opacity (=alpha) of the fill.
@@ -3670,8 +4255,10 @@ if __name__ == "__main__":
 #                   align=text_alignment,
 #                   xanchor=horizontal_alignment,
 #                   yanchor=vertical_alignment,
-#                   xref=self._get_plotly_anchor("x", self.cols, row, col) + x_domain,
-#                   yref=self._get_plotly_anchor("y", self.cols, row, col) + y_domain,
+#                   xref=self._get_plotly_anchor("x", self.cols, row, col)
+#                   + x_domain,
+#                   yref=self._get_plotly_anchor("y", self.cols, row, col)
+#                   + y_domain,
 #                   font=dict(color=self.digest_color(color, opacity)),
 #                   row=row,
 #                   col=col,
@@ -3690,7 +4277,9 @@ if __name__ == "__main__":
 #                       "for static matplotlib plot. x_data_coords was used."
 #                   )
 #               transform = (
-#                   dict() if x_data_coords else dict(transform=self.ax[row, col].transAxes)
+#                   dict()
+#                   if x_data_coords
+#                   else dict(transform=self.ax[row, col].transAxes)
 #               )
 #               self.ax[row, col].text(
 #                   x,
@@ -3709,7 +4298,9 @@ if __name__ == "__main__":
 #           self,
 #           x,
 #           y,
+#           /,
 #           image,
+#           *,
 #           horizontal_alignment="center",
 #           vertical_alignment="center",
 #           data_coords=True,
@@ -3792,8 +4383,10 @@ if __name__ == "__main__":
 #                       source=image,
 #                       x=x,
 #                       y=y,
-#                       xref=self._get_plotly_anchor("x", self.cols, row, col) + x_domain,
-#                       yref=self._get_plotly_anchor("y", self.cols, row, col) + y_domain,
+#                       xref=self._get_plotly_anchor("x", self.cols, row, col)
+#                       + x_domain,
+#                       yref=self._get_plotly_anchor("y", self.cols, row, col)
+#                       + y_domain,
 #                       xanchor=horizontal_alignment,
 #                       yanchor=vertical_alignment,
 #                       sizex=x_size,
@@ -3811,7 +4404,10 @@ if __name__ == "__main__":
 #               if kwargs_mpl is None:
 #                   kwargs_mpl = dict()
 #               if not isinstance(image, Image.Image):
-#                   warn("Image must be a PIL Image object for static " "matplotlib plot.")
+#                   warn(
+#                       "Image must be a PIL Image object for static "
+#                       "matplotlib plot."
+#                   )
 #   
 #               if data_coords or data_coords is None:
 #                   x1 = x + x_size
@@ -3857,7 +4453,8 @@ if __name__ == "__main__":
 #                       "matplotlib plot. 'contain' behavior is used instead."
 #                   )
 #               if sizing == "contain" and (
-#                   horizontal_alignment != "center" or vertical_alignment != "center"
+#                   horizontal_alignment != "center"
+#                   or vertical_alignment != "center"
 #               ):
 #                   warn(
 #                       "When using `sizing='contain'` with `horizontal_alignment`"
@@ -3879,6 +4476,7 @@ if __name__ == "__main__":
 #   
 #       def post_process(
 #           self,
+#           *,
 #           global_custom_func=None,
 #           mpl_custom_func=None,
 #           pty_custom_func=None,
@@ -4043,6 +4641,7 @@ if __name__ == "__main__":
 #       def save(
 #           self,
 #           path,
+#           *,
 #           export_format=None,
 #           html_no_fig_size=True,
 #           print_confirm=True,
@@ -4065,9 +4664,13 @@ if __name__ == "__main__":
 #   
 #               An iterable of multiple formats may be provided. In this case
 #               the save command will be repeated for each element.
-#           print_confirm: bool, optional
+#   
+#               If none is provided, the format will be derived from the filename.
+#           html_no_fig_size: bool, default: True
+#               Allow the HTML plot to use the entire window and auto-scale upon
+#               window resizing.
+#           print_confirm: bool, default: True
 #               Print a confirmation message where the file has been saved.
-#               Default: True
 #   
 #           Returns
 #           -------
@@ -4162,13 +4765,15 @@ if __name__ == "__main__":
 #           if self.interactive:
 #               return self.fig.show(
 #                   config=(
-#                       conf.PTY_CONFIG if self.save_config is None else self.save_config
+#                       conf.PTY_CONFIG
+#                       if self.save_config is None
+#                       else self.save_config
 #                   )
 #               )
 #           return self.fig.show()
 #   
 #       def close(self):
-#           """Close the plot."""
+#           """Close the matplotlib plot."""
 #           if not self.interactive:
 #               plt.close(self.fig)
 #   
@@ -4186,11 +4791,11 @@ if __name__ == "__main__":
 #           if self.interactive:
 #               init_notebook_mode()
 #               return self.JS_RENDER_WARNING + self.fig._repr_html_()
-#           raise NotImplementedError
+#           raise NotImplementedError("not implemented for static plots.")
 #   
 #       def _repr_png_(self):
 #           if self.interactive:
-#               raise NotImplementedError
+#               raise NotImplementedError("Not implemented for interactive plots.")
 #           bio = BytesIO()
 #           self.fig.savefig(bio, format="png")
 #           bio.seek(0)
@@ -4447,36 +5052,6 @@ if __name__ == "__main__":
 #   
 #   
 #   @magic_plot
-#   @wraps(Plot.add_fill)
-#   def fill(
-#       *args,
-#       fig,
-#       **kwargs,
-#   ):
-#       fig.add_fill(*args, **kwargs)
-#   
-#   
-#   @magic_plot
-#   @wraps(Plot.add_text)
-#   def text(
-#       *args,
-#       fig,
-#       **kwargs,
-#   ):
-#       fig.add_text(*args, **kwargs)
-#   
-#   
-#   @magic_plot
-#   @wraps(Plot.add_image)
-#   def image(
-#       *args,
-#       fig,
-#       **kwargs,
-#   ):
-#       fig.add_image(*args, **kwargs)
-#   
-#   
-#   @magic_plot
 #   @wraps(Plot.add_hist)
 #   def hist(
 #       *args,
@@ -4514,6 +5089,66 @@ if __name__ == "__main__":
 #       **kwargs,
 #   ):
 #       fig.add_regression(*args, **kwargs)
+#   
+#   
+#   @magic_plot
+#   @wraps(Plot.add_fill)
+#   def fill(
+#       *args,
+#       fig,
+#       **kwargs,
+#   ):
+#       fig.add_fill(*args, **kwargs)
+#   
+#   
+#   @magic_plot
+#   @wraps(Plot.add_hvline)
+#   def hvline(
+#       *args,
+#       fig,
+#       **kwargs,
+#   ):
+#       fig.add_hvline(*args, **kwargs)
+#   
+#   
+#   @magic_plot
+#   @wraps(Plot.add_hline)
+#   def hline(
+#       *args,
+#       fig,
+#       **kwargs,
+#   ):
+#       fig.add_hline(*args, **kwargs)
+#   
+#   
+#   @magic_plot
+#   @wraps(Plot.add_vline)
+#   def vline(
+#       *args,
+#       fig,
+#       **kwargs,
+#   ):
+#       fig.add_vline(*args, **kwargs)
+#   
+#   
+#   @magic_plot
+#   @wraps(Plot.add_text)
+#   def text(
+#       *args,
+#       fig,
+#       **kwargs,
+#   ):
+#       fig.add_text(*args, **kwargs)
+#   
+#   
+#   @magic_plot
+#   @wraps(Plot.add_image)
+#   def image(
+#       *args,
+#       fig,
+#       **kwargs,
+#   ):
+#       fig.add_image(*args, **kwargs)
 #   
 #   
 #   class ShowDataArray(NotebookInteraction):
@@ -4654,7 +5289,9 @@ if __name__ == "__main__":
 #           var = self.default_var if var is None else var
 #           sel = self.default_sel if sel is None else sel
 #           isel = self.default_isel if isel is None else isel
-#           return super()._plot_core(self.data[var], *args, sel=sel, isel=isel, **kwargs)
+#           return super()._plot_core(
+#               self.data[var], *args, sel=sel, isel=isel, **kwargs
+#           )
 #   
 ###########################
 #### interplot/conf.py ####
@@ -4727,6 +5364,24 @@ if __name__ == "__main__":
 #   MPL_FIG_SIZE = (700, 450)  # px
 #   """
 #   Default figure size for the `matplotlib` backend, in px.
+#   """
+#   
+#   
+#   MAX_LENGTH = None
+#   """
+#   Downsample traces to reduce file size.
+#   """
+#   
+#   DOWNSAMPLE_MODE = "step"
+#   """
+#   Default mode for downsampling.
+#   
+#   Options:
+#   
+#   step: Based on `max_length` and the array size, the smallest `stepsize` is
+#       determined, such that the new length is smaller or equal to `max_length`.
+#       Each `stepsize`-th element is displayed.
+#   average: Bins of length `stepsize` are averaged. The remainders are discarded.
 #   """
 #   
 #   
@@ -5281,7 +5936,6 @@ if __name__ == "__main__":
 #   
 #   import json
 #   
-#   
 #   _active = False
 #   """Whether to watch for events."""
 #   _save_to_log = True
@@ -5331,8 +5985,6 @@ if __name__ == "__main__":
 #   
 #   def get_log(index=None):
 #       """Get the logged events."""
-#       global log
-#   
 #       if index is None:
 #           return log
 #   
@@ -5358,8 +6010,6 @@ if __name__ == "__main__":
 #   
 #       @wraps(core)
 #       def inner(*args, core=core, **kwargs):
-#           global _active, _save_to_log, _verbose
-#   
 #           if not _active:
 #               return core(*args, **kwargs)
 #   
