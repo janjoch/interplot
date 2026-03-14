@@ -1,6 +1,7 @@
 from functools import wraps
 import inspect
 from PIL import Image
+from warnings import warn
 
 import interplot as ip
 
@@ -10,17 +11,10 @@ import matplotlib.pyplot as plt
 
 import numpy as np
 
-import pandas as pd
-
 
 # prepare some 2d data
 np.random.seed(10)
 data2d = np.random.normal(1, 1, (5, 5))
-df2d = pd.DataFrame(
-    data=data2d,
-    columns=("A", "B", "C", "D", "E"),
-    index=(5, 10, 15, 20, 25),
-)
 
 
 @pytest.mark.skip(reason="just a decorator, for no error assertion")
@@ -165,15 +159,27 @@ def test_bar_adv(interactive):
 
 @test_for_errors
 def test_2d_data(interactive):
-    fig = ip.Plot(rows=2, cols=2, interactive=interactive)
+    try:
+        import pandas as pd
 
-    fig.add_line(data2d)
-    fig.add_line(df2d, col=1)
+        df2d = pd.DataFrame(
+            data=data2d,
+            columns=("A", "B", "C", "D", "E"),
+            index=(5, 10, 15, 20, 25),
+        )
 
-    fig.add_bar(data2d, row=1)
-    fig.add_bar(df2d, col=1, row=1)
+        fig = ip.Plot(rows=2, cols=2, interactive=interactive)
 
-    fig.post_process()
+        fig.add_line(data2d)
+        fig.add_line(df2d, col=1)
+
+        fig.add_bar(data2d, row=1)
+        fig.add_bar(df2d, col=1, row=1)
+
+        fig.post_process()
+
+    except ImportError:
+        warn("pandas not installed")
 
 
 @test_for_errors

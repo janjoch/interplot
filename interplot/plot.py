@@ -29,11 +29,6 @@ import uuid
 
 import numpy as np
 
-from pandas.core.series import Series as pd_Series
-from pandas.core.frame import DataFrame as pd_DataFrame
-
-from xarray.core.dataarray import DataArray as xr_DataArray
-
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 
@@ -41,6 +36,23 @@ import plotly.graph_objects as go
 import plotly.express as px
 import plotly.subplots as sp
 import plotly.offline
+
+try:
+    from xarray.core.dataarray import DataArray as xr_DataArray
+
+except ImportError:
+    class xr_DataArray:
+        pass
+
+try:
+    from pandas.core.series import Series as pd_Series
+    from pandas.core.frame import DataFrame as pd_DataFrame
+
+except ImportError:
+    class pd_Series:
+        pass
+    class pd_DataFrame:
+        pass
 
 from . import conf
 from .iter import ITERABLE_TYPES, zip_smart, filter_nozip
@@ -1586,7 +1598,8 @@ class Plot(NotebookInteraction):
             )
             x, y = arraytools.downsample(
                 max_length,
-                x, y,
+                x,
+                y,
                 mode=downsample_mode,
             )
             if x_error is not None:
@@ -2011,7 +2024,8 @@ class Plot(NotebookInteraction):
     def add_boxplot(
         self,
         x,
-        /, *,
+        /,
+        *,
         horizontal=False,
         label=None,
         show_legend=None,
@@ -2499,7 +2513,8 @@ class Plot(NotebookInteraction):
     def add_hvline(
         self,
         pos,
-        /, *,
+        /,
+        *,
         horizontal=True,
         line_style="solid",
         line_width=None,

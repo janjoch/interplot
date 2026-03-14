@@ -28,7 +28,6 @@ import datetime as dt
 
 import json
 
-
 _active = False
 """Whether to watch for events."""
 _save_to_log = True

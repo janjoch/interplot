@@ -5,7 +5,13 @@ from datetime import datetime
 from types import GeneratorType
 
 from numpy import ndarray as np_ndarray
-from pandas.core.series import Series as pd_Series
+
+try:
+    from pandas.core.series import Series as pd_Series
+
+except ImportError:
+    class pd_Series:
+        pass
 
 
 ITERABLE_TYPES = (

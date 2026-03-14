@@ -3,19 +3,47 @@ A collection of useful functions to work with numpy arrays.
 """
 
 import math
+from warnings import warn
 
 import numpy as np
 
 import scipy.stats as sp_stats
 
-import pandas as pd
+try:
+    from pandas.core.series import Series as pd_Series
+    from pandas import Series
 
-import numba as nb
+except ImportError:
+    class pd_Series:
+        pass
+    class Series:
+        pass
+
+
+__warn_numba_import = False
+
+try:
+    from numba import jit, prange
+
+    __warn_numba_import = False
+
+except ImportError:
+    __warn_numba_import = True
+
+    def jit(**_):
+        def decorator(func):
+            def wrapper(*args, **kwargs):
+                return func(*args, **kwargs)
+
+            return wrapper
+
+        return decorator
+
+    prange = range
 
 from . import plot
 
-
-LISTLIKE_TYPES = (tuple, list, np.ndarray, pd.core.series.Series)
+LISTLIKE_TYPES = (tuple, list, np.ndarray, pd_Series)
 
 
 def _new_pd_index(series, n):
@@ -46,10 +74,17 @@ def lowpass(data, n=101, new_index=None):
     if n == 1:
         return data
 
+    global __warn_numba_import
+    if __warn_numba_import:
+        warn(
+            "Import numba to speed up the lowpass filtering: `pip install numba`"
+        )
+        __warn_numba_import = False
+
     # pandas Series
-    if isinstance(data, pd.core.series.Series):
+    if isinstance(data, pd_Series):
         new_index = _new_pd_index(data, n) if new_index is None else new_index
-        return pd.Series(
+        return Series(
             lowpass_core(np.array(data), n),
             index=new_index,
         )
@@ -62,7 +97,7 @@ def lowpass(data, n=101, new_index=None):
     raise TypeError("Data type not supported:\n{}".format(type(data)))
 
 
-@nb.jit(nopython=True, parallel=True)
+@jit(nopython=True, parallel=True)
 def lowpass_core(data, n):
     """
     Average symetrically over n data points.
@@ -81,7 +116,7 @@ def lowpass_core(data, n):
     size = data.size - n + 1
 
     array = np.empty(size, dtype=data.dtype)
-    for i in nb.prange(size):
+    for i in prange(size):
         array[i] = np.mean(data[i : i + n])
 
     return array
@@ -119,7 +154,7 @@ def highpass(
         raise ValueError("n must be odd!")
 
     # pandas Series
-    if isinstance(data, pd.core.series.Series):
+    if isinstance(data, pd_Series):
         new_index = _new_pd_index(data, n) if new_index is None else new_index
         return data[((n - 1) // 2) : -((n - 1) // 2)] - lowpass(
             np.array(data), n, new_index=new_index
@@ -197,10 +232,10 @@ def downsample(max_length, *x, mode="step", axis=0):
     """
     if mode == "step":
         return downsample_step(max_length, *x, axis=axis)
-    
+
     elif mode == "average":
         return downsample_average(max_length, *x, axis=axis)
-    
+
     else:
         raise NotImplementedError(
             f"{mode=} is not implemented for downsampling."
@@ -239,11 +274,7 @@ def downsample_step(max_length, *x, axis=0):
     if len(x) == 1:
         return x[0][s]
 
-    return [
-        y[s]
-        for y
-        in x
-    ]
+    return [y[s] for y in x]
 
 
 def _downsample_average_item(x, transp, step, length):
@@ -289,12 +320,9 @@ def downsample_average(max_length, *x, axis=0):
 
     if len(x) == 1:
         return _downsample_average_item(x[0], transp, step, length)
-    
-    return [
-        _downsample_average_item(y, transp, step, length)
-        for y
-        in x
-    ]
+
+    return [_downsample_average_item(y, transp, step, length) for y in x]
+
 
 class LinearRegression(plot.NotebookInteraction):
     """
@@ -337,6 +365,7 @@ class LinearRegression(plot.NotebookInteraction):
         t statistics
     ...
     """
+
     def __init__(
         self,
         x,
