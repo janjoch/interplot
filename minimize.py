@@ -30,7 +30,6 @@ import re
 import io
 from pathlib import Path
 
-
 files_to_minimize = [
     "setup.py",
     "requirements.txt",

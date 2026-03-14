@@ -11,6 +11,9 @@ numba
 jupyter
 jupyterlab
 
+# pre-commit checks and formatting
+pre-commit
+
 # documentation
 sphinx
 numpydoc

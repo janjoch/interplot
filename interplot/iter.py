@@ -10,6 +10,7 @@ try:
     from pandas.core.series import Series as pd_Series
 
 except ImportError:
+
     class pd_Series:
         pass
 

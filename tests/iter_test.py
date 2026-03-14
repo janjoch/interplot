@@ -8,6 +8,7 @@ from numpy import array
 
 try:
     from pandas import DataFrame, Series
+
     s = Series((1, 2))
     df = DataFrame(data=array(((1, 2), (3, 4))), columns=("A", "B"))
 

@@ -27,12 +27,12 @@ def test_downsample_average_small():
     a = np.arange(100)
     a_ = at.downsample_average(20, a)
     assert len(a_) == 20
-    assert a_[0] == 2.
-    assert a_[-1] == 97.
+    assert a_[0] == 2.0
+    assert a_[-1] == 97.0
 
     b_ = at.downsample_average(20, a[:-1])
     assert len(b_) == 19
-    assert b_[-1] == 92.
+    assert b_[-1] == 92.0
 
 
 def test_downsample_multiple():
@@ -42,10 +42,12 @@ def test_downsample_multiple():
     a_, b_ = at.downsample(20, a, b)
     assert len(a_) == len(b_)
 
+
 def test_downsample_step_2d():
-    aa = np.random.normal(size=(10,123))
+    aa = np.random.normal(size=(10, 123))
     aa_ = at.downsample(13, aa, axis=1)
     assert aa_.shape == (10, 13)
+
 
 def test_downsample_average_4d():
     aaaa = np.random.normal(size=(10, 5, 123, 4))

@@ -11,7 +11,6 @@ import matplotlib.pyplot as plt
 
 import numpy as np
 
-
 # prepare some 2d data
 np.random.seed(10)
 data2d = np.random.normal(1, 1, (5, 5))
@@ -130,11 +129,7 @@ def test_line_colors(color, interactive):
 
 @test_for_errors
 def test_bar_basic(interactive):
-    ip.bar(
-        [1, 2, 3],
-        [4, 5, 6],
-        interactive=interactive
-    )
+    ip.bar([1, 2, 3], [4, 5, 6], interactive=interactive)
 
 
 @test_for_errors
@@ -186,11 +181,11 @@ def test_2d_data(interactive):
 def test_hvline(interactive):
     fig = ip.Plot(rows=2, cols=2, interactive=interactive)
 
-    fig.add_hline(2.)
-    fig.add_hline((2., 3.), row=1)
+    fig.add_hline(2.0)
+    fig.add_hline((2.0, 3.0), row=1)
 
-    fig.add_vline(2., col=1)
-    fig.add_vline((2., 3.), col=1, row=1)
+    fig.add_vline(2.0, col=1)
+    fig.add_vline((2.0, 3.0), col=1, row=1)
 
     fig.post_process()
 

@@ -41,18 +41,23 @@ try:
     from xarray.core.dataarray import DataArray as xr_DataArray
 
 except ImportError:
+
     class xr_DataArray:
         pass
+
 
 try:
     from pandas.core.series import Series as pd_Series
     from pandas.core.frame import DataFrame as pd_DataFrame
 
 except ImportError:
+
     class pd_Series:
         pass
+
     class pd_DataFrame:
         pass
+
 
 from . import conf
 from .iter import ITERABLE_TYPES, zip_smart, filter_nozip

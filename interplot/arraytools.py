@@ -14,8 +14,10 @@ try:
     from pandas import Series
 
 except ImportError:
+
     class pd_Series:
         pass
+
     class Series:
         pass
 
