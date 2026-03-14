@@ -1,16 +1,24 @@
+from warnings import warn
+
 import interplot
 
 import pytest
 
 from numpy import array
 
-from pandas import DataFrame, Series
+try:
+    from pandas import DataFrame, Series
+    s = Series((1, 2))
+    df = DataFrame(data=array(((1, 2), (3, 4))), columns=("A", "B"))
+
+except ImportError:
+    warn("pandas not found. Fallback to tuples to pass testing.")
+    s = (1, 2)
+    df = ("A", "B")
 
 
 dct = {1: 5, 2: 6}
 a = array((1, 2))
-s = Series((1, 2))
-df = DataFrame(data=array(((1, 2), (3, 4))), columns=("A", "B"))
 
 
 @pytest.mark.parametrize(

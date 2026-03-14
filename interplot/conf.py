@@ -78,7 +78,7 @@ DOWNSAMPLE_MODE = "step"
 """
 Default mode for downsampling.
 
-Options: 
+Options:
 
 step: Based on `max_length` and the array size, the smallest `stepsize` is
     determined, such that the new length is smaller or equal to `max_length`.
