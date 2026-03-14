@@ -189,14 +189,11 @@ if __name__ == "__main__":
 ##########################
 #### requirements.txt ####
 ##########################
-#   numba
 #   numpy
-#   pandas
 #   matplotlib
 #   plotly
 #   kaleido
 #   scipy
-#   xarray
 #   
 ###################
 #### README.md ####
@@ -500,19 +497,47 @@ if __name__ == "__main__":
 #   """
 #   
 #   import math
+#   from warnings import warn
 #   
 #   import numpy as np
 #   
 #   import scipy.stats as sp_stats
 #   
-#   import pandas as pd
+#   try:
+#       from pandas.core.series import Series as pd_Series
+#       from pandas import Series
 #   
-#   import numba as nb
+#   except ImportError:
+#       class pd_Series:
+#           pass
+#       class Series:
+#           pass
+#   
+#   
+#   __warn_numba_import = False
+#   
+#   try:
+#       from numba import jit, prange
+#   
+#       __warn_numba_import = False
+#   
+#   except ImportError:
+#       __warn_numba_import = True
+#   
+#       def jit(**_):
+#           def decorator(func):
+#               def wrapper(*args, **kwargs):
+#                   return func(*args, **kwargs)
+#   
+#               return wrapper
+#   
+#           return decorator
+#   
+#       prange = range
 #   
 #   from . import plot
 #   
-#   
-#   LISTLIKE_TYPES = (tuple, list, np.ndarray, pd.core.series.Series)
+#   LISTLIKE_TYPES = (tuple, list, np.ndarray, pd_Series)
 #   
 #   
 #   def _new_pd_index(series, n):
@@ -543,10 +568,17 @@ if __name__ == "__main__":
 #       if n == 1:
 #           return data
 #   
+#       global __warn_numba_import
+#       if __warn_numba_import:
+#           warn(
+#               "Import numba to speed up the lowpass filtering: `pip install numba`"
+#           )
+#           __warn_numba_import = False
+#   
 #       # pandas Series
-#       if isinstance(data, pd.core.series.Series):
+#       if isinstance(data, pd_Series):
 #           new_index = _new_pd_index(data, n) if new_index is None else new_index
-#           return pd.Series(
+#           return Series(
 #               lowpass_core(np.array(data), n),
 #               index=new_index,
 #           )
@@ -559,7 +591,7 @@ if __name__ == "__main__":
 #       raise TypeError("Data type not supported:\n{}".format(type(data)))
 #   
 #   
-#   @nb.jit(nopython=True, parallel=True)
+#   @jit(nopython=True, parallel=True)
 #   def lowpass_core(data, n):
 #       """
 #       Average symetrically over n data points.
@@ -578,7 +610,7 @@ if __name__ == "__main__":
 #       size = data.size - n + 1
 #   
 #       array = np.empty(size, dtype=data.dtype)
-#       for i in nb.prange(size):
+#       for i in prange(size):
 #           array[i] = np.mean(data[i : i + n])
 #   
 #       return array
@@ -616,7 +648,7 @@ if __name__ == "__main__":
 #           raise ValueError("n must be odd!")
 #   
 #       # pandas Series
-#       if isinstance(data, pd.core.series.Series):
+#       if isinstance(data, pd_Series):
 #           new_index = _new_pd_index(data, n) if new_index is None else new_index
 #           return data[((n - 1) // 2) : -((n - 1) // 2)] - lowpass(
 #               np.array(data), n, new_index=new_index
@@ -694,10 +726,10 @@ if __name__ == "__main__":
 #       """
 #       if mode == "step":
 #           return downsample_step(max_length, *x, axis=axis)
-#       
+#   
 #       elif mode == "average":
 #           return downsample_average(max_length, *x, axis=axis)
-#       
+#   
 #       else:
 #           raise NotImplementedError(
 #               f"{mode=} is not implemented for downsampling."
@@ -736,11 +768,7 @@ if __name__ == "__main__":
 #       if len(x) == 1:
 #           return x[0][s]
 #   
-#       return [
-#           y[s]
-#           for y
-#           in x
-#       ]
+#       return [y[s] for y in x]
 #   
 #   
 #   def _downsample_average_item(x, transp, step, length):
@@ -786,12 +814,9 @@ if __name__ == "__main__":
 #   
 #       if len(x) == 1:
 #           return _downsample_average_item(x[0], transp, step, length)
-#       
-#       return [
-#           _downsample_average_item(y, transp, step, length)
-#           for y
-#           in x
-#       ]
+#   
+#       return [_downsample_average_item(y, transp, step, length) for y in x]
+#   
 #   
 #   class LinearRegression(plot.NotebookInteraction):
 #       """
@@ -834,6 +859,7 @@ if __name__ == "__main__":
 #           t statistics
 #       ...
 #       """
+#   
 #       def __init__(
 #           self,
 #           x,
@@ -1062,7 +1088,13 @@ if __name__ == "__main__":
 #   from types import GeneratorType
 #   
 #   from numpy import ndarray as np_ndarray
-#   from pandas.core.series import Series as pd_Series
+#   
+#   try:
+#       from pandas.core.series import Series as pd_Series
+#   
+#   except ImportError:
+#       class pd_Series:
+#           pass
 #   
 #   
 #   ITERABLE_TYPES = (
@@ -1503,11 +1535,6 @@ if __name__ == "__main__":
 #   
 #   import numpy as np
 #   
-#   from pandas.core.series import Series as pd_Series
-#   from pandas.core.frame import DataFrame as pd_DataFrame
-#   
-#   from xarray.core.dataarray import DataArray as xr_DataArray
-#   
 #   import matplotlib.pyplot as plt
 #   import matplotlib.colors as mcolors
 #   
@@ -1515,6 +1542,23 @@ if __name__ == "__main__":
 #   import plotly.express as px
 #   import plotly.subplots as sp
 #   import plotly.offline
+#   
+#   try:
+#       from xarray.core.dataarray import DataArray as xr_DataArray
+#   
+#   except ImportError:
+#       class xr_DataArray:
+#           pass
+#   
+#   try:
+#       from pandas.core.series import Series as pd_Series
+#       from pandas.core.frame import DataFrame as pd_DataFrame
+#   
+#   except ImportError:
+#       class pd_Series:
+#           pass
+#       class pd_DataFrame:
+#           pass
 #   
 #   from . import conf
 #   from .iter import ITERABLE_TYPES, zip_smart, filter_nozip
@@ -3060,7 +3104,8 @@ if __name__ == "__main__":
 #               )
 #               x, y = arraytools.downsample(
 #                   max_length,
-#                   x, y,
+#                   x,
+#                   y,
 #                   mode=downsample_mode,
 #               )
 #               if x_error is not None:
@@ -3485,7 +3530,8 @@ if __name__ == "__main__":
 #       def add_boxplot(
 #           self,
 #           x,
-#           /, *,
+#           /,
+#           *,
 #           horizontal=False,
 #           label=None,
 #           show_legend=None,
@@ -3973,7 +4019,8 @@ if __name__ == "__main__":
 #       def add_hvline(
 #           self,
 #           pos,
-#           /, *,
+#           /,
+#           *,
 #           horizontal=True,
 #           line_style="solid",
 #           line_width=None,
@@ -5329,7 +5376,7 @@ if __name__ == "__main__":
 #   """
 #   Default mode for downsampling.
 #   
-#   Options: 
+#   Options:
 #   
 #   step: Based on `max_length` and the array size, the smallest `stepsize` is
 #       determined, such that the new length is smaller or equal to `max_length`.
@@ -5888,7 +5935,6 @@ if __name__ == "__main__":
 #   import datetime as dt
 #   
 #   import json
-#   
 #   
 #   _active = False
 #   """Whether to watch for events."""
