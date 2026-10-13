@@ -753,8 +753,11 @@ class Plot(NotebookInteraction):
         ylog=False,
         shared_xaxes=False,
         shared_yaxes=False,
+        secondary=False,
         column_widths=None,
         row_heights=None,
+        horizontal_spacing=None,  # also implement for matplotlib?
+        vertical_spacing=None,  # "
         fig_size=None,
         dpi=None,
         legend_loc=None,
@@ -821,6 +824,13 @@ class Plot(NotebookInteraction):
 
             # init fig
             figure = go.Figure()
+            specs = [
+                [
+                    {"secondary_y": sec}
+                    for _, sec in zip_smart(range(cols), sec_col)
+                ]
+                for _, sec_col in zip_smart(range(rows), secondary)
+            ]
             self.fig = sp.make_subplots(
                 rows=rows,
                 cols=cols,
@@ -829,6 +839,9 @@ class Plot(NotebookInteraction):
                 row_heights=row_heights,
                 column_widths=column_widths,
                 figure=figure,
+                specs=specs,
+                horizontal_spacing=horizontal_spacing,
+                vertical_spacing=vertical_spacing,
             )
 
         # init matplotlib
@@ -912,7 +925,7 @@ class Plot(NotebookInteraction):
         )
 
     @staticmethod
-    def init(fig=None, *args, **kwargs):
+    def init(fig=None, *args, override=None, **kwargs):
         """
         Initialize a Plot instance, if not already initialized.
 
@@ -921,11 +934,27 @@ class Plot(NotebookInteraction):
         fig: Plot or any
             If fig is a Plot instance, return it.
             Otherwise, create a new Plot instance.
+        override: dict, optional
+            Parameters passed within `override` will override the according
+            parameter in `kwargs`.
         *args, **kwargs: any
             Passed to Plot.__init__.
+
+        Examples
+        --------
+        ```python
+        >>> def func(arrays, fig=None):
+        ...     fig = ip.Plot.init(
+        ...         fig=fig,  # if the user wants to provide a custom figure
+        ...         rows=len()
+        ...     )
+        ...     for array in arrays:
+        ```
         """
         if isinstance(fig, Plot):
             return fig
+        if override is not None:
+            kwargs.update(override)
         return Plot(*args, **kwargs)
 
     def _digest_label(self, label, default_label=None, show_legend=None):
@@ -1422,6 +1451,7 @@ class Plot(NotebookInteraction):
         *,
         x_error=None,
         y_error=None,
+        secondary=False,
         mode=None,
         line_style="solid",
         line_width=None,
@@ -1471,6 +1501,8 @@ class Plot(NotebookInteraction):
                     contains the lower errors, the second row contains the
                     upper errors.
                 - None: No errorbar.
+        secondary: bool, default: False
+            Show the trace with a secondary y axis on the right
         mode: str, optional
             Options: `lines` / `lines+markers` / `markers`
 
@@ -1703,6 +1735,7 @@ class Plot(NotebookInteraction):
                 ),
                 row=row,
                 col=col,
+                secondary_y=secondary,
             )
 
         # MATPLOTLIB
@@ -1772,6 +1805,7 @@ class Plot(NotebookInteraction):
         y=None,
         *,
         horizontal=False,
+        secondary=False,
         width=0.8,
         label=None,
         show_legend=None,
@@ -1889,6 +1923,7 @@ class Plot(NotebookInteraction):
                 ),
                 row=row,
                 col=col,
+                secondary_y=secondary,
             )
 
         else:
@@ -1924,6 +1959,7 @@ class Plot(NotebookInteraction):
         x=None,
         y=None,
         *,
+        secondary=False,
         bins=None,
         density=False,
         label=None,
@@ -2003,6 +2039,7 @@ class Plot(NotebookInteraction):
                 ),
                 row=row,
                 col=col,
+                secondary_y=secondary,
             )
 
         # MATPLOTLIB
@@ -2032,6 +2069,7 @@ class Plot(NotebookInteraction):
         /,
         *,
         horizontal=False,
+        secondary=False,
         label=None,
         show_legend=None,
         color=None,
@@ -2119,6 +2157,7 @@ class Plot(NotebookInteraction):
                 ),
                 row=row,
                 col=col,
+                secondary_y=secondary,
             )
 
         # MATPLOTLIB
@@ -2160,6 +2199,7 @@ class Plot(NotebookInteraction):
         aspect=1,
         invert_x=False,
         invert_y=False,
+        secondary=False,
         cmap="rainbow",
         cmap_under=None,
         cmap_over=None,
@@ -2275,6 +2315,7 @@ class Plot(NotebookInteraction):
                 ),
                 row=row,
                 col=col,
+                secondary_y=secondary,
             )
             self.fig.update_xaxes(
                 autorange=("reversed" if invert_x else None),
@@ -2380,6 +2421,7 @@ class Plot(NotebookInteraction):
         y1,
         y2=None,
         *,
+        secondary=False,
         label=None,
         mode="lines",
         color=None,
@@ -2475,6 +2517,7 @@ class Plot(NotebookInteraction):
                 ),
                 row=row,
                 col=col,
+                secondary_y=secondary,
             )
             self.fig.add_trace(
                 go.Scatter(
@@ -2493,6 +2536,7 @@ class Plot(NotebookInteraction):
                 ),
                 row=row,
                 col=col,
+                secondary_y=secondary,
             )
 
         # MATPLOTLIB
@@ -2521,6 +2565,7 @@ class Plot(NotebookInteraction):
         /,
         *,
         horizontal=True,
+        secondary=False,
         line_style="solid",
         line_width=None,
         label=None,
@@ -2612,6 +2657,7 @@ class Plot(NotebookInteraction):
                 col=col,
                 line_color=color,
                 line_width=line_width,
+                secondary_y=secondary,
                 line_dash=conf.PTY_LINE_STYLES.get(line_style, line_style),
                 **self._digest_label(
                     label,
@@ -2659,6 +2705,7 @@ class Plot(NotebookInteraction):
         *,
         horizontal_alignment="center",
         vertical_alignment="center",
+        secondary=False,
         text_alignment=None,
         data_coords=None,
         x_data_coords=True,
@@ -2758,6 +2805,7 @@ class Plot(NotebookInteraction):
                 + x_domain,
                 yref=self._get_plotly_anchor("y", self.cols, row, col)
                 + y_domain,
+                secondary_y=secondary,
                 font=dict(color=self.digest_color(color, opacity)),
                 row=row,
                 col=col,
@@ -2803,6 +2851,7 @@ class Plot(NotebookInteraction):
         horizontal_alignment="center",
         vertical_alignment="center",
         data_coords=True,
+        secondary=False,
         x_size=1,
         y_size=1,
         sizing="contain",
@@ -2888,6 +2937,7 @@ class Plot(NotebookInteraction):
                     + y_domain,
                     xanchor=horizontal_alignment,
                     yanchor=vertical_alignment,
+                    secondary_y=secondary,
                     sizex=x_size,
                     sizey=y_size,
                     sizing=sizing,
@@ -3361,8 +3411,11 @@ def magic_plot(core, doc_decorator=None):
         ylog=False,
         shared_xaxes=False,
         shared_yaxes=False,
+        secondary=False,
         column_widths=None,
         row_heights=None,
+        horizontal_spacing=None,
+        vertical_spacing=None,
         fig_size=None,
         dpi=None,
         legend_loc=None,
@@ -3393,8 +3446,11 @@ def magic_plot(core, doc_decorator=None):
             ylog=ylog,
             shared_xaxes=shared_xaxes,
             shared_yaxes=shared_yaxes,
+            secondary=secondary,
             column_widths=column_widths,
             row_heights=row_heights,
+            horizontal_spacing=horizontal_spacing,
+            vertical_spacing=vertical_spacing,
             fig_size=fig_size,
             dpi=dpi,
             legend_loc=legend_loc,
